@@ -2,6 +2,7 @@ package com.zero.customview;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
@@ -93,7 +94,11 @@ public class MainActivity extends AppCompatActivity
 
 
     public void onDebug(View view) {
-        showSpeakDialog(view);
+        toNormalKeyBoard(view);
+    }
+
+    public void toNormalKeyBoard(View view) {
+        startActivity(new Intent(this, NormalKeyBoardActivity.class));
     }
 
     public void dardBackground(Activity context, float alpha) {

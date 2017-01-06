@@ -108,7 +108,7 @@ public class MultilevelProgressBar extends ProgressBar {
             mPaint.setColor(mSecondColor);
             canvas.drawCircle(centre, centre, radius, mPaint);
             mPaint.setColor(mFirstColor);
-            canvas.drawArc(oval, -90, mProgress, false, mPaint); 
+            canvas.drawArc(oval, -90, mProgress, false, mPaint);
         }
     }
 }

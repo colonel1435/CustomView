@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">CustomView</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="recognize_title">识别中</string>
+    <string name="speak_title">请讲话</string>
+    <string name="recognize_err">识别错误...</string>
+    <string name="speak_null">您好像没有说话哦...</string>
+    <string name="net_err">网络未连接哦...</string>
+    <string name="speak_null_toast">您好像还没有说话哦!</string>
+    <string name="net_err_toast">请连接网络再试!</string>
+    <string name="recognize_err_toast">识别错误，请重试！</string>
+</resources>

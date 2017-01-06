@@ -34,6 +34,16 @@
         wumin:progress_reached_color="@color/colorCadeBlue"
         wumin:progress_reached_height="5dp"
         wumin:progress_unreached_height="5dp"/>
+    <com.zero.customview.view.MultilevelProgressBar
+        android:id="@+id/multilevel_progress_bar"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="20dp"
+        wumin:circleWidth="15dp"
+        wumin:firstColor="@color/colorCadeBlue"
+        wumin:secondColor="@color/colorLightRed"
+        wumin:speed="30" />
+
     <FrameLayout
         android:id="@+id/fl_progressbar"
         android:layout_width="wrap_content"

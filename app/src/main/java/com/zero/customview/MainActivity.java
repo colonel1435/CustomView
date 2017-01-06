@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zero.customview.view.HorizontalProgressBar;
+import com.zero.customview.view.MultilevelProgressBar;
 import com.zero.customview.view.RoundImageDrawable;
 import com.zero.customview.view.RoundProgressBar;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView mTest;
     private HorizontalProgressBar mHorizontalProgress;
     private RoundProgressBar mRoundProgress;
+    private MultilevelProgressBar mMultiLevelProgress;
     public static final int HORIZONTAL_PROGRESSBAR_UPDATE = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class MainActivity extends AppCompatActivity
         mHorizontalProgress.setMax(100);
         mRoundProgress = (RoundProgressBar) findViewById(R.id.round_progress_bar);
         mRoundProgress.setMax(100);
+        mMultiLevelProgress = (MultilevelProgressBar) findViewById(R.id.multilevel_progress_bar);
+        mMultiLevelProgress.setIndeterminate(true);
         mHandler.sendEmptyMessage(HORIZONTAL_PROGRESSBAR_UPDATE);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

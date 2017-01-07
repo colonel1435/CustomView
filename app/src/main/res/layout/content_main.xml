@@ -6,70 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     tools:context="com.zero.customview.MainActivity">
 
     <ImageView
-        android:id="@+id/iv_test"
+        android:id="@+id/iv_header"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <com.zero.customview.view.HorizontalProgressBar
-        android:id="@+id/horizontal_progress_bar"
-        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:padding="10dp"
-        wumin:progress_text_color = "@color/colorCadeBlue"
-        wumin:progress_unreached_height="5dp"
-        wumin:progress_reached_height="5dp"/>
+        android:layout_gravity="center"/>
 
-    <com.zero.customview.view.RoundProgressBar
-        android:id="@+id/round_progress_bar"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_button_list"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:padding="10dp"
-        wumin:radius="200dp"
-        wumin:progress_text_color="@color/colorCadeBlue"
-        wumin:progress_reached_color="@color/colorCadeBlue"
-        wumin:progress_reached_height="5dp"
-        wumin:progress_unreached_height="5dp"/>
-    <com.zero.customview.view.MultilevelProgressBar
-        android:id="@+id/multilevel_progress_bar"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="20dp"
-        wumin:circleWidth="15dp"
-        wumin:firstColor="@color/colorCadeBlue"
-        wumin:secondColor="@color/colorLightRed"
-        wumin:speed="30" />
+        android:layout_marginTop="@dimen/item_margin_top">
 
-    <FrameLayout
-        android:id="@+id/fl_progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="识别中"/>
-        <ProgressBar
-            android:id="@+id/pbar_voice"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_below="@+id/tv_voice_info"
-            android:indeterminate="true"
-            android:indeterminateDrawable="@drawable/rotate_progressbar" />
-    </FrameLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/item_margin_top"
-        android:text="测试"
-        android:background="@drawable/round_button_shape"
-        android:onClick="onDebug"/>
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>

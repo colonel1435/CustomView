@@ -13,4 +13,9 @@
     <string name="speak_null_toast">您好像还没有说话哦!</string>
     <string name="net_err_toast">请连接网络再试!</string>
     <string name="recognize_err_toast">识别错误，请重试！</string>
+
+    <string name="progress_bar_item">Custom ProgressBar</string>
+    <string name="draw_view_item">Draw View</string>
+    <string name="virtual_num_keyboard_item">Virtual KeyBoard</string>
+    <string name="shape_view_item">Shape View</string>
 </resources>

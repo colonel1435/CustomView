@@ -53,6 +53,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.Mac;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_DRAW_VIEW = 1;
     private static final int ITEM_VIRTUAL_NUM_KEYBOARD = 2;
     private static final int ITEM_SHAPE_VIEW = 3;
+    private static final int ITEM_DOWNLOAD = 4;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.draw_view_item));
         mDatas.add(getString(R.string.virtual_num_keyboard_item));
         mDatas.add(getString(R.string.shape_view_item));
+        mDatas.add(getString(R.string.task_download));
     }
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,7 +94,7 @@ public class MainActivity extends AppCompatActivity
 
         mTest = (ImageView) findViewById(R.id.iv_header);
         Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.test);
-        mTest.setImageDrawable(new RoundImageDrawable(bmp));
+        mTest.setImageDrawable(new RoundImageDrawable(bmp, 200));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +157,10 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(MainActivity.this, NormalKeyBoardActivity.class));
                 break;
             case ITEM_SHAPE_VIEW:
+                startActivity(new Intent(MainActivity.this, ShapeActivity.class));
+                break;
+            case ITEM_DOWNLOAD:
+                startActivity(new Intent(MainActivity.this, DownloadActivity.class));
                 break;
         }
     }

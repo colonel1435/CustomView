@@ -14,8 +14,16 @@
     <string name="net_err_toast">请连接网络再试!</string>
     <string name="recognize_err_toast">识别错误，请重试！</string>
 
+    <string name="download_title">下载中</string>
+
     <string name="progress_bar_item">Custom ProgressBar</string>
     <string name="draw_view_item">Draw View</string>
     <string name="virtual_num_keyboard_item">Virtual KeyBoard</string>
     <string name="shape_view_item">Shape View</string>
+    <string name="task_download">Download</string>
+    <string name="msg_title">温馨提示</string>
+    <string name="look_raw">您想查看原图吗？</string>
+    <string name="look_cut">您想查看裁剪图吗？</string>
+    <string name="look_scale">您想查看缩放图吗？</string>
+    <string name="take_photo">您想拍照吗？</string>
 </resources>

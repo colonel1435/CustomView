@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="sixangleImageView">
+        <attr name="bgColor" format="color|reference"/>
+        <attr name="titleText" format="string"/>
+        <attr name="titleSize" format="dimension"/>
+        <attr name="textMarginBottom" format="integer"/>
+        <attr name="sideLength" format="integer"/>
+        <attr name="imageRadius" format="integer"/>
+        <attr name="logoImage" format="reference"/>
+    </declare-styleable>
+</resources>

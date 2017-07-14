@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_VIRTUAL_NUM_KEYBOARD = 2;
     private static final int ITEM_SHAPE_VIEW = 3;
     private static final int ITEM_DOWNLOAD = 4;
+    private static final int ITEM_CANVAS_VIEW = 5;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.virtual_num_keyboard_item));
         mDatas.add(getString(R.string.shape_view_item));
         mDatas.add(getString(R.string.task_download));
+        mDatas.add(getString(R.string.canvas_view));
     }
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -161,6 +163,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_DOWNLOAD:
                 startActivity(new Intent(MainActivity.this, DownloadActivity.class));
+                break;
+            case ITEM_CANVAS_VIEW:
+                startActivity(new Intent(MainActivity.this, CanvasViewActivity.class));
+                break;
+            default:
                 break;
         }
     }

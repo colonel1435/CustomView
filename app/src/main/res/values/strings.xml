@@ -26,4 +26,5 @@
     <string name="look_cut">您想查看裁剪图吗？</string>
     <string name="look_scale">您想查看缩放图吗？</string>
     <string name="take_photo">您想拍照吗？</string>
+    <string name="canvas_view">Canvas View</string>
 </resources>

@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.view.View;
 import com.zero.customview.R;
 
@@ -20,8 +22,16 @@ class ClockView extends View {
 
     Paint paint;
 
-    public ClockView(Context context) {
-        super(context);
+    public ClockView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        initSetup(context);
+    }
+
+    public ClockView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public void initSetup(Context context) {
         paint = new Paint(); //设置一个笔刷大小是3的黄色的画笔
         paint.setColor(Color.WHITE);
         paint.setStrokeJoin(Paint.Join.ROUND);

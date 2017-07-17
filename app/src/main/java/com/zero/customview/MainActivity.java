@@ -39,6 +39,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.orhanobut.logger.Logger;
 import com.zero.customview.adapter.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.RecyclerItemClickListener;
 import com.zero.customview.adapter.RecyclerViewCommonAdapter;
@@ -79,6 +80,8 @@ public class MainActivity extends AppCompatActivity
 
         initData();
         initView();
+
+        Logger.init("wumin").methodCount(0);
     }
 
     private void initData() {

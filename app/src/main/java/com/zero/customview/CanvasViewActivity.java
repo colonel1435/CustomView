@@ -11,7 +11,6 @@ public class CanvasViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_canvas_view);
-//        setContentView(new ClockView(this));
         mContext = this;
     }
 

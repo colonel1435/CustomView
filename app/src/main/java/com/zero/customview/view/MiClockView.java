@@ -249,7 +249,7 @@ public class MiClockView extends View {
         float translateX = (event.getX() - getWidth() / 2);
         float translateY = (event.getY() - getHeight() / 2);
         float percentX = translateX / mRadius;
-        float percentY= translateX / mRadius;
+        float percentY= translateY / mRadius;
         if (percentX > 1) {
             percentX = 1;
         } else if (percentX < -1) {

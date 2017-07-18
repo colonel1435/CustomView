@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MsecClockView">
+        <attr name="handColor" format="color"/>
+        <attr name="coverColor" format="color"/>
+        <attr name="handSize" format="dimension"/>
+        <attr name="msecRadius" format="dimension"/>
+        <attr name="msecPadding" format="dimension"/>
+        <attr name="msecType">
+            <enum name="msec" value="1"/>
+            <enum name="sec" value="2"/>
+            <enum name="min" value="3"/>
+            <enum name="hour" value="4"/>
+        </attr>
+    </declare-styleable>
+</resources>

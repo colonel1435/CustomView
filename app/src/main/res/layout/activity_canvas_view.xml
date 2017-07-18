@@ -15,8 +15,29 @@
         wumin:darkColor="#80ffffff"
         wumin:lightColor="#ffffff"
         wumin:textSize="14sp" />
-    <android.support.v4.widget.Space
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <com.zero.customview.view.MsecClockView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            wumin:handColor="@color/colorWhite"
+            wumin:handSize="3dp"
+            wumin:coverColor="#237EAD"
+            wumin:msecPadding="32dp"
+            wumin:msecType="msec"/>
+        <com.zero.customview.view.MsecClockView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            wumin:handColor="@color/colorWhite"
+            wumin:handSize="3dp"
+            wumin:coverColor="#237EAD"
+            wumin:msecPadding="32dp"
+            wumin:msecType="sec"/>
+    </LinearLayout>
 </LinearLayout>

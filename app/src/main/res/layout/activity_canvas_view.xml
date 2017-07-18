@@ -9,9 +9,14 @@
 
     <com.zero.customview.view.MiClockView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
         wumin:backgroundColor="#237EAD"
         wumin:darkColor="#80ffffff"
         wumin:lightColor="#ffffff"
         wumin:textSize="14sp" />
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

@@ -27,4 +27,6 @@
     <string name="look_scale">您想查看缩放图吗？</string>
     <string name="take_photo">您想拍照吗？</string>
     <string name="canvas_view">Canvas View</string>
+    <string name="anim_view">Animation</string>
+    <string name="anim_clicked_me">Click me</string>
 </resources>

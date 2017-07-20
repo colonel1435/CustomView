@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_SHAPE_VIEW = 3;
     private static final int ITEM_DOWNLOAD = 4;
     private static final int ITEM_CANVAS_VIEW = 5;
+    private static final int ITEM_ANIM_VIEW = 6;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.shape_view_item));
         mDatas.add(getString(R.string.task_download));
         mDatas.add(getString(R.string.canvas_view));
+        mDatas.add(getString(R.string.anim_view));
     }
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -169,6 +171,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_CANVAS_VIEW:
                 startActivity(new Intent(MainActivity.this, CanvasViewActivity.class));
+                break;
+            case ITEM_ANIM_VIEW:
+                startActivity(new Intent(MainActivity.this, AnimActivity.class));
                 break;
             default:
                 break;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="BallView">
-        <attr name="circleColor" format="color"/>
-        <attr name="ballColor" format="color"/>
-        <attr name="ballRadius" format="dimension"/>
+        <attr name="circleColor" format="color|reference"/>
+        <attr name="ballColor" format="color|reference"/>
+        <attr name="ballRadius" format="dimension|reference"/>
     </declare-styleable>
 </resources>

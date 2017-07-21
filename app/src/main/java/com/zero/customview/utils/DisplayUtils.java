@@ -1,6 +1,9 @@
 package com.zero.customview.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by Administrator on 2017/2/18.
@@ -37,5 +40,15 @@ public class DisplayUtils {
         public static int sp2px(Context context, float spValue) {
             final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
             return (int) (spValue * fontScale + 0.5f);
+        }
+
+        public static float getScreenHeight(Context context) {
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+            return dm.widthPixels;
+        }
+
+        public static float getScreenWidth(Context context) {
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+            return dm.heightPixels;
         }
 }

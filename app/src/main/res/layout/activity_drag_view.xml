@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zero.customview.activity.DragViewActivity">
+
+    <com.zero.customview.view.DragLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_woo_me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_margin="5dp"
+            android:background="@color/colorOceanBlue"
+            android:text="WOO ME"
+            android:textColor="@color/colorWhite"/>
+        <TextView
+            android:id="@+id/tv_woo_u"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_margin="5dp"
+            android:background="@color/colorOceanBlue"
+            android:text="WOO U"
+            android:textColor="@color/colorWhite"/>
+
+        <TextView
+            android:id="@+id/tv_refused"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_margin="5dp"
+            android:background="@color/colorOceanBlue"
+            android:text="Refused!"
+            android:textColor="@color/colorWhite"/>
+
+        <Button
+            android:id="@+id/bt_yeah"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:layout_margin="5dp"
+            android:layout_gravity="center"
+            android:background="@color/colorAccent"
+            android:text="It's U"/>
+    </com.zero.customview.view.DragLayout>
+
+</LinearLayout>

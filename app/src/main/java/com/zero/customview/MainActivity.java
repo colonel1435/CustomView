@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.orhanobut.logger.Logger;
+import com.zero.customview.activity.DragViewActivity;
 import com.zero.customview.adapter.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.RecyclerItemClickListener;
 import com.zero.customview.adapter.RecyclerViewCommonAdapter;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_DOWNLOAD = 4;
     private static final int ITEM_CANVAS_VIEW = 5;
     private static final int ITEM_ANIM_VIEW = 6;
+    private static final int ITEM_DRAG_VIEW = 7;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.task_download));
         mDatas.add(getString(R.string.canvas_view));
         mDatas.add(getString(R.string.anim_view));
+        mDatas.add(getString(R.string.drag_view));
     }
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -174,6 +177,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_ANIM_VIEW:
                 startActivity(new Intent(MainActivity.this, AnimActivity.class));
+                break;
+            case ITEM_DRAG_VIEW:
+                startActivity(new Intent(MainActivity.this, DragViewActivity.class));
                 break;
             default:
                 break;

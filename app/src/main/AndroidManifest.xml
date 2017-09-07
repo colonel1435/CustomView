@@ -32,7 +32,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ShapeActivity" />
         <activity android:name=".CanvasViewActivity" />
-        <activity android:name=".AnimActivity"></activity>
+        <activity android:name=".AnimActivity" />
+        <activity android:name=".activity.DragViewActivity"></activity>
     </application>
 
 </manifest>

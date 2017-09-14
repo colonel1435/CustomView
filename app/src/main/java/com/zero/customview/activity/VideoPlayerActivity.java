@@ -1,7 +1,6 @@
 package com.zero.customview.activity;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -13,26 +12,19 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.zero.customview.R;
-import com.zero.customview.utils.DisplayUtils;
+import com.zero.customview.view.danmaku.DanmakuManager;
 import com.zero.customview.view.vedio.BalloonRelativeLayout;
 import com.zero.customview.view.vedio.CustomVideoView;
 
-import java.util.Random;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.ui.widget.DanmakuView;
 
 public class VideoPlayerActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener {
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.videoView)
@@ -43,8 +35,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     DanmakuView danmakuView;
 
     private Context mContext;
-    private DanmakuContext danmakuContext;
-    private boolean showDanmaku;
+    private DanmakuManager danmakuManager;
 
     private BaseDanmakuParser parser = new BaseDanmakuParser() {
         @Override
@@ -100,90 +91,29 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
         videoView.setOnPreparedListener(this);
         videoView.setOnCompletionListener(this);
 
-        danmakuView.enableDanmakuDrawingCache(true);
-        danmakuView.setCallback(new DrawHandler.Callback() {
-            @Override
-            public void prepared() {
-                showDanmaku = true;
-                danmakuView.start();
-                generateSomeDanmaku();
-            }
+        danmakuManager = new DanmakuManager(mContext);
+        danmakuManager.setDanmakuView(danmakuView);
 
-            @Override
-            public void updateTimer(DanmakuTimer timer) {
-
-            }
-
-            @Override
-            public void danmakuShown(BaseDanmaku danmaku) {
-
-            }
-
-            @Override
-            public void drawingFinished() {
-
-            }
-        });
-        danmakuContext = DanmakuContext.create();
-        danmakuView.prepare(parser, danmakuContext);
-    }
-
-    private void addDanmaku(String content, boolean withBorder) {
-        BaseDanmaku danmaku = danmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        danmaku.text = content;
-        danmaku.padding = 5;
-        danmaku.textSize = DisplayUtils.sp2px(mContext, 20);
-        danmaku.textColor = Color.WHITE;
-        danmaku.setTime(danmakuView.getCurrentTime());
-        if (withBorder) {
-            danmaku.borderColor = Color.GREEN;
-        }
-        danmakuView.addDanmaku(danmaku);
-    }
-
-    private void generateSomeDanmaku() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(showDanmaku) {
-                    int time = new Random().nextInt(300);
-                    String content = "" + time + time;
-                    addDanmaku(content, false);
-                    try {
-                        Thread.sleep(time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
+        danmakuManager.addDanmuList(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (danmakuView != null && danmakuView.isPrepared()) {
-            danmakuView.pause();
-        }
+        danmakuManager.pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (danmakuView != null && danmakuView.isPrepared() && danmakuView.isPaused()) {
-            danmakuView.resume();
-        }
+        danmakuManager.resume();
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        showDanmaku = false;
-        if (danmakuView != null) {
-            danmakuView.release();
-            danmakuView = null;
-        }
+        danmakuManager.destroy();
     }
 
     @Override

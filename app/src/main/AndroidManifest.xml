@@ -38,10 +38,16 @@
             android:name=".activity.PhotoViewActivity"
             android:label="@string/title_activity_photo_view"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.DragPhotoActivity"
-            android:theme="@style/translucent"/>
-        <activity android:name=".activity.FadePhotoActivity"
-            android:theme="@style/ImageTheme.Transparent"/>
+        <activity
+            android:name=".activity.DragPhotoActivity"
+            android:theme="@style/translucent" />
+        <activity
+            android:name=".activity.FadePhotoActivity"
+            android:theme="@style/ImageTheme.Transparent" />
+        <activity
+            android:name=".activity.VideoPlayerActivity"
+            android:label="@string/title_activity_media_player"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

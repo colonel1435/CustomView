@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.orhanobut.logger.Logger;
 import com.zero.customview.activity.DragViewActivity;
 import com.zero.customview.activity.PhotoViewActivity;
+import com.zero.customview.activity.VideoPlayerActivity;
 import com.zero.customview.adapter.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.RecyclerItemClickListener;
 import com.zero.customview.adapter.RecyclerViewCommonAdapter;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_ANIM_VIEW = 6;
     private static final int ITEM_DRAG_VIEW = 7;
     private static final int ITEM_PHOTO_VIEW = 8;
+    private static final int ITEM_VIDEO_PLAYER = 9;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.anim_view));
         mDatas.add(getString(R.string.drag_view));
         mDatas.add(getString(R.string.photo_view));
+        mDatas.add(getString(R.string.vedio_player));
 
     }
     private void initView() {
@@ -187,6 +190,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_PHOTO_VIEW:
                 startActivity(new Intent(MainActivity.this, PhotoViewActivity.class));
+                break;
+            case ITEM_VIDEO_PLAYER:
+                startActivity(new Intent(mContext, VideoPlayerActivity.class));
                 break;
             default:
                 break;

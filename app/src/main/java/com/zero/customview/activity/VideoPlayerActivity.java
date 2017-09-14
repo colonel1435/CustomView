@@ -25,8 +25,6 @@ import master.flame.danmaku.ui.widget.DanmakuView;
 
 public class VideoPlayerActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener {
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
     @BindView(R.id.videoView)
     CustomVideoView videoView;
     @BindView(R.id.balloonRelativeLayout)
@@ -94,7 +92,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
         danmakuManager = new DanmakuManager(mContext);
         danmakuManager.setDanmakuView(danmakuView);
 
-        danmakuManager.addDanmuList(true);
     }
 
     @Override
@@ -113,6 +110,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        danmakuManager.destroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         danmakuManager.destroy();
     }
 

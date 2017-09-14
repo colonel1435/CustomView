@@ -36,7 +36,7 @@ public class BackgroundCacheStuffer extends SpannedCacheStuffer{
 
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-//            danmaku.padding = 20;  // 在背景绘制模式下增加padding
+        danmaku.padding = 20;
         super.measure(danmaku, paint, fromWorkerThread);
     }
 

@@ -10,6 +10,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
@@ -27,6 +28,7 @@ import master.flame.danmaku.danmaku.model.android.BaseCacheStuffer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.ui.widget.DanmakuView;
 
 /**
  * Description
@@ -36,7 +38,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
  */
 
 public class DanmakuManager {
-    private static final String TAG = "DanmakuManager";
+    private final String TAG = getClass().getSimpleName() + "@wumin";
 
     private static final long ADD_DANMU_TIME = 2000;
 
@@ -52,7 +54,7 @@ public class DanmakuManager {
     private final int mMyUserId   = 2;
 
     private Context mContext;
-    private IDanmakuView mDanmakuView;
+    private DanmakuView mDanmakuView;
     private DanmakuContext mDanmakuContext;
 
     public DanmakuManager() {
@@ -73,12 +75,9 @@ public class DanmakuManager {
         DANMU_TEXT_SIZE = DisplayUtils.sp2px(context, DANMU_TEXT_SIZE);
     }
 
-    /**
-     * 初始化配置
-     */
     private void initDanmuConfig() {
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 2);
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3);
         HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
@@ -110,7 +109,7 @@ public class DanmakuManager {
         }
     };
 
-    public void setDanmakuView(IDanmakuView danmakuView) {
+    public void setDanmakuView(DanmakuView danmakuView) {
         this.mDanmakuView = danmakuView;
         initDanmuView();
     }
@@ -121,6 +120,7 @@ public class DanmakuManager {
                 @Override
                 public void prepared() {
                     mDanmakuView.start();
+                    addDanmuList(true);
                 }
 
                 @Override
@@ -147,6 +147,7 @@ public class DanmakuManager {
                 return new Danmakus();
             }
         }, mDanmakuContext);
+        mDanmakuView.showFPS(true);
         mDanmakuView.enableDanmakuDrawingCache(true);
     }
 
@@ -186,11 +187,11 @@ public class DanmakuManager {
             @Override
             public void run() {
                 while(isContinue) {
-                    int time = new Random().nextInt(300);
+                    int time = new Random().nextInt(500);
                     String content = "Hello," + time;
                     addDanmu(content);
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(time);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -202,7 +203,13 @@ public class DanmakuManager {
     public void addDanmu(String content) {
         BaseDanmaku danmaku = mDanmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
 
-        danmaku.isGuest = new Random().nextInt(1) == 1 ? true:false;
+        if (danmaku == null || mDanmakuView == null) {
+            return;
+        }
+
+        Log.d(TAG, "addDanmu: " + content);
+//        danmaku.isGuest = new Random().nextInt(1) == 1 ? true:false;
+        danmaku.isGuest = false;
         danmaku.userId = new Random().nextInt(2);
 
         SpannableStringBuilder spannable;
@@ -216,7 +223,6 @@ public class DanmakuManager {
         danmaku.padding = DANMU_PADDING;
         danmaku.priority = 0;
         danmaku.isLive = false;
-//        danmaku.time = mDanmakuView.getCurrentTime() + (i * ADD_DANMU_TIME);
         danmaku.textSize = DANMU_TEXT_SIZE/* * (mDanmakuContext.getDisplayer().getDensity() - 0.6f)*/;
         danmaku.textColor = Color.WHITE;
         danmaku.textShadowColor = 0;

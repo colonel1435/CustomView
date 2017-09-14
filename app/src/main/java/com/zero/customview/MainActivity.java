@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.orhanobut.logger.Logger;
 import com.zero.customview.activity.DragViewActivity;
+import com.zero.customview.activity.PhotoViewActivity;
 import com.zero.customview.adapter.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.RecyclerItemClickListener;
 import com.zero.customview.adapter.RecyclerViewCommonAdapter;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_CANVAS_VIEW = 5;
     private static final int ITEM_ANIM_VIEW = 6;
     private static final int ITEM_DRAG_VIEW = 7;
+    private static final int ITEM_PHOTO_VIEW = 8;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -97,6 +99,8 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.canvas_view));
         mDatas.add(getString(R.string.anim_view));
         mDatas.add(getString(R.string.drag_view));
+        mDatas.add(getString(R.string.photo_view));
+
     }
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -181,6 +185,9 @@ public class MainActivity extends AppCompatActivity
             case ITEM_DRAG_VIEW:
                 startActivity(new Intent(MainActivity.this, DragViewActivity.class));
                 break;
+            case ITEM_PHOTO_VIEW:
+                startActivity(new Intent(MainActivity.this, PhotoViewActivity.class));
+                break;
             default:
                 break;
         }
@@ -190,18 +197,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(new Intent(this, ProgressBarActivity.class));
 //        toNormalKeyBoard(view);
     }
-
-    public void toNormalKeyBoard(View view) {
-        startActivity(new Intent(this, NormalKeyBoardActivity.class));
-    }
-
-
-    public Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            int id = msg.what;
-        }
-    };
 
     @Override
     public void onBackPressed() {

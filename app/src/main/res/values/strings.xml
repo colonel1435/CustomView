@@ -29,7 +29,9 @@
     <string name="canvas_view">Canvas View</string>
     <string name="anim_view">Animation</string>
     <string name="drag_view">Drag View</string>
+    <string name="photo_view">Photo View</string>
     <string name="anim_clicked_me">Click me</string>
     <string name="start_anim">Startup...</string>
     <string name="anim_shopping">Shopping</string>
+    <string name="title_activity_photo_view">PhotoViewActivity</string>
 </resources>

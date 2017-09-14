@@ -33,7 +33,15 @@
         <activity android:name=".ShapeActivity" />
         <activity android:name=".CanvasViewActivity" />
         <activity android:name=".AnimActivity" />
-        <activity android:name=".activity.DragViewActivity"></activity>
+        <activity android:name=".activity.DragViewActivity" />
+        <activity
+            android:name=".activity.PhotoViewActivity"
+            android:label="@string/title_activity_photo_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.DragPhotoActivity"
+            android:theme="@style/translucent"/>
+        <activity android:name=".activity.FadePhotoActivity"
+            android:theme="@style/ImageTheme.Transparent"/>
     </application>
 
 </manifest>

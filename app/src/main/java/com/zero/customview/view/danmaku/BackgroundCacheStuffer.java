@@ -10,6 +10,7 @@ import android.text.TextPaint;
 import android.widget.MultiAutoCompleteTextView;
 
 import com.zero.customview.R;
+import com.zero.customview.utils.DisplayUtils;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
@@ -22,8 +23,8 @@ import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
  */
 
 public class BackgroundCacheStuffer extends SpannedCacheStuffer{
-    private final int DANMU_PADDING_INNER = 5;
-    private final int DANMU_RADIUS = 3;
+    private final int DANMUKU_PADDING_INNER = 8;
+    private final int DANMUKU_RADIUS = 12;
     final Paint paint = new Paint();
     private Context mContext;
 
@@ -36,7 +37,6 @@ public class BackgroundCacheStuffer extends SpannedCacheStuffer{
 
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-        danmaku.padding = 20;
         super.measure(danmaku, paint, fromWorkerThread);
     }
 
@@ -53,10 +53,12 @@ public class BackgroundCacheStuffer extends SpannedCacheStuffer{
         if (danmaku.isGuest) {
             paint.setColor(Color.TRANSPARENT);
         }
-        canvas.drawRoundRect(new RectF(left + DANMU_PADDING_INNER, top + DANMU_PADDING_INNER
-                        , left + danmaku.paintWidth - DANMU_PADDING_INNER + 6,
-                        top + danmaku.paintHeight - DANMU_PADDING_INNER + 6),
-                DANMU_RADIUS, DANMU_RADIUS, paint);
+        int paddingInner = DisplayUtils.dip2px(mContext, DANMUKU_PADDING_INNER);
+        int radius = DisplayUtils.dip2px(mContext, DANMUKU_RADIUS);
+        canvas.drawRoundRect(new RectF(left + paddingInner, top + paddingInner
+                        , left + danmaku.paintWidth - paddingInner + 6,
+                        top + danmaku.paintHeight - paddingInner + 6),
+                radius, radius, paint);
     }
 
     @Override

@@ -40,18 +40,10 @@ import master.flame.danmaku.ui.widget.DanmakuView;
 public class DanmakuManager {
     private final String TAG = getClass().getSimpleName() + "@wumin";
 
-    private static final long ADD_DANMU_TIME = 2000;
-
-    private int   BITMAP_WIDTH    = 18;
-    private int   BITMAP_HEIGHT   = 18;
-    private float DANMU_TEXT_SIZE = 10f;
-
+    private int   BITMAP_WIDTH    = 30;
+    private int   BITMAP_HEIGHT   = 30;
+    private float DANMU_TEXT_SIZE = 16f;
     private int DANMU_PADDING       = 8;
-    private int DANMU_PADDING_INNER = 7;
-    private int DANMU_RADIUS        = 11;
-
-    private final int mGoodUserId = 1;
-    private final int mMyUserId   = 2;
 
     private Context mContext;
     private DanmakuView mDanmakuView;
@@ -70,14 +62,12 @@ public class DanmakuManager {
         BITMAP_WIDTH = DisplayUtils.dip2px(context, BITMAP_HEIGHT);
         BITMAP_HEIGHT = DisplayUtils.dip2px(context, BITMAP_HEIGHT);
         DANMU_PADDING = DisplayUtils.dip2px(context, DANMU_PADDING);
-        DANMU_PADDING_INNER = DisplayUtils.dip2px(context, DANMU_PADDING_INNER);
-        DANMU_RADIUS = DisplayUtils.dip2px(context, DANMU_RADIUS);
         DANMU_TEXT_SIZE = DisplayUtils.sp2px(context, DANMU_TEXT_SIZE);
     }
 
     private void initDanmuConfig() {
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3);
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 2);
         HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
@@ -120,22 +110,21 @@ public class DanmakuManager {
                 @Override
                 public void prepared() {
                     mDanmakuView.start();
-                    addDanmuList(true);
+                    Log.d(TAG, "prepared: ");
                 }
 
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-
                 }
 
                 @Override
                 public void danmakuShown(BaseDanmaku danmaku) {
-
+                    Log.d(TAG, "danmakuShown: ");
                 }
 
                 @Override
                 public void drawingFinished() {
-
+                    Log.d(TAG, "drawingFinished: ");
                 }
             });
         }
@@ -147,7 +136,6 @@ public class DanmakuManager {
                 return new Danmakus();
             }
         }, mDanmakuContext);
-        mDanmakuView.showFPS(true);
         mDanmakuView.enableDanmakuDrawingCache(true);
     }
 
@@ -182,56 +170,56 @@ public class DanmakuManager {
         }
     }
 
-    public void addDanmuList(final boolean isContinue) {
+    public void addDanmuList(final List<DanmakuMsg> danmukus) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(isContinue) {
-                    int time = new Random().nextInt(500);
-                    String content = "Hello," + time;
-                    addDanmu(content);
-                    try {
-                        Thread.sleep(time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                for(DanmakuMsg msg : danmukus) {
+                    addDanmu(msg);
                 }
             }
         }).start();
     }
 
-    public void addDanmu(String content) {
+    public void addDanmu(DanmakuMsg msg) {
         BaseDanmaku danmaku = mDanmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
 
         if (danmaku == null || mDanmakuView == null) {
             return;
         }
 
-        Log.d(TAG, "addDanmu: " + content);
-//        danmaku.isGuest = new Random().nextInt(1) == 1 ? true:false;
-        danmaku.isGuest = false;
-        danmaku.userId = new Random().nextInt(2);
+        danmaku.isGuest = msg.getUserType() != 0 ? true:false;
+        danmaku.userId = msg.getUserId();
 
         SpannableStringBuilder spannable;
-        int iconId = new Random().nextInt(1) == 1? R.mipmap.ic_default_header:R.mipmap.ic_liked;
-        Bitmap bitmap = getDefaultBitmap(iconId);
+        Bitmap bitmap = getDefaultBitmap(msg.getIconId(), null);
         CircleDrawable circleDrawable = new CircleDrawable(mContext, bitmap, danmaku.isGuest);
         circleDrawable.setBounds(0, 0, BITMAP_WIDTH, BITMAP_HEIGHT);
-        spannable = createSpannable(circleDrawable, content);
+        if (!danmaku.isGuest) {
+            spannable = createSpannable(circleDrawable, msg.getMsg());
+        } else {
+            spannable = createSpannable(circleDrawable, "");
+        }
         danmaku.text = spannable;
 
         danmaku.padding = DANMU_PADDING;
         danmaku.priority = 0;
         danmaku.isLive = false;
-        danmaku.textSize = DANMU_TEXT_SIZE/* * (mDanmakuContext.getDisplayer().getDensity() - 0.6f)*/;
+        danmaku.textSize = DANMU_TEXT_SIZE;
         danmaku.textColor = Color.WHITE;
         danmaku.textShadowColor = 0;
+        danmaku.setTime(mDanmakuView.getCurrentTime());
         mDanmakuView.addDanmaku(danmaku);
     }
 
-    private Bitmap getDefaultBitmap(int drawableId) {
+    private Bitmap getDefaultBitmap(int drawableId, String drawblePath) {
         Bitmap mDefauleBitmap = null;
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), drawableId);
+        Bitmap bitmap;
+        if (drawableId != 0) {
+            bitmap = BitmapFactory.decodeResource(mContext.getResources(), drawableId);
+        } else {
+            bitmap = BitmapFactory.decodeFile(drawblePath);
+        }
         if (bitmap != null) {
             int width = bitmap.getWidth();
             int height = bitmap.getHeight();

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -26,7 +27,6 @@ public class CircleDrawable extends Drawable {
     private Bitmap  mBitmapHeart;
     private boolean mHasHeart;
 
-    private static final int BLACK_COLOR          = 0xb2000000;//黑色 背景
     private static final int BLACKGROUDE_ADD_SIZE = 4;//背景比图片多出来的部分
 
     public CircleDrawable(Bitmap bitmap) {
@@ -59,8 +59,9 @@ public class CircleDrawable extends Drawable {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_liked);
         if (bitmap != null) {
             Matrix matrix = new Matrix();
-            matrix.postScale(0.8f, 0.8f);
-            mBitmapHeart = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            matrix.postScale(0.95f, 0.95f);
+            mBitmapHeart = Bitmap.createBitmap(bitmap, 0, 0,
+                    bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         }
     }
 
@@ -71,29 +72,29 @@ public class CircleDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
+        int width = getIntrinsicWidth();
+        int height = getIntrinsicHeight();
         if (mHasHeart && mBitmapHeart != null) {
-            //设置背景
             Paint backgroundPaint = new Paint();
             backgroundPaint.setAntiAlias(true);
-            backgroundPaint.setColor(BLACK_COLOR);
-            canvas.drawCircle(getIntrinsicWidth() / 2 + BLACKGROUDE_ADD_SIZE, getIntrinsicHeight() / 2 + BLACKGROUDE_ADD_SIZE,
-                    getIntrinsicWidth() / 2 + BLACKGROUDE_ADD_SIZE, backgroundPaint);
+            backgroundPaint.setColor(Color.BLACK);
+            canvas.drawCircle(width / 2 + BLACKGROUDE_ADD_SIZE, height / 2 + BLACKGROUDE_ADD_SIZE,
+                    width / 2 + BLACKGROUDE_ADD_SIZE, backgroundPaint);
 
-            //先将画布平移，防止图片不在正中间，然后绘制图片
             canvas.translate(BLACKGROUDE_ADD_SIZE, BLACKGROUDE_ADD_SIZE);
-            canvas.drawCircle(getIntrinsicWidth() / 2, getIntrinsicHeight() / 2, getIntrinsicWidth() / 2, mPaint);
+            canvas.drawCircle(width / 2, height / 2, width / 2, mPaint);
 
-            //在右下角绘制‘心’
             Rect srcRect = new Rect(0, 0, mBitmapHeart.getWidth(), mBitmapHeart.getHeight());
-            Rect desRect = new Rect(getIntrinsicWidth() - mBitmapHeart.getWidth() + BLACKGROUDE_ADD_SIZE * 2,
-                    getIntrinsicHeight() - mBitmapHeart.getHeight() + BLACKGROUDE_ADD_SIZE * 2,
-                    getIntrinsicWidth() + BLACKGROUDE_ADD_SIZE * 2, getIntrinsicHeight() + BLACKGROUDE_ADD_SIZE * 2);
+            Rect desRect = new Rect(width - mBitmapHeart.getWidth() + BLACKGROUDE_ADD_SIZE ,
+                    height - mBitmapHeart.getHeight() + BLACKGROUDE_ADD_SIZE,
+                    width + BLACKGROUDE_ADD_SIZE,
+                    height + BLACKGROUDE_ADD_SIZE);
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setFilterBitmap(true);
             paint.setDither(true);
             canvas.drawBitmap(mBitmapHeart, srcRect, desRect, paint);
         } else {
-            canvas.drawCircle(getIntrinsicWidth() / 2, getIntrinsicHeight() / 2, getIntrinsicWidth() / 2, mPaint);
+            canvas.drawCircle(width / 2, height / 2, width / 2, mPaint);
         }
     }
 

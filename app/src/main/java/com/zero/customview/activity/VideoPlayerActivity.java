@@ -13,11 +13,22 @@ import android.view.WindowManager;
 
 import com.zero.customview.R;
 import com.zero.customview.view.danmaku.DanmakuManager;
+import com.zero.customview.view.danmaku.DanmakuMsg;
 import com.zero.customview.view.vedio.BalloonRelativeLayout;
 import com.zero.customview.view.vedio.CustomVideoView;
 
+import java.util.Random;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Scheduler;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.internal.util.ExceptionHelper;
+import io.reactivex.schedulers.Schedulers;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -34,14 +45,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
 
     private Context mContext;
     private DanmakuManager danmakuManager;
-
-    private BaseDanmakuParser parser = new BaseDanmakuParser() {
-        @Override
-        protected IDanmakus parse() {
-            return new Danmakus();
-        }
-    };
-
+    private boolean isContinue = true;
     private int TIME = 100;
     Handler mHandler = new Handler();
     Runnable runnable = new Runnable() {
@@ -91,18 +95,63 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
 
         danmakuManager = new DanmakuManager(mContext);
         danmakuManager.setDanmakuView(danmakuView);
+        initData();
+    }
 
+    private void initData() {
+        Observable.create(new ObservableOnSubscribe<DanmakuMsg>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<DanmakuMsg> emitter) throws Exception {
+                while (isContinue) {
+                    int time = new Random().nextInt(500);
+                    int usrId = new Random().nextInt(3);
+                    int usrType = new Random().nextInt(2);
+                    int randId = new Random().nextInt(4);
+                    int iconId;
+                    switch (randId) {
+                        case 0:
+                            iconId = R.mipmap.ic_header_beast;
+                            break;
+                        case 1:
+                            iconId = R.mipmap.ic_header_monky;
+                            break;
+                        case 2:
+                            iconId = R.mipmap.ic_header_pig;
+                            break;
+                        case 3:
+                        default:
+                            iconId = R.mipmap.ic_default_header;
+                            break;
+                    }
+                    String content = "hello," + time;
+                    emitter.onNext(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
+                    try {
+                        Thread.sleep(time);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+          .subscribe(new Consumer<DanmakuMsg>() {
+              @Override
+              public void accept(DanmakuMsg danmakuMsg) throws Exception {
+                danmakuManager.addDanmu(danmakuMsg);
+              }
+          });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        isContinue = false;
         danmakuManager.pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        isContinue = true;
         danmakuManager.resume();
     }
 

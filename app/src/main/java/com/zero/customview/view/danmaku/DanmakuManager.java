@@ -188,7 +188,7 @@ public class DanmakuManager {
             return;
         }
 
-        danmaku.isGuest = msg.getUserType() != 0 ? true:false;
+        danmaku.isGuest = msg.getUserType() == 0 ? true:false;
         danmaku.userId = msg.getUserId();
 
         SpannableStringBuilder spannable;
@@ -210,6 +210,7 @@ public class DanmakuManager {
         danmaku.textShadowColor = 0;
         danmaku.setTime(mDanmakuView.getCurrentTime());
         mDanmakuView.addDanmaku(danmaku);
+        Log.d(TAG, "addDanmu: " + msg.toString());
     }
 
     private Bitmap getDefaultBitmap(int drawableId, String drawblePath) {

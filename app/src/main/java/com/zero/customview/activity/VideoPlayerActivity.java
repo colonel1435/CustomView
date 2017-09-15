@@ -186,7 +186,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
             public void onSend(String content) {
                 if (!TextUtils.isEmpty(content)) {
                     int usrId = 1;
-                    int usrType = 0;
+                    int usrType = 1;
                     int iconId = R.mipmap.ic_header_admin_96;
                     danmakuManager.addDanmu(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
                     danmuku.dismiss();

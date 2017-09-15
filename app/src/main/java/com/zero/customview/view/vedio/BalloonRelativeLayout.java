@@ -3,14 +3,18 @@ package com.zero.customview.view.vedio;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -20,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.zero.customview.R;
+import com.zero.customview.utils.DisplayUtils;
 
 import java.util.Random;
 
@@ -28,18 +33,21 @@ import java.util.Random;
  */
 
 public class BalloonRelativeLayout extends RelativeLayout {
+    private final String TAG = this.getClass().getSimpleName() + "@wumin";
     private Context mContext;
-    private Interpolator[] interpolators;//插值器数组
+    private Interpolator[] interpolators;
     private Interpolator linearInterpolator = new LinearInterpolator();// 以常量速率改变
     private Interpolator accelerateInterpolator = new AccelerateInterpolator();//加速
     private Interpolator decelerateInterpolator = new DecelerateInterpolator();//减速
     private Interpolator accelerateDecelerateInterpolator = new AccelerateDecelerateInterpolator();//先加速后减速
     private LayoutParams layoutParams;
+    private LayoutParams heartLayoutParams;
     private int mHeight;
     private int mWidth;
-    private Random random = new Random();//初始化随机数类
-    private int mViewHeight = dip2px(getContext(), 50);//默认50dp
+    private Random random = new Random();
+    private int mViewHeight = DisplayUtils.dip2px(getContext(), 50);
     private Drawable[] drawables;
+    private Drawable[] heartDrawables;
 
     public BalloonRelativeLayout(Context context) {
         this(context, null);
@@ -65,7 +73,18 @@ public class BalloonRelativeLayout extends RelativeLayout {
         drawables[1] = mBalloon2;
         drawables[2] = mBalloon3;
 
-        //设置view宽高相等，默认都是50dp
+        heartDrawables = new Drawable[3];
+        Drawable redDrawable = ContextCompat.getDrawable(mContext, R.mipmap.pl_red);
+        Drawable blueDrawable = ContextCompat.getDrawable(mContext, R.mipmap.pl_blue);
+        Drawable yellowDrawble = ContextCompat.getDrawable(mContext, R.mipmap.pl_yellow);
+        heartDrawables[0] = redDrawable;
+        heartDrawables[1] = blueDrawable;
+        heartDrawables[2] = yellowDrawble;
+
+        heartLayoutParams = new LayoutParams(mViewHeight, mViewHeight);
+        heartLayoutParams.addRule(CENTER_HORIZONTAL, TRUE);
+        heartLayoutParams.addRule(ALIGN_PARENT_BOTTOM, TRUE);
+
         layoutParams = new LayoutParams(mViewHeight, mViewHeight);
         layoutParams.addRule(ALIGN_PARENT_BOTTOM, TRUE);
 
@@ -86,28 +105,61 @@ public class BalloonRelativeLayout extends RelativeLayout {
     }
 
     public void addBalloon() {
+
         final ImageView imageView = new ImageView(getContext());
         //随机选一个
         imageView.setImageDrawable(drawables[random.nextInt(3)]);
         imageView.setLayoutParams(layoutParams);
         addView(imageView);
 
-        Animator animator = getAnimator(imageView);
+        Animator animator = getBalloonAnimator(imageView, new PointF(0, getHeight()));
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                //view动画结束后remove掉
                 removeView(imageView);
             }
         });
         animator.start();
     }
 
+    public void addHeart(PointF startPoint) {
+        Log.d(TAG, "addHeart: X -> " + startPoint.x + " Y -> " + startPoint.y);
+        final ImageView imageView = new ImageView(getContext());
+        imageView.setImageDrawable(heartDrawables[random.nextInt(3)]);
+        imageView.setLayoutParams(heartLayoutParams);
+        imageView.setX(startPoint.x);
+        imageView.setY(startPoint.y);
+        addView(imageView);
 
-    private Animator getAnimator(View target) {
+        PointF point = new PointF(startPoint.x - imageView.getWidth(),
+                                startPoint.y - imageView.getHeight());
+        getHeartAnimator(imageView, point).start();
+    }
 
-        ValueAnimator bezierValueAnimator = getBezierValueAnimator(target);
+    private Animator getHeartAnimator(final View target, PointF startPoint) {
+        AnimatorSet enterAnimtor = getHeartEnterAnimtor(target);
+        ValueAnimator bezierAnimator = getBezierValueAnimator(target, startPoint);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playSequentially(enterAnimtor);
+        animatorSet.playSequentially(enterAnimtor, bezierAnimator);
+        animatorSet.setInterpolator(interpolators[random.nextInt(4)]);
+        animatorSet.setTarget(target);
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                removeView(target);
+                Log.d(TAG, "onAnimationEnd: " + getChildCount());
+            }
+        });
+        return animatorSet;
+    }
+
+    private Animator getBalloonAnimator(View target, PointF startPoint) {
+
+        ValueAnimator bezierValueAnimator = getBezierValueAnimator(target, startPoint);
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playSequentially(bezierValueAnimator);
@@ -116,18 +168,15 @@ public class BalloonRelativeLayout extends RelativeLayout {
         return animatorSet;
     }
 
-    private ValueAnimator getBezierValueAnimator(final View target) {
+    private ValueAnimator getBezierValueAnimator(final View target, PointF startPoint) {
 
-        //初始化一个自定义的贝塞尔曲线插值器，并且传入控制点
         BezierEvaluator evaluator = new BezierEvaluator(getPointF(), getPointF());
 
-        //传入了曲线起点（左下角）和终点（顶部随机）
-        ValueAnimator animator = ValueAnimator.ofObject(evaluator, new PointF(0, getHeight())
+        ValueAnimator animator = ValueAnimator.ofObject(evaluator, startPoint
                 , new PointF(random.nextInt(getWidth()), -mViewHeight));
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                //获取到贝塞尔曲线轨迹上的x和y值 赋值给view
                 PointF pointF = (PointF) animation.getAnimatedValue();
                 target.setX(pointF.x);
                 target.setY(pointF.y);
@@ -139,9 +188,6 @@ public class BalloonRelativeLayout extends RelativeLayout {
     }
 
 
-    /**
-     * 自定义曲线的两个控制点，随机在ViewGroup上的任何一个位置
-     */
     private PointF getPointF() {
         PointF pointF = new PointF();
         pointF.x = random.nextInt(mWidth);
@@ -150,13 +196,8 @@ public class BalloonRelativeLayout extends RelativeLayout {
     }
 
 
-    /**
-     * 自定义插值器
-     */
-
     class BezierEvaluator implements TypeEvaluator<PointF> {
 
-        //途径的两个点
         private PointF pointF1;
         private PointF pointF2;
 
@@ -171,7 +212,6 @@ public class BalloonRelativeLayout extends RelativeLayout {
 
             float timeOn = 1.0f - time;
             PointF point = new PointF();
-            //这么复杂的公式让我计算真心头疼，但是计算机很easy
             point.x = timeOn * timeOn * timeOn * (startValue.x)
                     + 3 * timeOn * timeOn * time * (pointF1.x)
                     + 3 * timeOn * time * time * (pointF2.x)
@@ -185,11 +225,17 @@ public class BalloonRelativeLayout extends RelativeLayout {
         }
     }
 
-    /**
-     * Dip into pixels
-     */
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
+    private AnimatorSet getHeartEnterAnimtor(final View target) {
+
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(target,View.ALPHA, 0.2f, 1f);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(target,View.SCALE_X, 0.2f, 1f);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(target,View.SCALE_Y, 0.2f, 1f);
+        AnimatorSet enter = new AnimatorSet();
+        enter.setDuration(300);
+        enter.setInterpolator(new LinearInterpolator());
+        enter.playTogether(alpha,scaleX, scaleY);
+        enter.setTarget(target);
+        return enter;
     }
+
 }

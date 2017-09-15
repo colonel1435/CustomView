@@ -1,15 +1,18 @@
 package com.zero.customview.activity;
 
 import android.content.Context;
+import android.graphics.PointF;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.zero.customview.R;
 import com.zero.customview.view.danmaku.DanmakuManager;
@@ -21,17 +24,13 @@ import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Scheduler;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
-import io.reactivex.internal.util.ExceptionHelper;
 import io.reactivex.schedulers.Schedulers;
-import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.ui.widget.DanmakuView;
 
 public class VideoPlayerActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener,
@@ -42,7 +41,22 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     BalloonRelativeLayout rlBalloon;
     @BindView(R.id.danmaku_view)
     DanmakuView danmakuView;
+    @BindView(R.id.iv_vedio_music)
+    ImageView ivVedioMusic;
+    @BindView(R.id.iv_vedio_love)
+    ImageView ivVedioLove;
+    @BindView(R.id.iv_vedio_face)
+    ImageView ivVedioFace;
+    @BindView(R.id.iv_vedio_msg)
+    ImageView ivVedioMsg;
+    @BindView(R.id.iv_vedio_gift)
+    ImageView ivVedioGift;
+    @BindView(R.id.ll_bottom_button)
+    LinearLayout llBottomButton;
+    @BindView(R.id.iv_vedio_close)
+    ImageView ivVedioClose;
 
+    private final String TAG = this.getClass().getSimpleName() + "@wumin";
     private Context mContext;
     private DanmakuManager danmakuManager;
     private boolean isContinue = true;
@@ -127,18 +141,42 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
                     emitter.onNext(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
                     try {
                         Thread.sleep(time);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
         }).subscribeOn(Schedulers.newThread())
-          .subscribe(new Consumer<DanmakuMsg>() {
-              @Override
-              public void accept(DanmakuMsg danmakuMsg) throws Exception {
-                danmakuManager.addDanmu(danmakuMsg);
-              }
-          });
+                .subscribe(new Consumer<DanmakuMsg>() {
+                    @Override
+                    public void accept(DanmakuMsg danmakuMsg) throws Exception {
+                        danmakuManager.addDanmu(danmakuMsg);
+                    }
+                });
+    }
+
+    private void startSong() {
+
+    }
+
+    private void startLike(View view) {
+        int[] position = new int[2];
+        view.getLocationInWindow(position);
+        Log.d(TAG, "startLike: getLocationInWindow:" + position[0] + "," + position[1]);
+
+        rlBalloon.addHeart(new PointF(position[0], position[1]));
+    }
+
+    private void startFace() {
+
+    }
+
+    private void startMessage() {
+
+    }
+
+    private void startGift() {
+
     }
 
     @Override
@@ -179,4 +217,30 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
         videoView.start();
     }
 
+    @OnClick({R.id.iv_vedio_music, R.id.iv_vedio_love, R.id.iv_vedio_face,
+            R.id.iv_vedio_msg, R.id.iv_vedio_gift, R.id.iv_vedio_close})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.iv_vedio_music:
+                startSong();
+                break;
+            case R.id.iv_vedio_love:
+                startLike(view);
+                break;
+            case R.id.iv_vedio_face:
+                startFace();
+                break;
+            case R.id.iv_vedio_msg:
+                startMessage();
+                break;
+            case R.id.iv_vedio_gift:
+                startGift();
+                break;
+            case R.id.iv_vedio_close:
+                finish();
+                break;
+            default:
+                break;
+        }
+    }
 }

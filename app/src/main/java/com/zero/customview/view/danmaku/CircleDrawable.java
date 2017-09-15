@@ -85,7 +85,7 @@ public class CircleDrawable extends Drawable {
             canvas.drawCircle(width / 2, height / 2, width / 2, mPaint);
 
             Rect srcRect = new Rect(0, 0, mBitmapHeart.getWidth(), mBitmapHeart.getHeight());
-            Rect desRect = new Rect(width - mBitmapHeart.getWidth() + BLACKGROUDE_ADD_SIZE ,
+            Rect desRect = new Rect(width - mBitmapHeart.getWidth() + BLACKGROUDE_ADD_SIZE,
                     height - mBitmapHeart.getHeight() + BLACKGROUDE_ADD_SIZE,
                     width + BLACKGROUDE_ADD_SIZE,
                     height + BLACKGROUDE_ADD_SIZE);

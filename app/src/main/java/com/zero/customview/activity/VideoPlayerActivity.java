@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.zero.customview.R;
+import com.zero.customview.view.EmojDialog;
 import com.zero.customview.view.danmaku.DanmakuManager;
 import com.zero.customview.view.danmaku.DanmakuMsg;
 import com.zero.customview.view.vedio.BalloonRelativeLayout;
@@ -168,7 +170,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     }
 
     private void startFace() {
-
+//        EmojDialog emojDlg = new EmojDialog();
+//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//        emojDlg.show(ft, "emoj");
     }
 
     private void startMessage() {

@@ -9,13 +9,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.zero.customview.R;
+import com.zero.customview.view.DanmukuPopupwindow;
 import com.zero.customview.view.EmojDialog;
 import com.zero.customview.view.danmaku.DanmakuManager;
 import com.zero.customview.view.danmaku.DanmakuMsg;
@@ -176,8 +179,21 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
 //        emojDlg.show(ft, "emoj");
     }
 
-    private void startMessage() {
-
+    private void startMessage(View view) {
+        final DanmukuPopupwindow danmuku = new DanmukuPopupwindow(mContext);
+        danmuku.setSendCallback(new DanmukuPopupwindow.OnDanmukuCallback() {
+            @Override
+            public void onSend(String content) {
+                if (!TextUtils.isEmpty(content)) {
+                    int usrId = 1;
+                    int usrType = 0;
+                    int iconId = R.mipmap.ic_header_admin_96;
+                    danmakuManager.addDanmu(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
+                    danmuku.dismiss();
+                }
+            }
+        });
+        danmuku.show(VideoPlayerActivity.this, view, Gravity.BOTTOM);
     }
 
     private void startGift() {
@@ -236,7 +252,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
                 startFace();
                 break;
             case R.id.iv_vedio_msg:
-                startMessage();
+                startMessage(view);
                 break;
             case R.id.iv_vedio_gift:
                 startGift();

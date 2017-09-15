@@ -36,4 +36,6 @@
     <string name="anim_shopping">Shopping</string>
     <string name="title_activity_photo_view">PhotoViewActivity</string>
     <string name="title_activity_media_player">MediaPlayerActivity</string>
+    <string name="action_send">发送</string>
+    <string name="vedio_danmuku_hint">快来说点什么吧</string>
 </resources>

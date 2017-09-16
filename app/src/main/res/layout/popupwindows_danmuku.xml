@@ -1,24 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/et_danmuku_content"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:enabled="true"
-        android:hint="@string/vedio_danmuku_hint"/>
-    <TextView
-        android:id="@+id/tv_danmuku_send"
-        android:layout_width="48dp"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/et_danmuku_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="true"
+            android:hint="@string/vedio_danmuku_hint"/>
+        <ImageView
+            android:id="@+id/iv_danmuku_face"
+            android:layout_width="@dimen/vedio_image_button_size"
+            android:layout_height="@dimen/vedio_image_button_size"
+            android:layout_gravity="center"
+            android:padding="6dp"
+            android:src="@mipmap/ic_vedio_face"/>
+        <TextView
+            android:id="@+id/tv_danmuku_send"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/selector_danmuku_send"
+            android:text="@string/action_send"
+            android:textColor="@color/colorWhite" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_danmuku_face"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="5dp"
-        android:layout_margin="3dp"
-        android:background="@drawable/selector_danmuku_send"
-        android:text="@string/action_send"
-        android:textColor="@color/colorWhite" />
+        android:visibility="visible">
+    </FrameLayout>
 </LinearLayout>

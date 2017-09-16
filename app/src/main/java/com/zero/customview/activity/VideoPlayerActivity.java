@@ -30,6 +30,9 @@ import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.github.rockerhieu.emojicon.EmojiconGridFragment;
+import io.github.rockerhieu.emojicon.EmojiconsFragment;
+import io.github.rockerhieu.emojicon.emoji.Emojicon;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -39,7 +42,8 @@ import io.reactivex.schedulers.Schedulers;
 import master.flame.danmaku.ui.widget.DanmakuView;
 
 public class VideoPlayerActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnCompletionListener {
+        MediaPlayer.OnCompletionListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
+        EmojiconGridFragment.OnEmojiconClickedListener{
     @BindView(R.id.videoView)
     CustomVideoView videoView;
     @BindView(R.id.balloonRelativeLayout)
@@ -181,6 +185,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
 
     private void startMessage(View view) {
         final DanmukuPopupwindow danmuku = new DanmukuPopupwindow(mContext);
+        danmuku.setFragmentManager(getSupportFragmentManager());
         danmuku.setSendCallback(new DanmukuPopupwindow.OnDanmukuCallback() {
             @Override
             public void onSend(String content) {
@@ -263,5 +268,15 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+
+    }
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+
     }
 }

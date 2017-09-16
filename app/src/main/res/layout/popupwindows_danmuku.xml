@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="5dp"
-        android:background="@color/colorAccent"
+        android:layout_margin="3dp"
+        android:background="@drawable/selector_danmuku_send"
         android:text="@string/action_send"
-        android:textColor="@color/colorWhite"/>
+        android:textColor="@color/colorWhite" />
 </LinearLayout>

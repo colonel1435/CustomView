@@ -122,7 +122,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
             @Override
             public void subscribe(@NonNull ObservableEmitter<DanmakuMsg> emitter) throws Exception {
                 while (isContinue) {
-                    int time = new Random().nextInt(500);
+                    int time = new Random().nextInt(1000);
                     int usrId = new Random().nextInt(3);
                     int usrType = new Random().nextInt(2);
                     int randId = new Random().nextInt(4);

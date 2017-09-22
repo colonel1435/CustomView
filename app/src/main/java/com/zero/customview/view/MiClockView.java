@@ -4,7 +4,6 @@ import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.pm.ProviderInfo;
 import android.content.res.TypedArray;
 import android.graphics.Camera;
 import android.graphics.Canvas;
@@ -15,22 +14,15 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SweepGradient;
-import android.provider.CalendarContract;
-import android.support.annotation.BoolRes;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
 
-import com.orhanobut.logger.Logger;
-import com.zero.customview.CanvasViewActivity;
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 
 import java.util.Calendar;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Description

@@ -1,4 +1,4 @@
-package com.zero.customview;
+package com.zero.customview.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 
+import com.zero.customview.R;
 import com.zero.customview.view.VirtualKeyboardView;
 
 import java.lang.reflect.Method;

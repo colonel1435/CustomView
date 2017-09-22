@@ -1,10 +1,11 @@
-package com.zero.customview;
+package com.zero.customview.activity;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.zero.customview.R;
 import com.zero.customview.utils.TipUtils;
 import com.zero.customview.view.CircleTextImageView;
 import com.zero.customview.view.SixangleImageView;

@@ -1,10 +1,7 @@
-package com.zero.customview;
+package com.zero.customview.activity;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Message;
@@ -22,9 +19,9 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.zero.customview.R;
 import com.zero.customview.view.HorizontalProgressBar;
 import com.zero.customview.view.MultilevelProgressBar;
-import com.zero.customview.view.RoundImageDrawable;
 import com.zero.customview.view.RoundProgressBar;
 
 public class ProgressBarActivity extends AppCompatActivity {

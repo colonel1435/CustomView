@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.zero.customview.CanvasViewActivity;
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 

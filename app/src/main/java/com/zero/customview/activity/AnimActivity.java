@@ -1,4 +1,4 @@
-package com.zero.customview;
+package com.zero.customview.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,11 +16,11 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 import com.zero.customview.view.BallView;
 

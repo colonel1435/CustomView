@@ -1,4 +1,4 @@
-package com.zero.customview;
+package com.zero.customview.activity;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 
 import com.orhanobut.logger.Logger;
+import com.zero.customview.R;
 import com.zero.customview.view.HorizontalProgressBar;
 
 import java.io.UnsupportedEncodingException;

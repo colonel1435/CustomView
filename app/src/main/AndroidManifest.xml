@@ -52,6 +52,10 @@
         <activity
             android:name=".activity.ChartActivity"
             android:label="@string/title_activity_chart"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.OpenGLActivity"
+            android:label="@string/title_activity_open_gl"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

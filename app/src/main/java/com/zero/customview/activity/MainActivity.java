@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_PHOTO_VIEW = 8;
     private static final int ITEM_VIDEO_PLAYER = 9;
     private static final int ITEM_CHART = 10;
+    private static final int ITEM_OPENGL_3D = 11;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.photo_view));
         mDatas.add(getString(R.string.vedio_player));
         mDatas.add(getString(R.string.chart_view));
+        mDatas.add(getString(R.string.opengl_3d));
 
     }
     private void initView() {
@@ -171,6 +173,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_CHART:
                 startActivity(new Intent(mContext, ChartActivity.class));
+                break;
+            case ITEM_OPENGL_3D:
+                startActivity(new Intent(mContext, OpenGLActivity.class));
                 break;
             default:
                 break;

@@ -73,7 +73,7 @@ public class DanmukuPopupwindow extends PopupWindow implements View.OnClickListe
         this.setContentView(popupView);
         this.setTouchable(true);
         this.setFocusable(true);
-        this.setOutsideTouchable(false);
+        this.setOutsideTouchable(true);
         this.setBackgroundDrawable(new ColorDrawable());
         this.setAnimationStyle(R.style.pop_add_ainm);
         this.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);

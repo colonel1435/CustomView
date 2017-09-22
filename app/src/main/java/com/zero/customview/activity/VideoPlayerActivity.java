@@ -1,5 +1,8 @@
 package com.zero.customview.activity;
 
+import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.PointF;
 import android.media.MediaPlayer;
@@ -14,12 +17,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.zero.customview.R;
+import com.zero.customview.utils.SystemUtils;
 import com.zero.customview.view.DanmukuPopupwindow;
-import com.zero.customview.view.EmojDialog;
 import com.zero.customview.view.danmaku.DanmakuManager;
 import com.zero.customview.view.danmaku.DanmakuMsg;
 import com.zero.customview.view.vedio.BalloonRelativeLayout;
@@ -43,7 +49,7 @@ import master.flame.danmaku.ui.widget.DanmakuView;
 
 public class VideoPlayerActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
-        EmojiconGridFragment.OnEmojiconClickedListener{
+        EmojiconGridFragment.OnEmojiconClickedListener {
     @BindView(R.id.videoView)
     CustomVideoView videoView;
     @BindView(R.id.balloonRelativeLayout)
@@ -66,10 +72,23 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     ImageView ivVedioClose;
 
     private final String TAG = this.getClass().getSimpleName() + "@wumin";
+    @BindView(R.id.et_danmuku_content)
+    EditText etDanmukuContent;
+    @BindView(R.id.iv_danmuku_face)
+    ImageView ivDanmukuFace;
+    @BindView(R.id.tv_danmuku_send)
+    TextView tvDanmukuSend;
+    @BindView(R.id.fl_danmuku_face)
+    FrameLayout flDanmukuFace;
+    @BindView(R.id.ll_danmuku_input)
+    LinearLayout llDanmukuInput;
     private Context mContext;
     private DanmakuManager danmakuManager;
     private boolean isContinue = true;
     private int TIME = 100;
+    private int emotionHeight;
+    private final LayoutTransition transitioner = new LayoutTransition();
+
     Handler mHandler = new Handler();
     Runnable runnable = new Runnable() {
 
@@ -119,6 +138,17 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
         danmakuManager = new DanmakuManager(mContext);
         danmakuManager.setDanmakuView(danmakuView);
         initData();
+
+        ObjectAnimator animIn = ObjectAnimator.ofFloat(null, "translationY",
+                SystemUtils.getScreenHeight((Activity) mContext), emotionHeight).
+                setDuration(transitioner.getDuration(LayoutTransition.APPEARING));
+        transitioner.setAnimator(LayoutTransition.APPEARING, animIn);
+        ObjectAnimator animOut = ObjectAnimator.ofFloat(null, "translationY",
+                emotionHeight,
+                SystemUtils.getScreenHeight((Activity)mContext)).
+                setDuration(transitioner.getDuration(LayoutTransition.DISAPPEARING));
+        transitioner.setAnimator(LayoutTransition.DISAPPEARING, animOut);
+        llDanmukuInput.setLayoutTransition(transitioner);
     }
 
     private void initData() {
@@ -149,7 +179,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
                     String content = "hello," + time;
                     emitter.onNext(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
                     try {
-                        Thread.sleep(time);
+                        Thread.sleep(1000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -176,29 +206,38 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
         rlBalloon.addHeart(new PointF(position[0], position[1]));
     }
 
+    private void startSend() {
+        SystemUtils.hideSoftInput(etDanmukuContent);
+        llDanmukuInput.setVisibility(View.GONE);
+        llBottomButton.setVisibility(View.VISIBLE);
+        String content = etDanmukuContent.getText().toString();
+        if (!TextUtils.isEmpty(content)) {
+            int usrId = 1;
+            int usrType = 1;
+            int iconId = R.mipmap.ic_header_admin_96;
+            danmakuManager.addDanmu(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
+
+            etDanmukuContent.setText("");
+        }
+    }
+
     private void startFace() {
-//        EmojDialog emojDlg = new EmojDialog();
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//        emojDlg.show(ft, "emoj");
+        EmojiconsFragment emojFragemnt = EmojiconsFragment.newInstance(false);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.add(R.id.fl_danmuku_face, emojFragemnt).commit();
+
+        SystemUtils.hideSoftInput(etDanmukuContent);
+        emotionHeight = SystemUtils.getKeyboardHeight((Activity) mContext);
+        flDanmukuFace.getLayoutParams().height = emotionHeight;
+        llDanmukuInput.setVisibility(View.VISIBLE);
+        llBottomButton.setVisibility(View.INVISIBLE);
     }
 
     private void startMessage(View view) {
-        final DanmukuPopupwindow danmuku = new DanmukuPopupwindow(mContext);
-        danmuku.setFragmentManager(getSupportFragmentManager());
-        danmuku.setSendCallback(new DanmukuPopupwindow.OnDanmukuCallback() {
-            @Override
-            public void onSend(String content) {
-                if (!TextUtils.isEmpty(content)) {
-                    int usrId = 1;
-                    int usrType = 1;
-                    int iconId = R.mipmap.ic_header_admin_96;
-                    danmakuManager.addDanmu(new DanmakuMsg(usrId, usrType, usrId, iconId, content));
-                    danmuku.dismiss();
-                }
-            }
-        });
-        danmuku.show(VideoPlayerActivity.this, view, Gravity.BOTTOM);
+        llDanmukuInput.setVisibility(View.VISIBLE);
+        llBottomButton.setVisibility(View.INVISIBLE);
+        SystemUtils.showKeyBoard(etDanmukuContent);
     }
 
     private void startGift() {
@@ -229,6 +268,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (llDanmukuInput.getVisibility() == View.VISIBLE) {
+            llDanmukuInput.setVisibility(View.INVISIBLE);
+        }
+        if (llBottomButton.getVisibility() != View.VISIBLE) {
+            llBottomButton.setVisibility(View.VISIBLE);
+        }
         danmakuManager.destroy();
     }
 
@@ -244,7 +289,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
     }
 
     @OnClick({R.id.iv_vedio_music, R.id.iv_vedio_love, R.id.iv_vedio_face,
-            R.id.iv_vedio_msg, R.id.iv_vedio_gift, R.id.iv_vedio_close})
+            R.id.iv_vedio_msg, R.id.iv_vedio_gift, R.id.iv_vedio_close,
+            R.id.iv_danmuku_face, R.id.tv_danmuku_send})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_vedio_music:
@@ -265,6 +311,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
             case R.id.iv_vedio_close:
                 finish();
                 break;
+            case R.id.iv_danmuku_face:
+                startFace();
+                break;
+            case R.id.tv_danmuku_send:
+                startSend();
+                break;
             default:
                 break;
         }
@@ -272,11 +324,11 @@ public class VideoPlayerActivity extends AppCompatActivity implements MediaPlaye
 
     @Override
     public void onEmojiconClicked(Emojicon emojicon) {
-
+        EmojiconsFragment.input(etDanmukuContent, emojicon);
     }
 
     @Override
     public void onEmojiconBackspaceClicked(View v) {
-
+        EmojiconsFragment.backspace(etDanmukuContent);
     }
 }

@@ -48,6 +48,10 @@
         <activity
             android:name=".activity.VideoPlayerActivity"
             android:label="@string/title_activity_media_player"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.ChartActivity"
+            android:label="@string/title_activity_chart"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

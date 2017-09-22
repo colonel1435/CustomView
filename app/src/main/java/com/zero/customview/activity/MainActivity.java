@@ -23,10 +23,10 @@ import android.widget.ImageView;
 
 import com.orhanobut.logger.Logger;
 import com.zero.customview.R;
-import com.zero.customview.adapter.MyGridDividerItemDecoration;
-import com.zero.customview.adapter.RecyclerItemClickListener;
-import com.zero.customview.adapter.RecyclerViewCommonAdapter;
-import com.zero.customview.adapter.RecyclerViewHolder;
+import com.zero.customview.adapter.recyclerview.MyGridDividerItemDecoration;
+import com.zero.customview.adapter.recyclerview.RecyclerItemClickListener;
+import com.zero.customview.adapter.recyclerview.RecyclerViewCommonAdapter;
+import com.zero.customview.adapter.recyclerview.RecyclerViewHolder;
 import com.zero.customview.view.RoundImageDrawable;
 
 import java.util.ArrayList;
@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_DRAG_VIEW = 7;
     private static final int ITEM_PHOTO_VIEW = 8;
     private static final int ITEM_VIDEO_PLAYER = 9;
+    private static final int ITEM_CHART = 10;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.drag_view));
         mDatas.add(getString(R.string.photo_view));
         mDatas.add(getString(R.string.vedio_player));
+        mDatas.add(getString(R.string.chart_view));
 
     }
     private void initView() {
@@ -166,6 +168,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_VIDEO_PLAYER:
                 startActivity(new Intent(mContext, VideoPlayerActivity.class));
+                break;
+            case ITEM_CHART:
+                startActivity(new Intent(mContext, ChartActivity.class));
                 break;
             default:
                 break;

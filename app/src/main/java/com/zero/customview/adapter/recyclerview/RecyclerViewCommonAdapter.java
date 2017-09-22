@@ -1,11 +1,10 @@
-package com.zero.customview.adapter;
+package com.zero.customview.adapter.recyclerview;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.io.LineNumberInputStream;
 import java.util.List;
 
 /**

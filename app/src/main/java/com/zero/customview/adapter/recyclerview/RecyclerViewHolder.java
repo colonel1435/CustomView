@@ -1,14 +1,9 @@
-package com.zero.customview.adapter;
+package com.zero.customview.adapter.recyclerview;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.res.ObbInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.service.voice.VoiceInteractionService;
-import android.support.v4.util.SparseArrayCompat;
-import android.support.v7.widget.ContentFrameLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package com.zero.customview.adapter;
+package com.zero.customview.adapter.recyclerview;
 
 import android.content.Context;
 import android.content.res.TypedArray;

@@ -15,6 +15,7 @@ import com.zero.customview.adapter.FragmentPageAdapter;
 import com.zero.customview.fragment.chart.BarFragment;
 import com.zero.customview.fragment.chart.LineFragment;
 import com.zero.customview.fragment.chart.RadarFragment;
+import com.zero.customview.view.NoScrollViewPager;
 
 import java.util.ArrayList;
 import java.util.List;

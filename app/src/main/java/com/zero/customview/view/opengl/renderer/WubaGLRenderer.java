@@ -1,8 +1,13 @@
 package com.zero.customview.view.opengl.renderer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.LightingColorFilter;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.opengl.GLUtils;
+import android.util.Log;
 
 import com.zero.customview.view.opengl.bean.Model;
 import com.zero.customview.view.opengl.bean.Point;
@@ -11,6 +16,8 @@ import com.zero.customview.view.opengl.utils.STLReader;
 
 import java.io.IOException;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -20,9 +27,12 @@ import javax.microedition.khronos.opengles.GL10;
  * Author : Mr.wumin
  * Email  : fusu1435@163.com
  * Date   : 2017/9/22 0022 17:20
+ * Refer: http://blog.csdn.net/huachao1001
  */
 
 public class WubaGLRenderer implements GLSurfaceView.Renderer {
+    private Context mContext;
+    private List<Model> models = new ArrayList<>();
     private Model model;
     private Point mCenterPoint;
     private Point eye = new Point(0, 0, -3);
@@ -40,8 +50,20 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
     float[] materialSpec = {1.0f, 0.5f, 0.0f, 1.0f};
 
     public WubaGLRenderer(Context context) {
+//        try {
+//            mContext = context;
+//            model = new STLReader().parserBinStlInAssets(context, "dragon.stl");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         try {
-            model = new STLReader().parserBinStlInAssets(context, "dragon.stl");
+            mContext = context;
+            STLReader reader = new STLReader();
+            for (int i = 1; i <= 6; i++) {
+                Model model = reader.parseStlWithTextureInAssets(context, "wuba/" + i);
+                models.add(model);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,13 +80,14 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         gl.glClearDepthf(1.0f); // 设置深度缓存值
         gl.glDepthFunc(GL10.GL_LEQUAL); // 设置深度缓存比较函数
         gl.glShadeModel(GL10.GL_SMOOTH);// 设置阴影模式GL_SMOOTH
-        float r = model.getR();
+        float r = model.getRadius();
         //r是半径，不是直径，因此用0.5/r可以算出放缩比例
         mScalef = 0.5f / r;
         mCenterPoint = model.getCentrePoint();
 
         openLight(gl);
         enableMaterial(gl);
+        initConfigData(gl);
     }
 
     @Override
@@ -104,8 +127,8 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
                 -mCenterPoint.z);
 
 
-        //===================begin==============================//
-
+        /*
+        //=================== Light ==============================//
         //允许给每个顶点设置法向量
         gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
         // 允许设置顶点
@@ -124,6 +147,34 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         //取消法向量设置
         gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+        */
+        //=================== Texture ==============================//
+        for (Model model : models) {
+            //開啟貼紋理功能
+            gl.glEnable(GL10.GL_TEXTURE_2D);
+            //根據ID綁定對應的紋理
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, model.getTextureIds()[0]);
+            //啟用相關功能
+            gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+            gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+            gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+            //開始繪制
+            gl.glNormalPointer(GL10.GL_FLOAT, 0, model.getVnormBuffer());
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, model.getVertBuffer());
+            gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, model.getTextureBuffer());
+
+            gl.glDrawArrays(GL10.GL_TRIANGLES, 0, model.getFacetCount() * 3);
+
+            //關閉當前模型貼紋理，即將紋理id設置為0
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, 0);
+
+            //關閉對應的功能
+            gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+            gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+            gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+            gl.glDisable(GL10.GL_TEXTURE_2D);
+        }
     }
 
     public void openLight(GL10 gl) {
@@ -146,6 +197,54 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         //镜面光的反射情况
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, ByteUtils.floatToBuffer(materialSpec));
 
+    }
+
+    private void initConfigData(GL10 gl) {
+        float r = STLReader.getR(models);
+        mScalef = 0.5f / r;
+        mCenterPoint = STLReader.getCenter(models);
+
+        for (Model model : models) {
+            loadTexture(gl, model, true);
+        }
+
+    }
+
+    private void loadTexture(GL10 gl, Model model, boolean isAssets) {
+        Log.d("GLRenderer", "綁定紋理：" + model.getPictureName());
+        Bitmap bitmap = null;
+        try {
+            // 打開圖片資源
+            if (isAssets) {//如果是從assets中讀取
+                bitmap = BitmapFactory.decodeStream(mContext.getAssets().open(model.getPictureName()));
+            } else {//否則就是從SD卡裏面讀取
+                bitmap = BitmapFactory.decodeFile(model.getPictureName());
+            }
+            // 生成一個紋理對象，並將其ID保存到成員變量 texture 中
+            int[] textures = new int[1];
+            gl.glGenTextures(1, textures, 0);
+            model.setTextureIds(textures);
+
+            // 將生成的空紋理綁定到當前2D紋理通道
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+
+            // 設置2D紋理通道當前綁定的紋理的屬性
+            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
+                    GL10.GL_NEAREST);
+            gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
+                    GL10.GL_LINEAR);
+
+            // 將bitmap應用到2D紋理通道當前綁定的紋理中
+            GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+            if (bitmap != null)
+                bitmap.recycle();
+
+        }
     }
 
 }

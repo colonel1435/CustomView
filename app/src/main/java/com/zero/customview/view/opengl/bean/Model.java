@@ -20,12 +20,19 @@ public class Model {
     private float[] vnorms;
     //每个三角面的属性信息
     private short[] remarks;
+    //纹理数组
+    private float[] textures;
+    //　纹理id　数组
+    private int[] textureIds;
+    private String pictureName;
 
     //顶点数组转换而来的Buffer
     private FloatBuffer vertBuffer;
 
     //每个顶点对应的法向量转换而来的Buffer
     private FloatBuffer vnormBuffer;
+
+    private FloatBuffer textureBuffer;
     //以下分别保存所有点在x,y,z方向上的最大值、最小值
     public float maxX;
     public float minX;
@@ -43,7 +50,7 @@ public class Model {
     }
 
     //包裹模型的最大半径
-    public float getR() {
+    public float getRadius() {
         float dx = (maxX - minX);
         float dy = (maxY - minY);
         float dz = (maxZ - minZ);
@@ -153,5 +160,38 @@ public class Model {
 
     public void setMinZ(float minZ) {
         this.minZ = minZ;
+    }
+
+    public float[] getTextures() {
+        return textures;
+    }
+
+    public void setTextures(float[] texture) {
+        this.textures = texture;
+        this.textureBuffer = ByteUtils.floatToBuffer(textures);
+    }
+
+    public FloatBuffer getTextureBuffer() {
+        return textureBuffer;
+    }
+
+    public void setTextureBuffer(FloatBuffer textureBuffer) {
+        this.textureBuffer = textureBuffer;
+    }
+
+    public int[] getTextureIds() {
+        return textureIds;
+    }
+
+    public void setTextureIds(int[] textureIds) {
+        this.textureIds = textureIds;
+    }
+
+    public String getPictureName() {
+        return pictureName;
+    }
+
+    public void setPictureName(String pictureName) {
+        this.pictureName = pictureName;
     }
 }

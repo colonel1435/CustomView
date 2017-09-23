@@ -59,6 +59,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.CircleMenuActivity"
+            android:hardwareAccelerated="false"
             android:label="@string/title_activity_circle_menu"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

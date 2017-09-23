@@ -47,6 +47,8 @@ public class CircleMenuView extends View {
     private int mWidth;
     private int mHeight;
 
+    private int down_x;
+    private int down_y;
     private onMenuClickListener mClickListener;
     public CircleMenuView(Context context) {
         this(context, null);
@@ -118,9 +120,9 @@ public class CircleMenuView extends View {
         int minWidth = Math.min(w, h);
         minWidth *= 0.8;
         int outRadius = minWidth / 2;
-        RectF outCircle = new RectF(-outRadius, outRadius, -outRadius, outRadius);
+        RectF outCircle = new RectF(-outRadius, -outRadius, outRadius, outRadius);
         int innerRadius = minWidth / 4;
-        RectF innerCircle = new RectF(-innerRadius, innerRadius, -innerRadius, innerRadius);
+        RectF innerCircle = new RectF(-innerRadius, -innerRadius, innerRadius, innerRadius);
 
         float outAngle = 84;
         float innerAngle = -80;
@@ -178,6 +180,8 @@ public class CircleMenuView extends View {
             canvas.drawPath(centerPath, mPaint);
         }
         mPaint.setColor(regionColor);
+
+//        canvas.drawCircle(down_x, down_y, 20, mPaint);
     }
 
     private int getTouchPosition(int x, int y) {
@@ -238,6 +242,8 @@ public class CircleMenuView extends View {
                 break;
         }
 
+        down_x = x;
+        down_y = y;
         invalidate();
         return true;
     }

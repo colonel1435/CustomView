@@ -1,6 +1,7 @@
 package com.zero.customview.view;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.ProviderInfo;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -13,6 +14,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.zero.customview.utils.DisplayUtils;
+
 /**
  * Description
  * Author : Mr.wumin
@@ -23,7 +26,10 @@ import android.view.View;
 public class CircleMenuView extends View {
     enum  POSITION {NONE, TOP, BOTTOM, LEFT, RIGHT, CENTER};
 
+    private Context mContext;
     private Paint mPaint;
+    private Paint mTextPaint;
+    private Paint.FontMetricsInt fontMetrics;
     private Matrix mMatrix;
 
     private Path centerPath;
@@ -38,14 +44,26 @@ public class CircleMenuView extends View {
     private Region leftRegion;
     private Region rightRegion;
 
+    private String centerText = "OK";
+    private String topText = "Top";
+    private String bottomText = "Bottom";
+    private String leftText = "Left";
+    private String rightText = "Right";
     private int touchPosition = -1;
     private int currentPosition = -1;
 
     private int regionColor = 0xFF4699A3;
     private int touchColor = 0XFFE67B63;
+    private int textColor = 0XFFFFFFFF;
+
+    private int textSize = 12;
 
     private int mWidth;
     private int mHeight;
+
+    private int outRadius;
+    private int innerRadius;
+    private float centerRadius;
 
     private int down_x;
     private int down_y;
@@ -60,12 +78,21 @@ public class CircleMenuView extends View {
 
     public CircleMenuView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.mContext = context;
         initView();
     }
 
     private void initView() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setColor(regionColor);
+
+        mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.setColor(textColor);
+        mTextPaint.setTextSize(DisplayUtils.dip2px(mContext, textSize));
+        mTextPaint.setStyle(Paint.Style.FILL);
+        mTextPaint.setTextAlign(Paint.Align.CENTER);
+        fontMetrics = mTextPaint.getFontMetricsInt();
+
         mMatrix = new Matrix();
 
         topPath = new Path();
@@ -119,15 +146,16 @@ public class CircleMenuView extends View {
         Region globalRegion = new Region(-w, -h, w, h);
         int minWidth = Math.min(w, h);
         minWidth *= 0.8;
-        int outRadius = minWidth / 2;
+        centerRadius = minWidth / 5;
+        outRadius = minWidth / 2;
         RectF outCircle = new RectF(-outRadius, -outRadius, outRadius, outRadius);
-        int innerRadius = minWidth / 4;
+        innerRadius = minWidth / 4;
         RectF innerCircle = new RectF(-innerRadius, -innerRadius, innerRadius, innerRadius);
 
         float outAngle = 84;
         float innerAngle = -80;
 
-        centerPath.addCircle(0, 0, 0.2f * minWidth, Path.Direction.CW);
+        centerPath.addCircle(0, 0, centerRadius, Path.Direction.CW);
         centerRegion.setPath(centerPath, globalRegion);
 
         rightPath.addArc(outCircle, -40, outAngle);
@@ -181,6 +209,16 @@ public class CircleMenuView extends View {
         }
         mPaint.setColor(regionColor);
 
+        float baselineY = -(fontMetrics.ascent + fontMetrics.descent)/2;
+        int offset = outRadius * 3 / 4;
+        canvas.drawText(topText, 0, -offset, mTextPaint);
+        canvas.drawText(bottomText,  0, offset, mTextPaint);
+        canvas.drawText(leftText, -offset, baselineY, mTextPaint);
+        canvas.drawText(rightText, offset, baselineY, mTextPaint);
+        canvas.drawText(centerText, 0, baselineY, mTextPaint);
+
+        canvas.drawLine(-mWidth/2, 0, mWidth/2, 0, mTextPaint);
+        canvas.drawLine(0, -mHeight/2, 0, mHeight/2, mTextPaint);
 //        canvas.drawCircle(down_x, down_y, 20, mPaint);
     }
 

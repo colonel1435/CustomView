@@ -27,6 +27,7 @@ import com.zero.customview.adapter.recyclerview.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.recyclerview.RecyclerItemClickListener;
 import com.zero.customview.adapter.recyclerview.RecyclerViewCommonAdapter;
 import com.zero.customview.adapter.recyclerview.RecyclerViewHolder;
+import com.zero.customview.view.CircleMenuView;
 import com.zero.customview.view.RoundImageDrawable;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_VIDEO_PLAYER = 9;
     private static final int ITEM_CHART = 10;
     private static final int ITEM_OPENGL_3D = 11;
+    private static final int ITEM_CIRCLE_MENU = 12;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.vedio_player));
         mDatas.add(getString(R.string.chart_view));
         mDatas.add(getString(R.string.opengl_3d));
+        mDatas.add(getString(R.string.circle_menu));
 
     }
     private void initView() {
@@ -176,6 +179,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_OPENGL_3D:
                 startActivity(new Intent(mContext, OpenGLActivity.class));
+                break;
+            case ITEM_CIRCLE_MENU:
+                startActivity(new Intent(mContext, CircleMenuActivity.class));
                 break;
             default:
                 break;

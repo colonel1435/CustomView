@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_CHART = 10;
     private static final int ITEM_OPENGL_3D = 11;
     private static final int ITEM_CIRCLE_MENU = 12;
+    private static final int ITEM_ANIM_BOTTOM = 13;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.chart_view));
         mDatas.add(getString(R.string.opengl_3d));
         mDatas.add(getString(R.string.circle_menu));
+        mDatas.add(getString(R.string.anim_bottom));
 
     }
     private void initView() {
@@ -182,6 +184,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_CIRCLE_MENU:
                 startActivity(new Intent(mContext, CircleMenuActivity.class));
+                break;
+            case ITEM_ANIM_BOTTOM:
+                startActivity(new Intent(mContext, BottomBarActivity.class));
                 break;
             default:
                 break;

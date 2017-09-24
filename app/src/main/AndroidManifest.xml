@@ -61,6 +61,10 @@
             android:name=".activity.CircleMenuActivity"
             android:hardwareAccelerated="false"
             android:label="@string/title_activity_circle_menu"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.BottomBarActivity"
+            android:label="@string/title_activity_bottom_bar"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

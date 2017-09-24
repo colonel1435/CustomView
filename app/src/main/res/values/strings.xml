@@ -34,6 +34,7 @@
     <string name="chart_view">Chart View</string>
     <string name="opengl_3d">OpenGL 3D</string>
     <string name="circle_menu">Circle Menu</string>
+    <string name="anim_bottom">Anim Bottom</string>
     <string name="anim_clicked_me">Click me</string>
     <string name="start_anim">Startup...</string>
     <string name="anim_shopping">Shopping</string>
@@ -51,4 +52,5 @@
     <string name="title_activity_open_gl">OpenGLActivity</string>
     <string name="open_gl_none">不支持OPENGL</string>
     <string name="title_activity_circle_menu">CircleMenuActivity</string>
+    <string name="title_activity_bottom_bar">BottomBarActivity</string>
 </resources>

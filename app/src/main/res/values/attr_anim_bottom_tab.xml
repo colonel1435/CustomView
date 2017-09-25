@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AnimBottomTab">
+        <attr name="anim_tab_text" format="string|reference" />
+        <attr name="anim_tab_textSize" format="dimension|reference"/>
+        <attr name="anim_tab_textColor" format="color|reference"/>
+        <attr name="anim_tab_selectColor" format="color|reference"/>
+        <attr name="anim_tab_image" format="reference"/>
+        <attr name="anim_tab_selectImage" format="reference"/>
+    </declare-styleable>
+</resources>

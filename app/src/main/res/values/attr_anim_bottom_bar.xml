@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AnimBottomBar">
+        <attr name="anim_bottom_background" format="color|reference"/>
+        <attr name="anim_bottom_selectColor" format="color|reference"/>
+        <attr name="anim_bottom_textColor" format="color|reference"/>
+        <attr name="anim_bottom_textSelectColor" format="color|reference"/>
+        <attr name="anim_bottom_enableAnimation" format="boolean"/>
+    </declare-styleable>
+</resources>

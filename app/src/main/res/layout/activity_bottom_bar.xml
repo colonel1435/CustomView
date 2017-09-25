@@ -10,17 +10,56 @@
     <include layout="@layout/toolbar_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
     <android.support.v4.view.ViewPager
-        android:id="@+id/vp_bottom_bar"
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-
-    </android.support.v4.view.ViewPager>
+        android:layout_weight="1"/>
 
     <com.zero.customview.view.bottombar.AnimBottomBar
         android:id="@+id/anim_bottom_bar"
         android:layout_width="match_parent"
-        android:layout_height="64dp">
+        android:layout_height="wrap_content"
+        app:anim_bottom_background="@color/colorWhite"
+        app:anim_bottom_textColor="@color/colorGrey"
+        app:anim_bottom_textSelectColor="@color/colorWhite"
+        app:anim_bottom_enableAnimation="true">
+        <com.zero.customview.view.bottombar.AnimBottomTab
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            app:anim_tab_text="Home"
+            app:anim_tab_image="@mipmap/ic_header_pig"
+            app:anim_tab_selectColor="@color/colorCoral"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:radius="@dimen/ripple_radius"/>
+        <com.zero.customview.view.bottombar.AnimBottomTab
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            app:anim_tab_text="Friend"
+            app:anim_tab_image="@mipmap/ic_header_monky"
+            app:anim_tab_selectColor="@color/colorDarkCyan"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:radius="@dimen/ripple_radius"/>
+        <com.zero.customview.view.bottombar.AnimBottomTab
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            app:anim_tab_text="Work"
+            app:anim_tab_image="@mipmap/ic_header_beast"
+            app:anim_tab_selectColor="@color/colorTeal"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:radius="@dimen/ripple_radius"/>
+        <com.zero.customview.view.bottombar.AnimBottomTab
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            app:anim_tab_text="Message"
+            app:anim_tab_image="@mipmap/ic_default_header"
+            app:anim_tab_selectColor="@color/colorAccent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:radius="@dimen/ripple_radius"/>
     </com.zero.customview.view.bottombar.AnimBottomBar>
 </LinearLayout>

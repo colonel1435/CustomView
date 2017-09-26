@@ -2,6 +2,7 @@ package com.zero.customview.view.bottombar;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,20 +11,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.CycleInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Transformation;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -39,7 +32,9 @@ import java.util.List;
 
 public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
     private final String TAG = this.getClass().getSimpleName()+"@wumin";
-    private List<BottomItem> mItems;
+    public enum ANIMATION { DEFAULT, SCALE, GRADIENT, TRANSLATE}
+    private final int ANIMATION_TIME = 500;
+    private List<BottomTab> mItems;
     private Context mContext;
     private Paint mPaint;
 
@@ -66,6 +61,8 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
     private OnItemSelectListener onItemSelectListener = null;
     private boolean mEableAnimation;
     private ValueAnimator slideAnimator = null;
+    private ValueAnimator colorAnimator = null;
+    private int mAnimType;
 
     public AnimBottomBar(Context context) {
         this(context, null);
@@ -90,6 +87,7 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
         mTextColor = ta.getColor(R.styleable.AnimBottomBar_anim_bottom_textColor, defaultColor);
         mTextSelectColor = ta.getColor(R.styleable.AnimBottomBar_anim_bottom_textSelectColor, defaultColor);
         mEableAnimation = ta.getBoolean(R.styleable.AnimBottomBar_anim_bottom_enableAnimation, true);
+        mAnimType = ta.getInt(R.styleable.AnimBottomBar_anim_bottom_animationType, ANIMATION.DEFAULT.ordinal());
         ta.recycle();
         mTextSize = DisplayUtils.dip2px(mContext, 12);
 
@@ -106,13 +104,13 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
 
     private void initSlideAnimator() {
         slideAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-        slideAnimator.setDuration(300);
+        slideAnimator.setDuration(ANIMATION_TIME);
         slideAnimator.setInterpolator(new AccelerateInterpolator());
         slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float animValue = (float)animation.getAnimatedValue();
-                updateBackground(animValue);
+                updateTabBackground(animValue);
             }
         });
         slideAnimator.addListener(new AnimatorListenerAdapter() {
@@ -128,7 +126,6 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
                 lastMoveLeft = itemMoveLeft;
                 lastMoveRight = itemMoveRight;
                 lastSelectPositon = itemSelectPosition;
-                updateTitle();
             }
         });
     }
@@ -143,8 +140,10 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
 
                 @Override
                 public void onPageSelected(int position) {
-                    itemSelectPosition = position;
-                    updateTab();
+                    if (itemSelectPosition != position) {
+                        itemSelectPosition = position;
+                        updateBottomBar();
+                    }
                 }
 
                 @Override
@@ -168,21 +167,17 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
         lastMoveRight = itemMoveRight;
         lastSelectPositon = itemSelectPosition;
         postInvalidate();
-        updateTitle();
+        intTabs();
     }
 
-    private void updateTitle() {
-        for(int i = 0; i < childCount; i++) {
-            TextView title = ((AnimBottomTab) getChildAt(i)).getTitle();
-            if (i == itemSelectPosition) {
-                title.setTextColor(mTextSelectColor);
-            } else {
-                title.setTextColor(mTextColor);
-            }
-        }
+    private void updateTabColor() {
+        AnimBottomTab previousTab = (AnimBottomTab) getChildAt(lastSelectPositon);
+        previousTab.updateTabColor(mTextSelectColor, mTextColor);
+        AnimBottomTab currentTab = (AnimBottomTab) getChildAt(itemSelectPosition);
+        currentTab.updateTabColor(mTextColor, mTextSelectColor);
     }
 
-    private void updateBackground(float animValue) {
+    private void updateTabBackground(float animValue) {
         int position = itemSelectPosition - lastSelectPositon;
         if (position < 0) {/***    Slide to left    ***/
             itemMoveRight = (int) (lastMoveRight + animValue * itemWidth * position);
@@ -196,14 +191,27 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
         postInvalidate();
     }
 
-    private void updateTab() {
+    private void intTabs() {
+        for(int i = 0; i < childCount; i++) {
+            AnimBottomTab tab = (AnimBottomTab)getChildAt(i);
+            if (i == itemSelectPosition) {
+                tab.getTitle().setTextColor(mTextSelectColor);
+                tab.getImage().setColorFilter(mTextSelectColor);
+            } else {
+                tab.getTitle().setTextColor(mTextColor);
+                tab.getImage().clearColorFilter();
+            }
+        }
+    }
+    private void updateBottomBar() {
         if (mEableAnimation) {
             slideAnimator.start();
         } else {
-            updateBackground(1.0f);
-            updateTitle();
+            updateTabBackground(1.0f);
         }
+        updateTabColor();
     }
+
     private int measureSize(int measureSpec) {
         int defaultSize = 480;
         int result = 0;
@@ -263,12 +271,7 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
 
             /***    Scale tab   ***/
             int deltaX=Math.abs(itemMoveCenter-itemCenterX[i]);
-            if (deltaX<itemWidth){
-                itemScale[i]= (float) (-0.2*deltaX/itemWidth+1.0);
-            } else {
-                itemScale[i]=0.8f;
-            }
-            tab.updateTabScale(itemScale[i]);
+            tab.updateTabAnimation(mAnimType, deltaX);
             tab.setTag(i);
             tab.setOnClickListener(this);
         }
@@ -285,8 +288,7 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
     public void onClick(View v) {
         if (!(mEableAnimation && slideAnimator.isRunning())) {
             itemSelectPosition = (int) v.getTag();
-            Log.d(TAG, "onClick: " + itemSelectPosition);
-            updateTab();
+            updateBottomBar();
             if (onItemSelectListener != null) {
                 onItemSelectListener.onItemSelected(itemSelectPosition);
             }

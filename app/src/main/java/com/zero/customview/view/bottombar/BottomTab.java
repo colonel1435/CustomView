@@ -4,11 +4,11 @@ package com.zero.customview.view.bottombar;
  * Created by zero on 2017/9/24.
  */
 
-public class BottomItem {
+public class BottomTab {
     private String title;
     private int resId;
 
-    public BottomItem(String title, int resId) {
+    public BottomTab(String title, int resId) {
         this.title = title;
         this.resId = resId;
     }

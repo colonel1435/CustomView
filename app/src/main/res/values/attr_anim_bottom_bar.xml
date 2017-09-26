@@ -6,5 +6,11 @@
         <attr name="anim_bottom_textColor" format="color|reference"/>
         <attr name="anim_bottom_textSelectColor" format="color|reference"/>
         <attr name="anim_bottom_enableAnimation" format="boolean"/>
+        <attr name="anim_bottom_animationType">ss
+            <enum name="normal" value="0"/>
+            <enum name="scale" value="1"/>
+            <enum name="gradient" value="2"/>
+            <enum name="translate" value="3"/>
+        </attr>
     </declare-styleable>
 </resources>

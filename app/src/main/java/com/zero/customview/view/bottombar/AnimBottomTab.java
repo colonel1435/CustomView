@@ -1,5 +1,7 @@
 package com.zero.customview.view.bottombar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -9,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,8 @@ import com.zero.customview.view.MiClockView;
 import java.security.PublicKey;
 
 import static com.zero.customview.R.attr.selectableItemBackgroundBorderless;
+import static com.zero.customview.R.attr.switchMinWidth;
+import static com.zero.customview.R.attr.thickness;
 
 /**
  * Description
@@ -31,6 +36,7 @@ import static com.zero.customview.R.attr.selectableItemBackgroundBorderless;
  */
 
 public class AnimBottomTab extends LinearLayout {
+    private final String TAG = this.getClass().getSimpleName()+"@wumin";
     private Context mContext;
     private TextView mTitle;
     private ImageView mImage;
@@ -40,8 +46,8 @@ public class AnimBottomTab extends LinearLayout {
     private int mTitleSize;
     private int mTitleColor;
     private int mImageRes;
-    private int mImageWidth = 48;
-    private int mImageHeight = 48;
+    private int mImageWidth = 56;
+    private int mImageHeight = 56;
     private int mTopPadding = 0;
     private int mBottomPadding = 0;
     private int mSelectColor;
@@ -70,6 +76,7 @@ public class AnimBottomTab extends LinearLayout {
 
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
+        setPadding(0, 5, 0, 5);
 
         mImage = new ImageView(mContext);
         mImage.setImageResource(mImageRes);
@@ -97,12 +104,69 @@ public class AnimBottomTab extends LinearLayout {
         return this.mSelectColor;
     }
 
-    public void updateTabScale(float scale) {
-        mTitle.setScaleX(scale);
-        mTitle.setScaleY(scale);
+    public int getImageRes() {
+        return this.mImageRes;
+    }
 
-        mImage.setScaleX(scale);
-        mImage.setScaleY(scale);
+    public void updateTabWithScale(float offset) {
+        float scaleValue;
+        int tabWidth = getWidth();
+        if (offset < tabWidth) {
+            scaleValue = (float) (1.0 - 0.2*offset/tabWidth);
+        } else {
+            scaleValue = 0.8f;
+        }
+
+        mTitle.setScaleX(scaleValue);
+        mTitle.setScaleY(scaleValue);
+
+        mImage.setScaleX(scaleValue);
+        mImage.setScaleY(scaleValue);
+    }
+
+    public void updateTabWithGradient(float offset) {
+
+    }
+
+    public void updateTabAnimation(int type, float offset) {
+        if (type == AnimBottomBar.ANIMATION.SCALE.ordinal()) {
+            updateTabWithScale(offset);
+        } else if (type == AnimBottomBar.ANIMATION.GRADIENT.ordinal()){
+            updateTabWithGradient(offset);
+        }
+    }
+
+    public void selected() {
+        updateTabColor(mTitleColor, mSelectColor);
+    }
+
+    public void unselected() {
+        updateTabColor(mSelectColor, mTitleColor);
+    }
+
+    public void updateTabColor(int previous, int current) {
+        ValueAnimator colorAnimator = ValueAnimator.ofInt(previous, current);
+        colorAnimator.setDuration(500);
+        colorAnimator.setEvaluator(new ArgbEvaluator());
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int colorValue = (int) animation.getAnimatedValue();
+                updateColor(colorValue);
+            }
+        });
+        colorAnimator.start();
+    }
+
+
+    private void updateColor(int color) {
+        if (mImage != null) {
+            mImage.setColorFilter(color);
+        }
+
+        if (mTitle != null) {
+            mTitle.setTextColor(color);
+        }
     }
 
     @Override

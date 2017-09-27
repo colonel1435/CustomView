@@ -37,7 +37,7 @@ import static com.zero.customview.R.attr.thickness;
 
 public class AnimBottomTab extends LinearLayout {
     private final String TAG = this.getClass().getSimpleName()+"@wumin";
-    public enum TabType {NORMAL, MESSAGE, USER}
+    public enum TabType {NORMAL, MESSAGE, USER, MENU}
     private Context mContext;
     private TextView mTitle;
     private ImageView mImage;
@@ -47,8 +47,8 @@ public class AnimBottomTab extends LinearLayout {
     private int mTitleSize;
     private int mTitleColor;
     private int mImageRes;
-    private int mImageWidth = 56;
-    private int mImageHeight = 56;
+    private int mImageWidth = 64;
+    private int mImageHeight = 64;
     private int mTopPadding = 0;
     private int mBottomPadding = 0;
     private int mSelectColor;
@@ -83,8 +83,10 @@ public class AnimBottomTab extends LinearLayout {
 
         if (mTabType == TabType.NORMAL.ordinal()) {
             mImage = new ImageView(mContext);
-        } else {
+        } else if (mTabType == TabType.MESSAGE.ordinal()){
             mImage = new MessageTab(mContext);
+        } else if (mTabType == TabType.MENU.ordinal()) {
+            mImage = new MenuTab(mContext);
         }
         mImage.setImageResource(mImageRes);
         LayoutParams params = new LayoutParams(mImageWidth, mImageHeight);
@@ -145,6 +147,8 @@ public class AnimBottomTab extends LinearLayout {
         }
         if (mTabType == TabType.MESSAGE.ordinal()) {
             ((MessageTab)mImage).updateRadius(scaleValue);
+        } else if (mTabType == TabType.MENU.ordinal()) {
+            ((MenuTab)mImage).updateAnimation(scaleValue);
         }
         Log.d(TAG, "updateTabWithGradient: offset -> " + offset + " scale -> " + scaleValue);
     }
@@ -187,6 +191,8 @@ public class AnimBottomTab extends LinearLayout {
             } else {
                 if (mTabType == TabType.MESSAGE.ordinal()) {
                     ((MessageTab)mImage).updateColor(color);
+                } else if (mTabType == TabType.MENU.ordinal()) {
+                    ((MenuTab)mImage).updateColor(color);
                 }
             }
         }

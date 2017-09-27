@@ -44,7 +44,8 @@
             android:layout_height="wrap_content"
             app:anim_tab_text="Work"
             app:anim_tab_image="@mipmap/ic_page_work"
-            app:anim_tab_selectColor="@color/colorTeal"/>
+            app:anim_tab_selectColor="@color/colorTeal"
+            app:anim_tab_type="menu"/>
         <com.zero.customview.view.bottombar.AnimBottomTab
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

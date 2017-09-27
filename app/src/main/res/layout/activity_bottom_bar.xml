@@ -38,7 +38,8 @@
             android:layout_height="wrap_content"
             app:anim_tab_text="Friend"
             app:anim_tab_image="@mipmap/ic_page_friend"
-            app:anim_tab_selectColor="@color/colorDarkCyan"/>
+            app:anim_tab_selectColor="@color/colorDarkCyan"
+            app:anim_tab_type="contact"/>
         <com.zero.customview.view.bottombar.AnimBottomTab
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

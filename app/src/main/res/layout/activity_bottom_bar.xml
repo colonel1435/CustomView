@@ -25,13 +25,14 @@
         app:anim_bottom_textColor="@color/colorGrey"
         app:anim_bottom_textSelectColor="@color/colorWhite"
         app:anim_bottom_enableAnimation="true"
-        app:anim_bottom_animationType="scale">
+        app:anim_bottom_animationType="gradient">
         <com.zero.customview.view.bottombar.AnimBottomTab
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:anim_tab_text="Home"
             app:anim_tab_image="@mipmap/ic_page_message"
-            app:anim_tab_selectColor="@color/colorCoral"/>
+            app:anim_tab_selectColor="@color/colorCoral"
+            app:anim_tab_type="message"/>
         <com.zero.customview.view.bottombar.AnimBottomTab
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

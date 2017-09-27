@@ -37,6 +37,7 @@ import static com.zero.customview.R.attr.thickness;
 
 public class AnimBottomTab extends LinearLayout {
     private final String TAG = this.getClass().getSimpleName()+"@wumin";
+    public enum TabType {NORMAL, MESSAGE, USER}
     private Context mContext;
     private TextView mTitle;
     private ImageView mImage;
@@ -51,6 +52,7 @@ public class AnimBottomTab extends LinearLayout {
     private int mTopPadding = 0;
     private int mBottomPadding = 0;
     private int mSelectColor;
+    private int mTabType;
     public AnimBottomTab(Context context) {
         this(context, null);
     }
@@ -72,13 +74,18 @@ public class AnimBottomTab extends LinearLayout {
         mTitleColor = ta.getColor(R.styleable.AnimBottomTab_anim_tab_textColor, Color.BLACK);
         mImageRes = ta.getResourceId(R.styleable.AnimBottomTab_anim_tab_image, R.mipmap.ic_launcher);
         mSelectColor =ta.getColor(R.styleable.AnimBottomTab_anim_tab_selectColor, Color.WHITE);
+        mTabType = ta.getInt(R.styleable.AnimBottomTab_anim_tab_type, TabType.NORMAL.ordinal());
         ta.recycle();
 
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
         setPadding(0, 5, 0, 5);
 
-        mImage = new ImageView(mContext);
+        if (mTabType == TabType.NORMAL.ordinal()) {
+            mImage = new ImageView(mContext);
+        } else {
+            mImage = new MessageTab(mContext);
+        }
         mImage.setImageResource(mImageRes);
         LayoutParams params = new LayoutParams(mImageWidth, mImageHeight);
         mImage.setPadding(0, mTopPadding, 0, mBottomPadding);
@@ -108,6 +115,10 @@ public class AnimBottomTab extends LinearLayout {
         return this.mImageRes;
     }
 
+    public int getTabType() {
+        return this.mTabType;
+    }
+
     public void updateTabWithScale(float offset) {
         float scaleValue;
         int tabWidth = getWidth();
@@ -125,7 +136,17 @@ public class AnimBottomTab extends LinearLayout {
     }
 
     public void updateTabWithGradient(float offset) {
-
+        float scaleValue;
+        int tabWidth = getWidth();
+        if (offset < tabWidth) {
+            scaleValue = offset/tabWidth;
+        } else {
+            scaleValue = 1.0f;
+        }
+        if (mTabType == TabType.MESSAGE.ordinal()) {
+            ((MessageTab)mImage).updateRadius(scaleValue);
+        }
+        Log.d(TAG, "updateTabWithGradient: offset -> " + offset + " scale -> " + scaleValue);
     }
 
     public void updateTabAnimation(int type, float offset) {
@@ -159,9 +180,15 @@ public class AnimBottomTab extends LinearLayout {
     }
 
 
-    private void updateColor(int color) {
+    public void updateColor(int color) {
         if (mImage != null) {
-            mImage.setColorFilter(color);
+            if (mTabType == TabType.NORMAL.ordinal()) {
+                mImage.setColorFilter(color);
+            } else {
+                if (mTabType == TabType.MESSAGE.ordinal()) {
+                    ((MessageTab)mImage).updateColor(color);
+                }
+            }
         }
 
         if (mTitle != null) {

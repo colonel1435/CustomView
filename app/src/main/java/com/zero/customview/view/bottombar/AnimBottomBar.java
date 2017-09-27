@@ -196,10 +196,12 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
             AnimBottomTab tab = (AnimBottomTab)getChildAt(i);
             if (i == itemSelectPosition) {
                 tab.getTitle().setTextColor(mTextSelectColor);
-                tab.getImage().setColorFilter(mTextSelectColor);
+                tab.updateColor(mTextSelectColor);
+//                tab.getImage().setColorFilter(mTextSelectColor);
             } else {
                 tab.getTitle().setTextColor(mTextColor);
-                tab.getImage().clearColorFilter();
+                tab.updateColor(mTextColor);
+//                tab.getImage().clearColorFilter();
             }
         }
     }

@@ -37,7 +37,7 @@ import static com.zero.customview.R.attr.thickness;
 
 public class AnimBottomTab extends LinearLayout {
     private final String TAG = this.getClass().getSimpleName()+"@wumin";
-    public enum TabType {NORMAL, MESSAGE, CONTACT, MENU}
+    public enum TabType {NORMAL, MESSAGE, CONTACT, MENU, SETUP}
     private Context mContext;
     private TextView mTitle;
     private ImageView mImage;
@@ -89,6 +89,8 @@ public class AnimBottomTab extends LinearLayout {
             mImage = new MenuTab(mContext);
         }else if (mTabType == TabType.CONTACT.ordinal()) {
             mImage = new ContactTab(mContext);
+        }else if (mTabType == TabType.SETUP.ordinal()) {
+            mImage = new SetupTab(mContext);
         }
         mImage.setImageResource(mImageRes);
         LayoutParams params = new LayoutParams(mImageWidth, mImageHeight);
@@ -153,6 +155,8 @@ public class AnimBottomTab extends LinearLayout {
             ((MenuTab)mImage).updateAnimation(scaleValue);
         } else if (mTabType == TabType.CONTACT.ordinal()) {
             ((ContactTab)mImage).updateAnimation(scaleValue);
+        }else if (mTabType == TabType.SETUP.ordinal()) {
+            ((SetupTab)mImage).updateAnimation(scaleValue);
         }
         Log.d(TAG, "updateTabWithGradient: offset -> " + offset + " scale -> " + scaleValue);
     }
@@ -199,6 +203,8 @@ public class AnimBottomTab extends LinearLayout {
                     ((MenuTab)mImage).updateColor(color);
                 }else if (mTabType == TabType.CONTACT.ordinal()) {
                     ((ContactTab)mImage).updateColor(color);
+                }else if (mTabType == TabType.SETUP.ordinal()) {
+                    ((SetupTab)mImage).updateColor(color);
                 }
             }
         }

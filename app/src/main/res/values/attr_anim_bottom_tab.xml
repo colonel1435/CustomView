@@ -12,6 +12,7 @@
             <enum name="message" value="1"/>
             <enum name="contact" value="2"/>
             <enum name="menu" value="3"/>
+            <enum name="setup" value="4"/>
         </attr>
     </declare-styleable>
 </resources>

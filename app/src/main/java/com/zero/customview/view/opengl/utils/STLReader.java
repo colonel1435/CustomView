@@ -1,6 +1,7 @@
 package com.zero.customview.view.opengl.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.zero.customview.view.opengl.OpenGLConst;
 import com.zero.customview.view.opengl.bean.Model;
@@ -21,6 +22,7 @@ import java.util.List;
  */
 
 public class STLReader {
+    private final String TAG = this.getClass().getSimpleName()+"@wumin";
     private static final int STL_HEADER_SIZE = 80;
     private static final int STL_FACET_NUM_SIZE = 4;
     private static final int STL_FACET_SIZE = 50;
@@ -43,6 +45,7 @@ public class STLReader {
             throws IOException {
 
         InputStream is = context.getAssets().open(fileName);
+        Log.d(TAG, "parserBinStlInAssets: " + fileName);
         return parseBinStl(is);
     }
 
@@ -211,8 +214,11 @@ public class STLReader {
              *  however the android zero point is at the left-top.
              *  So it should be decreased by one;
              */
-            textures[i * STL_FACET_EDGE_NUM] = tx;
-            textures[i * STL_FACET_EDGE_NUM + 1] = 1 - ty;
+
+            tx = 1.0f;
+            ty = 0.0f;
+            textures[i * STL_TEXTURE_COORD_NUM] = tx;
+            textures[i * STL_TEXTURE_COORD_NUM + 1] = 1 - ty;
 
             textureOffset += (2*STL_FLOAT_SIZE);
         }

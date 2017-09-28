@@ -51,19 +51,18 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
     float[] materialSpec = {1.0f, 0.5f, 0.0f, 1.0f};
 
     public WubaGLRenderer(Context context) {
-        /*
-        try {
-            mContext = context;
-            model = new STLReader().parserBinStlInAssets(context, "dragon.stl");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
+
+//        try {
+//            mContext = context;
+//            model = new STLReader().parserBinStlInAssets(context, "stl/buddha.stl");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         try {
             mContext = context;
             STLReader reader = new STLReader();
-            Model model = reader.parseStlWithTextureInAssets(context, "stl/dragon");
+            model = reader.parseStlWithTextureInAssets(context, "stl/buddha");
             models.add(model);
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,13 +75,13 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        gl.glClearColor(0.74f, 0.76f, 0.78f, 0f); /***  colorSilver  ***/
-        gl.glEnable(GL10.GL_DEPTH_TEST); // 启用深度缓存
-        gl.glClearDepthf(1.0f); // 设置深度缓存值
-        gl.glDepthFunc(GL10.GL_LEQUAL); // 设置深度缓存比较函数
-        gl.glShadeModel(GL10.GL_SMOOTH);// 设置阴影模式GL_SMOOTH
+//        gl.glClearColor(0.74f, 0.76f, 0.78f, 0f); /***  colorSilver  ***/
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); /***  colorBlack  ***/
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        gl.glClearDepthf(1.0f);
+        gl.glDepthFunc(GL10.GL_LEQUAL);
+        gl.glShadeModel(GL10.GL_SMOOTH);
         float r = model.getRadius();
-        //r是半径，不是直径，因此用0.5/r可以算出放缩比例
         mScalef = 0.5f / r;
         mCenterPoint = model.getCentrePoint();
 
@@ -127,7 +126,7 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
                 -mCenterPoint.z);
 
 
-        /*
+
         //=================== Light ==============================//
         //允许给每个顶点设置法向量
         gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
@@ -147,7 +146,7 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         //取消法向量设置
         gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-        */
+
         //=================== Texture ==============================//
         for (Model model : models) {
             // Enable texture func
@@ -175,6 +174,7 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
             gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
             gl.glDisable(GL10.GL_TEXTURE_2D);
         }
+
     }
 
     public void openLight(GL10 gl) {

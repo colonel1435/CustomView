@@ -126,6 +126,39 @@ public class Model {
         this.vnormBuffer = vnormBuffer;
     }
 
+    public float[] getTextures() {
+        return textures;
+    }
+
+    public void setTextures(float[] texture) {
+        this.textures = texture;
+        this.textureBuffer = ByteUtils.floatToBuffer(textures);
+    }
+
+    public FloatBuffer getTextureBuffer() {
+        return textureBuffer;
+    }
+
+    public void setTextureBuffer(FloatBuffer textureBuffer) {
+        this.textureBuffer = textureBuffer;
+    }
+
+    public int[] getTextureIds() {
+        return textureIds;
+    }
+
+    public void setTextureIds(int[] textureIds) {
+        this.textureIds = textureIds;
+    }
+
+    public String getPictureName() {
+        return pictureName;
+    }
+
+    public void setPictureName(String pictureName) {
+        this.pictureName = pictureName;
+    }
+
     public float getMaxX() {
         return maxX;
     }
@@ -172,38 +205,5 @@ public class Model {
 
     public void setMinZ(float minZ) {
         this.minZ = minZ;
-    }
-
-    public float[] getTextures() {
-        return textures;
-    }
-
-    public void setTextures(float[] texture) {
-        this.textures = texture;
-        this.textureBuffer = ByteUtils.floatToBuffer(textures);
-    }
-
-    public FloatBuffer getTextureBuffer() {
-        return textureBuffer;
-    }
-
-    public void setTextureBuffer(FloatBuffer textureBuffer) {
-        this.textureBuffer = textureBuffer;
-    }
-
-    public int[] getTextureIds() {
-        return textureIds;
-    }
-
-    public void setTextureIds(int[] textureIds) {
-        this.textureIds = textureIds;
-    }
-
-    public String getPictureName() {
-        return pictureName;
-    }
-
-    public void setPictureName(String pictureName) {
-        this.pictureName = pictureName;
     }
 }

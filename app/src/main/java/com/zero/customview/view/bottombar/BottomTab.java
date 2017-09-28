@@ -1,31 +1,26 @@
 package com.zero.customview.view.bottombar;
 
+import android.content.Context;
+import android.support.v7.widget.AppCompatImageView;
+import android.util.AttributeSet;
+
 /**
  * Created by zero on 2017/9/24.
  */
 
-public class BottomTab {
-    private String title;
-    private int resId;
-
-    public BottomTab(String title, int resId) {
-        this.title = title;
-        this.resId = resId;
+public abstract class BottomTab extends AppCompatImageView {
+    public BottomTab(Context context) {
+        super(context);
     }
 
-    public String getTitle() {
-        return title;
+    public BottomTab(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public BottomTab(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
-    public int getResId() {
-        return resId;
-    }
-
-    public void setResId(int resId) {
-        this.resId = resId;
-    }
+    abstract void updateColor(int color);
+    abstract void updateAnimation(float scale);
 }

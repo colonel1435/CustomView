@@ -40,7 +40,7 @@ public class AnimBottomTab extends LinearLayout {
     public enum TabType {NORMAL, MESSAGE, CONTACT, MENU, SETUP}
     private Context mContext;
     private TextView mTitle;
-    private ImageView mImage;
+    private BottomTab mImage;
     private int mChildCount = 2;
 
     private String mTitleText;
@@ -81,17 +81,7 @@ public class AnimBottomTab extends LinearLayout {
         setGravity(Gravity.CENTER);
         setPadding(0, 5, 0, 5);
 
-        if (mTabType == TabType.NORMAL.ordinal()) {
-            mImage = new ImageView(mContext);
-        } else if (mTabType == TabType.MESSAGE.ordinal()){
-            mImage = new MessageTab(mContext);
-        } else if (mTabType == TabType.MENU.ordinal()) {
-            mImage = new MenuTab(mContext);
-        }else if (mTabType == TabType.CONTACT.ordinal()) {
-            mImage = new ContactTab(mContext);
-        }else if (mTabType == TabType.SETUP.ordinal()) {
-            mImage = new SetupTab(mContext);
-        }
+        mImage = BottomTabFactory.create(mContext, mTabType);
         mImage.setImageResource(mImageRes);
         LayoutParams params = new LayoutParams(mImageWidth, mImageHeight);
         mImage.setPadding(0, mTopPadding, 0, mBottomPadding);
@@ -149,15 +139,8 @@ public class AnimBottomTab extends LinearLayout {
         } else {
             scaleValue = 1.0f;
         }
-        if (mTabType == TabType.MESSAGE.ordinal()) {
-            ((MessageTab)mImage).updateRadius(scaleValue);
-        } else if (mTabType == TabType.MENU.ordinal()) {
-            ((MenuTab)mImage).updateAnimation(scaleValue);
-        } else if (mTabType == TabType.CONTACT.ordinal()) {
-            ((ContactTab)mImage).updateAnimation(scaleValue);
-        }else if (mTabType == TabType.SETUP.ordinal()) {
-            ((SetupTab)mImage).updateAnimation(scaleValue);
-        }
+
+        mImage.updateAnimation(scaleValue);
         Log.d(TAG, "updateTabWithGradient: offset -> " + offset + " scale -> " + scaleValue);
     }
 
@@ -194,19 +177,7 @@ public class AnimBottomTab extends LinearLayout {
 
     public void updateColor(int color) {
         if (mImage != null) {
-            if (mTabType == TabType.NORMAL.ordinal()) {
-                mImage.setColorFilter(color);
-            } else {
-                if (mTabType == TabType.MESSAGE.ordinal()) {
-                    ((MessageTab)mImage).updateColor(color);
-                } else if (mTabType == TabType.MENU.ordinal()) {
-                    ((MenuTab)mImage).updateColor(color);
-                }else if (mTabType == TabType.CONTACT.ordinal()) {
-                    ((ContactTab)mImage).updateColor(color);
-                }else if (mTabType == TabType.SETUP.ordinal()) {
-                    ((SetupTab)mImage).updateColor(color);
-                }
-            }
+            mImage.updateColor(color);
         }
 
         if (mTitle != null) {

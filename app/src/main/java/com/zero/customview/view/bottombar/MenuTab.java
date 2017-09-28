@@ -14,7 +14,7 @@ import android.util.AttributeSet;
  * Date   : 2017/9/27 0027 14:42
  */
 
-public class MenuTab extends AppCompatImageView {
+public class MenuTab extends BottomTab{
     private Context mContext;
     private final float DOT_MAX_POSITION = 17.0f;
     private final float DOT_MIN_POSITION = 16.0f;
@@ -49,11 +49,13 @@ public class MenuTab extends AppCompatImageView {
         mPosition = DOT_MIN_POSITION;
     }
 
+    @Override
     public void updateColor(int color) {
         this.mViewColor = color;
         invalidate();
     }
 
+    @Override
     public void  updateAnimation(float scaleValue) {
         this.mPosition = DOT_MIN_POSITION + (1-scaleValue)*DOT_MAX_POSITION;
         invalidate();

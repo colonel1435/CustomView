@@ -16,7 +16,7 @@ import android.util.Log;
  * Date   : 2017/9/27 0027 16:56
  */
 
-public class SetupTab extends AppCompatImageView {
+public class SetupTab extends BottomTab{
     private final String TAG = this.getClass().getSimpleName() + "@wumin";
     private final float MAX_ROTATION = 90;
     private final float DOT_MAX_RADIUS = 4;
@@ -52,11 +52,13 @@ public class SetupTab extends AppCompatImageView {
         mDotRadius = DOT_MAX_RADIUS;
     }
 
+    @Override
     public void updateColor(int color) {
         mViewColor = color;
         invalidate();
     }
 
+    @Override
     public void updateAnimation(float scaleValue) {
         float rotate = (1 - scaleValue) * MAX_ROTATION;
         this.setRotation(rotate);

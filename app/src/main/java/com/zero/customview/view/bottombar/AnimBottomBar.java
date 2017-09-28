@@ -34,7 +34,6 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
     private final String TAG = this.getClass().getSimpleName()+"@wumin";
     public enum ANIMATION { DEFAULT, SCALE, GRADIENT, TRANSLATE}
     private final int ANIMATION_TIME = 500;
-    private List<BottomTab> mItems;
     private Context mContext;
     private Paint mPaint;
 
@@ -80,7 +79,6 @@ public class AnimBottomBar extends LinearLayout implements View.OnClickListener{
     }
 
     private void initView(AttributeSet attrs) {
-        mItems = new ArrayList<>();
         TypedArray ta = mContext.obtainStyledAttributes(attrs,R.styleable.AnimBottomBar);
         mBackgoudColor = ta.getColor(R.styleable.AnimBottomBar_anim_bottom_background, defaultColor);
         mSelectColor = ta.getColor(R.styleable.AnimBottomBar_anim_bottom_selectColor,defaultColor);

@@ -18,7 +18,7 @@ import android.util.Log;
  * Date   : 2017/9/27 0027 8:48
  */
 
-public class MessageTab extends AppCompatImageView {
+public class MessageTab extends BottomTab{
     private final String TAG = this.getClass().getSimpleName() + "@wumin";
     public enum MessageAlign {TOP, CENTER}
     private final int DOT_CIRCLE = 4;
@@ -67,12 +67,14 @@ public class MessageTab extends AppCompatImageView {
         invalidate();
     }
 
+    @Override
     public void updateColor(int color) {
         this.mViewColor = color;
         invalidate();
     }
 
-    public void updateRadius(float scaleValue) {
+    @Override
+    public void updateAnimation(float scaleValue) {
         this.mRadius = (1-scaleValue)*DOT_CIRCLE;
         Log.d(TAG, "updateRadius: mRadius -> " + mRadius + " Scale -> " + scaleValue);
         invalidate();

@@ -21,7 +21,7 @@ import android.util.AttributeSet;
  * Date   : 2017/9/27 0027 16:05
  */
 
-public class ContactTab extends AppCompatImageView {
+public class ContactTab extends BottomTab{
     private final float MAX_POSITION = 4;
     private final int PAINT_SIZE = 4;
     private Context mContext;
@@ -56,11 +56,13 @@ public class ContactTab extends AppCompatImageView {
         mPosition = 0.0f;
     }
 
+    @Override
     public void updateColor(int color) {
         this.mViewColor = color;
         invalidate();
     }
 
+    @Override
     public void updateAnimation(float scaleValue) {
         this.mPosition = MAX_POSITION * (1 - scaleValue);
         invalidate();

@@ -17,9 +17,8 @@ import java.util.List;
 
 public class ByteUtils {
     public static FloatBuffer floatToBuffer(float[] a) {
-        //先初始化buffer，数组的长度*4，因为一个float占4个字节
+        /***    Float occupies 4B   ***/
         ByteBuffer bb = ByteBuffer.allocateDirect(a.length * 4);
-        //数组排序用nativeOrder
         bb.order(ByteOrder.nativeOrder());
         FloatBuffer buffer = bb.asFloatBuffer();
         buffer.put(a);
@@ -44,6 +43,10 @@ public class ByteUtils {
     public static float byte4ToFloat(byte[] bytes, int offset) {
 
         return Float.intBitsToFloat(byte4ToInt(bytes, offset));
+    }
+
+    public static String byteToString(byte[] bytes) {
+        return new String(bytes);
     }
 
 }

@@ -21,6 +21,14 @@ import java.util.List;
  */
 
 public class STLReader {
+    private static final int STL_HEADER_SIZE = 80;
+    private static final int STL_FACET_NUM_SIZE = 4;
+    private static final int STL_FACET_SIZE = 50;
+    private static final int STL_FACET_ATTR = 2;
+    private static final int STL_FACET_EDGE_NUM = 3;
+    private static final int STL_FACET_COORD_NUM = 3;
+    private static final int STL_TEXTURE_COORD_NUM = 2;
+    private static final int STL_FLOAT_SIZE = 4;
     private StlLoadListener stlLoadListener;
 
     public Model parserBinStlInSDCard(String path)
@@ -49,17 +57,26 @@ public class STLReader {
         return parseStlWithTexturePic(stlInput, textureInput, picName);
     }
 
-    //解析二进制的Stl文件
+    /**
+     *  @description    Parse stl binary file
+     *  @param in
+     *  @return com.zero.customview.view.opengl.bean.Model
+     *  @author Mr.wumin
+     *  @time 2017/9/28 0028 14:29
+     */
     public Model parseBinStl(InputStream in) throws IOException {
         if (stlLoadListener != null)
             stlLoadListener.onstart();
         Model model = new Model();
-        //前面80字节是文件头，用于存贮文件名；
-        in.skip(80);
+        /***    1, 80B is the header   ***/
+        byte[] headerBytes = new byte[STL_HEADER_SIZE];
+        in.read(headerBytes);
+        model.setHeader(ByteUtils.byteToString(headerBytes));
+//        in.skip(STL_HEADER_SIZE);
 
-        //紧接着用 4 个字节的整数来描述模型的三角面片个数
-        byte[] bytes = new byte[4];
-        in.read(bytes);// 读取三角面片个数
+        /***    2, Next 4B is the num of triangle facet     ***/
+        byte[] bytes = new byte[STL_FACET_NUM_SIZE];
+        in.read(bytes);
         int facetCount = ByteUtils.byte4ToInt(bytes, 0);
         model.setFacetCount(facetCount);
         if (facetCount == 0) {
@@ -67,15 +84,15 @@ public class STLReader {
             return model;
         }
 
-        // 每个三角面片占用固定的50个字节
-        byte[] facetBytes = new byte[50 * facetCount];
-        // 将所有的三角面片读取到字节数组
+        /**    3, Every facet occupies 50 Bytes, normal vector occupies 3*4 B,
+         *         edge abs occupies 3*4*3 B; The rest 2B is back up;
+         */
+        byte[] facetBytes = new byte[STL_FACET_SIZE * facetCount];
         in.read(facetBytes);
-        //数据读取完毕后，可以把输入流关闭
         in.close();
 
 
-        parseModel(model, facetBytes);
+        parseByteToModel(model, facetBytes);
 
 
         if (stlLoadListener != null)
@@ -84,25 +101,31 @@ public class STLReader {
     }
 
     /**
-     * 解析模型数据，包括顶点数据、法向量数据、所占空间范围等
+     *  @description    Parse bytes array to model,such as normal vector,
+     *                  edge coord.
+     *  @param model, facetBytes
+     *  @return void
+     *  @author Mr.wumin
+     *  @time 2017/9/28 0028 14:40
      */
-    private void parseModel(Model model, byte[] facetBytes) {
-        int facetCount = model.getFacetCount();
+    private void parseByteToModel(Model model, byte[] facetBytes) {
         /**
-         *  每个三角面片占用固定的50个字节,50字节当中：
-         *  三角片的法向量：（1个向量相当于一个点）*（3维/点）*（4字节浮点数/维）=12字节
-         *  三角片的三个点坐标：（3个点）*（3维/点）*（4字节浮点数/维）=36字节
-         *  最后2个字节用来描述三角面片的属性信息
-         * **/
-        // 保存所有顶点坐标信息,一个三角形3个顶点，一个顶点3个坐标轴
-        float[] verts = new float[facetCount * 3 * 3];
-        // 保存所有三角面对应的法向量位置，
-        // 一个三角面对应一个法向量，一个法向量有3个点
-        // 而绘制模型时，是针对需要每个顶点对应的法向量，因此存储长度需要*3
-        // 又同一个三角面的三个顶点的法向量是相同的，
-        // 因此后面写入法向量数据的时候，只需连续写入3个相同的法向量即可
-        float[] vnorms = new float[facetCount * 3 * 3];
-        //保存所有三角面的属性信息
+         *  Every facet occupy 50B;
+         *  Normal vector : (x, y ,z) * 4B = 12B
+         *  Edge coord : (x, y , z) * 3 edges * 4B = 36B
+         *  Attribute : 2B
+         */
+        int facetCount = model.getFacetCount();
+        /***    All the edge coord float    ***/
+        float[] verts = new float[facetCount * STL_FACET_EDGE_NUM * STL_FACET_COORD_NUM];
+        /**
+         *  All the normal vector float.
+         *  We need the normal vector of per edge when draw the model,
+         *  and normal vector of per edge in the facet are the same.
+         *  so we should write 3 normal vectors which is the same.
+         */
+        float[] vnorms = new float[facetCount * STL_FACET_EDGE_NUM * STL_FACET_EDGE_NUM];
+        /***    All attributes of every facet   ***/
         short[] remarks = new short[facetCount];
 
         int stlOffset = 0;
@@ -113,11 +136,11 @@ public class STLReader {
                 }
                 for (int j = 0; j < 4; j++) {
                     float x = ByteUtils.byte4ToFloat(facetBytes, stlOffset);
-                    float y = ByteUtils.byte4ToFloat(facetBytes, stlOffset + 4);
-                    float z = ByteUtils.byte4ToFloat(facetBytes, stlOffset + 8);
-                    stlOffset += 12;
+                    float y = ByteUtils.byte4ToFloat(facetBytes, stlOffset + STL_FLOAT_SIZE);
+                    float z = ByteUtils.byte4ToFloat(facetBytes, stlOffset + 2*STL_FLOAT_SIZE);
+                    stlOffset += 3*STL_FLOAT_SIZE;
 
-                    if (j == 0) {//法向量
+                    if (j == 0) {/***    Normal vectors     ***/
                         vnorms[i * 9] = x;
                         vnorms[i * 9 + 1] = y;
                         vnorms[i * 9 + 2] = z;
@@ -127,12 +150,12 @@ public class STLReader {
                         vnorms[i * 9 + 6] = x;
                         vnorms[i * 9 + 7] = y;
                         vnorms[i * 9 + 8] = z;
-                    } else {//三个顶点
+                    } else {/***    Edge coords     ***/
                         verts[i * 9 + (j - 1) * 3] = x;
                         verts[i * 9 + (j - 1) * 3 + 1] = y;
                         verts[i * 9 + (j - 1) * 3 + 2] = z;
 
-                        //记录模型中三个坐标轴方向的最大最小值
+                        /***    The max and min value in three coord axis   ***/
                         if (i == 0 && j == 1) {
                             model.minX = model.maxX = x;
                             model.minY = model.maxY = y;
@@ -147,8 +170,9 @@ public class STLReader {
                         }
                     }
                 }
+                /***    End of 2B are attributes    ***/
                 short r = ByteUtils.byte2ToShort(facetBytes, stlOffset);
-                stlOffset = stlOffset + 2;
+                stlOffset = stlOffset + STL_FACET_ATTR;
                 remarks[i] = r;
             }
         } catch (Exception e) {
@@ -158,29 +182,39 @@ public class STLReader {
                 e.printStackTrace();
             }
         }
-        //将读取的数据设置到Model对象中
+        /***    Set values      ***/
         model.setVerts(verts);
         model.setVnorms(vnorms);
         model.setRemarks(remarks);
 
     }
 
+    /**
+     *  @description    Parse texture
+     *  @param model, textureBytes
+     *  @return void
+     *  @author Mr.wumin
+     *  @time 2017/9/28 0028 14:54
+     */
     private void parseTexture(Model model, byte[] textureBytes) {
         int facetCount = model.getFacetCount();
-        // 三角面个数有三个顶点，一个顶点对应纹理二维坐标
-        float[] textures = new float[facetCount * 3 * 2];
+        /***    There are three edges in facet, and one edge correspond to 2-D coord    ***/
+        float[] textures = new float[facetCount * STL_FACET_EDGE_NUM * STL_TEXTURE_COORD_NUM];
         int textureOffset = 0;
-        for (int i = 0; i < facetCount * 3; i++) {
-            //第i个顶点对应的纹理坐标
-            //tx和ty的取值范围为[0,1],表示的坐标位置是在纹理图片上的对应比例
+        for (int i = 0; i < facetCount * STL_FACET_EDGE_NUM; i++) {
+            /***    tx and ty in the range of [0, 1], it said the scale of texture picture  ***/
             float tx = ByteUtils.byte4ToFloat(textureBytes, textureOffset);
-            float ty = ByteUtils.byte4ToFloat(textureBytes, textureOffset + 4);
+            float ty = ByteUtils.byte4ToFloat(textureBytes, textureOffset + STL_FLOAT_SIZE);
 
-            textures[i * 2] = tx;
-            //我们的pxy文件原点是在左下角，因此需要用1减去y坐标值
-            textures[i * 2 + 1] = 1 - ty;
+            /**
+             *  In the pxy, the zero point is at the left-bottom,
+             *  however the android zero point is at the left-top.
+             *  So it should be decreased by one;
+             */
+            textures[i * STL_FACET_EDGE_NUM] = tx;
+            textures[i * STL_FACET_EDGE_NUM + 1] = 1 - ty;
 
-            textureOffset += 8;
+            textureOffset += (2*STL_FLOAT_SIZE);
         }
         model.setTextures(textures);
     }
@@ -188,9 +222,9 @@ public class STLReader {
     public Model parseStlWithTexture(InputStream stlInput, InputStream textureInput) throws IOException {
         Model model = parseBinStl(stlInput);
         int facetCount = model.getFacetCount();
-        // 三角面片有3個頂點，一個頂點有2個坐標軸數據，每個坐標軸數據是float類型（4字節）
-        byte[] textureBytes = new byte[facetCount * 3 * 2 * 4];
-        textureInput.read(textureBytes);// 將所有紋理坐標讀出來
+        byte[] textureBytes = new byte[facetCount * STL_FACET_EDGE_NUM
+                                        * STL_TEXTURE_COORD_NUM * STL_FLOAT_SIZE];
+        textureInput.read(textureBytes);
         parseTexture(model, textureBytes);
         return model;
     }
@@ -200,11 +234,13 @@ public class STLReader {
         Model model = parseBinStl(stlInput);
         model.setPictureName(picName);
         int facetCount = model.getFacetCount();
-        byte[] textureBytes = new byte[facetCount * 3 * 2 * 4];
+        byte[] textureBytes = new byte[facetCount * STL_FACET_EDGE_NUM
+                                        * STL_TEXTURE_COORD_NUM * STL_FLOAT_SIZE];
         textureInput.read(textureBytes);
         parseTexture(model, textureBytes);
         return model;
     }
+
     public static float getR(List<Model> models) {
         float maxRadius = models.get(0).getRadius();
         for(Model model : models) {

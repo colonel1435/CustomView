@@ -12,28 +12,30 @@ import java.nio.FloatBuffer;
  */
 
 public class Model {
-    //三角面个数
+    /***    Header info     ***/
+    private String header;
+    /***    Count of the facet  ***/
     private int facetCount;
-    //顶点坐标数组
+    /***    Edge coord arrays   ***/
     private float[] verts;
-    //每个顶点对应的法向量数组
+    /***    Normal vector arrays    ***/
     private float[] vnorms;
-    //每个三角面的属性信息
+    /***    Attribte info of per facet  ***/
     private short[] remarks;
-    //纹理数组
+    /***    Texture arrays    ***/
     private float[] textures;
-    //　纹理id　数组
+    /***    Texture ID arrays   ***/
     private int[] textureIds;
+    /***    Picture of texture  ***/
     private String pictureName;
 
-    //顶点数组转换而来的Buffer
+    /***    Buffer of edge coord    ***/
     private FloatBuffer vertBuffer;
-
-    //每个顶点对应的法向量转换而来的Buffer
+    /***    Buffer of normal vector     ***/
     private FloatBuffer vnormBuffer;
-
+    /***    Buffer of texture   ***/
     private FloatBuffer textureBuffer;
-    //以下分别保存所有点在x,y,z方向上的最大值、最小值
+    /***    Max and min value of x, y, z axis   ***/
     public float maxX;
     public float minX;
     public float maxY;
@@ -41,7 +43,9 @@ public class Model {
     public float maxZ;
     public float minZ;
 
-    //返回模型的中心点
+    /**
+     *  Get the center point of model
+     */
     public Point getCentrePoint() {
         float cx = minX + (maxX - minX) / 2;
         float cy = minY + (maxY - minY) / 2;
@@ -49,7 +53,9 @@ public class Model {
         return new Point(cx, cy, cz);
     }
 
-    //包裹模型的最大半径
+    /**
+     *  Get the max radius of model
+     */
     public float getRadius() {
         float dx = (maxX - minX);
         float dy = (maxY - minY);
@@ -62,16 +68,22 @@ public class Model {
         return max;
     }
 
-    //设置顶点数组的同时，设置对应的Buffer
     public void setVerts(float[] verts) {
         this.verts = verts;
         vertBuffer = ByteUtils.floatToBuffer(verts);
     }
 
-    //设置顶点数组法向量的同时，设置对应的Buffer
     public void setVnorms(float[] vnorms) {
         this.vnorms = vnorms;
         vnormBuffer = ByteUtils.floatToBuffer(vnorms);
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
     }
 
     public int getFacetCount() {

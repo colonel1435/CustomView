@@ -7,6 +7,7 @@ import android.graphics.LightingColorFilter;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
+import android.text.method.SingleLineTransformationMethod;
 import android.util.Log;
 
 import com.zero.customview.view.opengl.bean.Model;
@@ -50,20 +51,20 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
     float[] materialSpec = {1.0f, 0.5f, 0.0f, 1.0f};
 
     public WubaGLRenderer(Context context) {
-//        try {
-//            mContext = context;
-//            model = new STLReader().parserBinStlInAssets(context, "dragon.stl");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        /*
+        try {
+            mContext = context;
+            model = new STLReader().parserBinStlInAssets(context, "dragon.stl");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
 
         try {
             mContext = context;
             STLReader reader = new STLReader();
-            for (int i = 1; i <= 6; i++) {
-                Model model = reader.parseStlWithTextureInAssets(context, "wuba/" + i);
-                models.add(model);
-            }
+            Model model = reader.parseStlWithTextureInAssets(context, "stl/dragon");
+            models.add(model);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,14 +107,13 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        // 清除屏幕和深度缓存
+        // Clear screen
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        // Reset model matrix
+        gl.glLoadIdentity();
 
 
-        gl.glLoadIdentity();// 重置当前的模型观察矩阵
-
-
-        //眼睛对着原点看
+        // Look at from zero point
         GLU.gluLookAt(gl, eye.x, eye.y, eye.z, center.x,
                 center.y, center.z, up.x, up.y, up.z);
 
@@ -150,26 +150,26 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         */
         //=================== Texture ==============================//
         for (Model model : models) {
-            //開啟貼紋理功能
+            // Enable texture func
             gl.glEnable(GL10.GL_TEXTURE_2D);
-            //根據ID綁定對應的紋理
+            // Bind texture with ID
             gl.glBindTexture(GL10.GL_TEXTURE_2D, model.getTextureIds()[0]);
-            //啟用相關功能
+            // Enable texture other func.
             gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
             gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
             gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
-            //開始繪制
+            // Drawing
             gl.glNormalPointer(GL10.GL_FLOAT, 0, model.getVnormBuffer());
             gl.glVertexPointer(3, GL10.GL_FLOAT, 0, model.getVertBuffer());
             gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, model.getTextureBuffer());
 
             gl.glDrawArrays(GL10.GL_TRIANGLES, 0, model.getFacetCount() * 3);
 
-            //關閉當前模型貼紋理，即將紋理id設置為0
+            // Disable texture func,and set ID with 0;
             gl.glBindTexture(GL10.GL_TEXTURE_2D, 0);
 
-            //關閉對應的功能
+            // Disable other func.
             gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
             gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
             gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
@@ -190,11 +190,11 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
 
     public void enableMaterial(GL10 gl) {
 
-        //材料对环境光的反射情况
+        /***    Environment light   ***/
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_AMBIENT, ByteUtils.floatToBuffer(materialAmb));
-        //散射光的反射情况
+        /***    Scatter light   ***/
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_DIFFUSE, ByteUtils.floatToBuffer(materialDiff));
-        //镜面光的反射情况
+        /***    Specular light  ***/
         gl.glMaterialfv(GL10.GL_FRONT_AND_BACK, GL10.GL_SPECULAR, ByteUtils.floatToBuffer(materialSpec));
 
     }
@@ -211,30 +211,29 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
     }
 
     private void loadTexture(GL10 gl, Model model, boolean isAssets) {
-        Log.d("GLRenderer", "綁定紋理：" + model.getPictureName());
+        Log.d("GLRenderer", "Load texture：" + model.getPictureName());
         Bitmap bitmap = null;
         try {
-            // 打開圖片資源
-            if (isAssets) {//如果是從assets中讀取
+            if (isAssets) {/***    Load from assets  ***/
                 bitmap = BitmapFactory.decodeStream(mContext.getAssets().open(model.getPictureName()));
-            } else {//否則就是從SD卡裏面讀取
+            } else {/***    Load from sd storage    ***/
                 bitmap = BitmapFactory.decodeFile(model.getPictureName());
             }
-            // 生成一個紋理對象，並將其ID保存到成員變量 texture 中
+            /***    Create texuture object, and save ID     ***/
             int[] textures = new int[1];
             gl.glGenTextures(1, textures, 0);
             model.setTextureIds(textures);
 
-            // 將生成的空紋理綁定到當前2D紋理通道
+            /***    Bind empty texture to 2d channel    ***/
             gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
 
-            // 設置2D紋理通道當前綁定的紋理的屬性
+            /***    Set attribute of currente binded channel    ***/
             gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
                     GL10.GL_NEAREST);
             gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
                     GL10.GL_LINEAR);
 
-            // 將bitmap應用到2D紋理通道當前綁定的紋理中
+            /***    Set bitmap to current 2d texture channel    ***/
             GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
             gl.glBindTexture(GL10.GL_TEXTURE_2D, 0);
         } catch (IOException e) {

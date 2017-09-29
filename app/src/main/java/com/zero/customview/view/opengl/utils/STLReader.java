@@ -44,8 +44,23 @@ public class STLReader {
     public Model parserBinStlInAssets(Context context, String fileName)
             throws IOException {
 
+        if (!fileName.endsWith(OpenGLConst.STL_POSTFIX)) {
+            return null;
+        }
         InputStream is = context.getAssets().open(fileName);
         Log.d(TAG, "parserBinStlInAssets: " + fileName);
+        return parseBinStl(is);
+    }
+
+    public Model parserBinStlInSdcard(File file)
+            throws IOException {
+
+        if (!file.getName().endsWith(OpenGLConst.STL_POSTFIX)) {
+            return null;
+        }
+
+        InputStream is = new FileInputStream(file);
+        Log.d(TAG, "parserBinStlInSdcard: " + file.getName());
         return parseBinStl(is);
     }
 
@@ -53,7 +68,7 @@ public class STLReader {
             throws IOException{
         String stlName = fileName + OpenGLConst.STL_POSTFIX;
         String textureName = fileName + OpenGLConst.PXY_POSTFIX;
-        String picName = fileName + OpenGLConst.JPG_POSTFIX;
+        String picName = fileName + OpenGLConst.PNG_POSTFIX;
         InputStream stlInput = context.getAssets().open(stlName);
         InputStream textureInput = context.getAssets().open(textureName);
 

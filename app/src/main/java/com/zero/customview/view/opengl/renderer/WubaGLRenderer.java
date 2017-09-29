@@ -7,14 +7,17 @@ import android.graphics.LightingColorFilter;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
+import android.os.Environment;
 import android.text.method.SingleLineTransformationMethod;
 import android.util.Log;
 
+import com.zero.customview.view.opengl.OpenGLConst;
 import com.zero.customview.view.opengl.bean.Model;
 import com.zero.customview.view.opengl.bean.Point;
 import com.zero.customview.view.opengl.utils.ByteUtils;
 import com.zero.customview.view.opengl.utils.STLReader;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -62,8 +65,18 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         try {
             mContext = context;
             STLReader reader = new STLReader();
-            model = reader.parseStlWithTextureInAssets(context, "stl/buddha");
-            models.add(model);
+            String rootDir = Environment.getExternalStorageDirectory() + File.separator + OpenGLConst.STL_ROOT;
+            File root = new File(rootDir);
+            if (root.exists()) {
+                File[] files = root.listFiles();
+                for (File file : files) {
+                    model = reader.parserBinStlInSdcard(file);
+                }
+                if (model != null) {
+                    models.add(model);
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,19 +100,20 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
 
         openLight(gl);
         enableMaterial(gl);
-        initConfigData(gl);
+//        initConfigData(gl);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-    // 设置OpenGL场景的大小,(0,0)表示窗口内部视口的左下角，(width, height)指定了视口的大小
         gl.glViewport(0, 0, width, height);
 
-        gl.glMatrixMode(GL10.GL_PROJECTION); // 设置投影矩阵
-        gl.glLoadIdentity(); // 设置矩阵为单位矩阵，相当于重置矩阵
-        GLU.gluPerspective(gl, 45.0f, ((float) width) / height, 1f, 100f);// 设置透视范围
+        // Set projection matrix
+        gl.glMatrixMode(GL10.GL_PROJECTION);
+        // Reset matrix
+        gl.glLoadIdentity();
+        // Set prespective range
+        GLU.gluPerspective(gl, 45.0f, ((float) width) / height, 1f, 100f);
 
-        //以下两句声明，以后所有的变换都是针对模型(即我们绘制的图形)
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
@@ -116,37 +130,36 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         GLU.gluLookAt(gl, eye.x, eye.y, eye.z, center.x,
                 center.y, center.z, up.x, up.y, up.z);
 
-        //为了能有立体感觉，通过改变mDegree值，让模型不断旋转
+        // Roate itself
         gl.glRotatef(mDegree, 0, 1, 0);
-
-        //将模型放缩到View刚好装下
+        // Scale itself
         gl.glScalef(mScalef, mScalef, mScalef);
-        //把模型移动到原点
+        // Translate to zero point
         gl.glTranslatef(-mCenterPoint.x, -mCenterPoint.y,
                 -mCenterPoint.z);
 
-
-
-        //=================== Light ==============================//
-        //允许给每个顶点设置法向量
+        // Enable set normal vector
         gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-        // 允许设置顶点
+        // Enable set vertex
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-        // 允许设置颜色
+        for (Model model : models) {
+            // Set norm vector
+            gl.glNormalPointer(GL10.GL_FLOAT, 0, model.getVnormBuffer());
+            // Set vertex
+            gl.glVertexPointer(3, GL10.GL_FLOAT, 0, model.getVertBuffer());
 
-        //设置法向量数据源
-        gl.glNormalPointer(GL10.GL_FLOAT, 0, model.getVnormBuffer());
-        // 设置三角形顶点数据源
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, model.getVertBuffer());
+            // Set color
+            gl.glColor4f(0.85f, 0.45f, 0.20f, 0f);
+            // Draw triangle
+            gl.glDrawArrays(GL10.GL_TRIANGLES, 0, model.getFacetCount() * 3);
 
-        // 绘制三角形
-        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, model.getFacetCount() * 3);
+            // Disable vertex
+            gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+            // Disable normal vector
+            gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
+        }
 
-        // 取消顶点设置
-        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-        //取消法向量设置
-        gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-
+        /*
         //=================== Texture ==============================//
         for (Model model : models) {
             // Enable texture func
@@ -174,6 +187,7 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
             gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
             gl.glDisable(GL10.GL_TEXTURE_2D);
         }
+        */
 
     }
 
@@ -239,7 +253,6 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-
             if (bitmap != null)
                 bitmap.recycle();
 

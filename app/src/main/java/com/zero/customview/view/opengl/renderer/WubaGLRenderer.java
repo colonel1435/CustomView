@@ -35,6 +35,17 @@ import javax.microedition.khronos.opengles.GL10;
  */
 
 public class WubaGLRenderer implements GLSurfaceView.Renderer {
+    private final String TAG = this.getClass().getSimpleName()+"@wumin";
+    public  float ratio;
+    public float xRotate = 0f;
+    public float yRotate = 0f;
+    public float zRotate = 0f;
+    public float XScalef = 1f;
+    public float YScalef = 1f;
+    public float ZScalef = 1f;
+    private float mScalef = 1f;
+    private float mMaxWidth;
+    public float maxRadius;
     private Context mContext;
     private List<Model> models = new ArrayList<>();
     private Model model;
@@ -42,7 +53,6 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
     private Point eye = new Point(0, 0, -3);
     private Point up = new Point(0, 1, 0);
     private Point center = new Point(0, 0, 0);
-    private float mScalef = 1;
     private float mDegree = 0;
     float[] ambient = {0.9f, 0.9f, 0.9f, 1.0f,};
     float[] diffuse = {0.5f, 0.5f, 0.5f, 1.0f,};
@@ -86,6 +96,10 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         mDegree = degree;
     }
 
+    public void setMaxWidth(float size) {
+        mMaxWidth = size;
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 //        gl.glClearColor(0.74f, 0.76f, 0.78f, 0f); /***  colorSilver  ***/
@@ -94,9 +108,19 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         gl.glClearDepthf(1.0f);
         gl.glDepthFunc(GL10.GL_LEQUAL);
         gl.glShadeModel(GL10.GL_SMOOTH);
-        float r = model.getRadius();
-        mScalef = 0.5f / r;
+        maxRadius = model.getRadius();
+        mScalef = 1f / maxRadius;
+//        XScalef = mScalef;
+//        YScalef = mScalef;
+//        ZScalef = mScalef;
         mCenterPoint = model.getCentrePoint();
+
+        XScalef = 2 * maxRadius / mMaxWidth/100;
+        YScalef = 2 * maxRadius / mMaxWidth/100;
+        ZScalef = 2 * maxRadius / mMaxWidth/100;
+        Log.d(TAG, "SIZE -> " + mMaxWidth + " maxRadius -> " + maxRadius
+                + " setScalef: x -> " + XScalef + " y -> " + YScalef + " Z -> " + ZScalef);
+
 
         openLight(gl);
         enableMaterial(gl);
@@ -130,10 +154,12 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         GLU.gluLookAt(gl, eye.x, eye.y, eye.z, center.x,
                 center.y, center.z, up.x, up.y, up.z);
 
-        // Roate itself
-        gl.glRotatef(mDegree, 0, 1, 0);
-        // Scale itself
-        gl.glScalef(mScalef, mScalef, mScalef);
+        // Rotate
+        gl.glRotatef(xRotate, 1, 0, 0);
+        gl.glRotatef(yRotate, 0, 1, 0);
+        gl.glRotatef(zRotate, 0, 0, 1);
+        // Scale up or down
+        gl.glScalef(XScalef,YScalef,ZScalef);
         // Translate to zero point
         gl.glTranslatef(-mCenterPoint.x, -mCenterPoint.y,
                 -mCenterPoint.z);
@@ -259,4 +285,22 @@ public class WubaGLRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    private int height = 0;
+    private long frameSeq = 0;
+    private int viewportOffset = 0;
+    private int maxOffset = 400;
+    private int width = 0;
+    private void changeGLViewport(GL10 gl) {
+        System.out.println("time=" + System.currentTimeMillis());
+        frameSeq++;
+        viewportOffset++;
+        // Current
+        if (frameSeq % 100 == 0) {// 每隔100帧，重置
+            gl.glViewport(0, 0, width, height);
+            viewportOffset = 0;
+        } else {
+            int k = 4;
+            gl.glViewport(-maxOffset + viewportOffset * k, -maxOffset + viewportOffset * k, this.width - viewportOffset * 2 * k + maxOffset * 2, this.height - viewportOffset * 2 * k + maxOffset * 2);
+        }
+    }
 }

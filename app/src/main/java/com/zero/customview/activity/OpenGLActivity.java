@@ -134,8 +134,10 @@ public class OpenGLActivity extends AppCompatActivity {
                 Log.d(TAG, "onTouch: scaleX -> " + glRenderer.XScalef
                             + " scaleY -> " + glRenderer.YScalef
                             + " scaleZ -> " + glRenderer.ZScalef);
+            } else if(1 == nCnt) {
+                return mGestureDetector.onTouchEvent(event);
             }
-            return mGestureDetector.onTouchEvent(event);
+            return true;
         }
     }
 

@@ -11,7 +11,7 @@ import retrofit2.http.GET;
  */
 
 public interface RetrofitService {
-    @GET("/Maintplatform/identify/getidentifyidentifyService.action")
+    @GET("/test.action")
     Observable<String> getInspectContent();
 
 }

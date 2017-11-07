@@ -50,7 +50,7 @@ public class BubbleFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private static final int BUBBLES_NUM = 100;
+    private static final int BUBBLES_NUM = 10;
 
     private BubbleChartData data;
     private ValueShape shape = ValueShape.CIRCLE;

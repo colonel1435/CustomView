@@ -6,6 +6,9 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.util.ArrayMap;
 
 import com.github.hellocharts.computator.ChartComputator;
 import com.github.hellocharts.formatter.BubbleChartValueFormatter;
@@ -18,6 +21,9 @@ import com.github.hellocharts.provider.BubbleChartDataProvider;
 import com.github.hellocharts.util.ChartUtils;
 import com.github.hellocharts.view.Chart;
 
+import java.util.List;
+
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class BubbleChartRenderer extends AbstractChartRenderer {
     private static final int DEFAULT_TOUCH_ADDITIONAL_DP = 1;
     private static final int MODE_DRAW = 0;
@@ -65,6 +71,7 @@ public class BubbleChartRenderer extends AbstractChartRenderer {
     private boolean hasLabelsOnlyForSelected;
     private BubbleChartValueFormatter valueFormatter;
     private Viewport tempMaximumViewport = new Viewport();
+    private ArrayMap<BubbleValue, PointF> bubbleCoors = new ArrayMap<>();
 
     public BubbleChartRenderer(Context context, Chart chart, BubbleChartDataProvider dataProvider) {
         super(context, chart);
@@ -185,9 +192,19 @@ public class BubbleChartRenderer extends AbstractChartRenderer {
 
     private void drawBubbles(Canvas canvas) {
         final BubbleChartData data = dataProvider.getBubbleChartData();
-        for (BubbleValue bubbleValue : data.getValues()) {
+        List<BubbleValue> bubbles = data.getValues();
+        int size = bubbles.size();
+        for(int i = 0; i < size; i++) {
+            BubbleValue bubbleValue = bubbles.get(i);
             drawBubble(canvas, bubbleValue);
+            if (i > 0) {
+                drawLine(canvas, bubbleCoors.valueAt(i-1), bubbleCoors.valueAt(i));
+            }
         }
+    }
+
+    private void drawLine(Canvas canvas, PointF startPoint, PointF endPoint) {
+        canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, labelPaint);
     }
 
     private void drawBubble(Canvas canvas, BubbleValue bubbleValue) {
@@ -269,6 +286,8 @@ public class BubbleChartRenderer extends AbstractChartRenderer {
             rawY -= rawRadius;
         }
         bubbleCenter.set(rawX, rawY);
+
+        bubbleCoors.put(bubbleValue, new PointF(rawX, rawY));
         if (ValueShape.SQUARE.equals(bubbleValue.getShape())) {
             bubbleRect.set(rawX - rawRadius, rawY - rawRadius, rawX + rawRadius, rawY + rawRadius);
         }

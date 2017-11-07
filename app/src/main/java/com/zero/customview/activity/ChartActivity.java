@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import com.zero.customview.R;
 import com.zero.customview.adapter.FragmentPageAdapter;
 import com.zero.customview.fragment.chart.BarFragment;
+import com.zero.customview.fragment.chart.BubbleFragment;
 import com.zero.customview.fragment.chart.LineFragment;
 import com.zero.customview.fragment.chart.RadarFragment;
 import com.zero.customview.view.NoScrollViewPager;
@@ -51,6 +52,7 @@ public class ChartActivity extends AppCompatActivity {
         mTitles.add(getString(R.string.chart_radar));
         mTitles.add(getString(R.string.chart_line));
         mTitles.add(getString(R.string.chart_bar));
+        mTitles.add(getString(R.string.chart_bubble));
 
         mPages = new ArrayList<>();
     }
@@ -68,6 +70,9 @@ public class ChartActivity extends AppCompatActivity {
 
         LineFragment lineFragment = LineFragment.newInstance("2", "line");
         mPages.add(lineFragment);
+
+        BubbleFragment bubbleFragment = BubbleFragment.newInstance("3", "bubble");
+        mPages.add(bubbleFragment);
 
         FragmentManager fm = getSupportFragmentManager();
         mPagerAdapter = new FragmentPageAdapter(fm, mPages, mTitles);

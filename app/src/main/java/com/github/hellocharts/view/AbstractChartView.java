@@ -39,7 +39,7 @@ public abstract class AbstractChartView extends View implements Chart {
     protected ChartDataAnimator dataAnimator;
     protected ChartViewportAnimator viewportAnimator;
     protected boolean isInteractive = true;
-    protected boolean isContainerScrollEnabled = true;
+    protected boolean isContainerScrollEnabled = false;
     protected ContainerScrollType containerScrollType;
 
     public AbstractChartView(Context context) {

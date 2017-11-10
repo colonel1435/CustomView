@@ -1,37 +1,40 @@
 package com.github.hellocharts.model;
 
-import com.github.hellocharts.formatter.BubbleChartValueFormatter;
-import com.github.hellocharts.formatter.SimpleBubbleChartValueFormatter;
+import com.github.hellocharts.formatter.NetChartValueFormatter;
+import com.github.hellocharts.formatter.SimpleNetChartValueFormatter;
+import com.github.hellocharts.view.Chart;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Data for BubbleChart.
  */
-public class BubbleChartData extends AbstractChartData {
-    public static final int DEFAULT_MIN_BUBBLE_RADIUS_DP = 6;
-    public static final float DEFAULT_BUBBLE_SCALE = 1f;
-    private BubbleChartValueFormatter formatter = new SimpleBubbleChartValueFormatter();
+public class NetChartData extends AbstractChartData {
+    public static final int DEFAULT_MIN_BUBBLE_RADIUS_DP = 2;
+    public static final int DEFAULT_MAX_BUBBLE_RADIUS_DP = 8;
+    public static final float DEFAULT_BUBBLE_SCALE = 0.5f;
+    private NetChartValueFormatter formatter = new SimpleNetChartValueFormatter();
     private boolean hasLabels = false;
     private boolean hasLabelsOnlyForSelected = false;
+    private boolean hasLines = false;
+    private int maxBubbleRadius = DEFAULT_MAX_BUBBLE_RADIUS_DP;
     private int minBubbleRadius = DEFAULT_MIN_BUBBLE_RADIUS_DP;
     private float bubbleScale = DEFAULT_BUBBLE_SCALE;
     // TODO: consider Collections.emptyList()
     private List<BubbleValue> values = new ArrayList<BubbleValue>();
 
-    public BubbleChartData() {
+    public NetChartData() {
     }
 
-    public BubbleChartData(List<BubbleValue> values) {
+    public NetChartData(List<BubbleValue> values) {
         setValues(values);
     }
 
     /**
      * Copy constructor for deep copy.
      */
-    public BubbleChartData(BubbleChartData data) {
+    public NetChartData(NetChartData data) {
         super(data);
         this.formatter = data.formatter;
         this.hasLabels = data.hasLabels;
@@ -44,15 +47,39 @@ public class BubbleChartData extends AbstractChartData {
         }
     }
 
-    public static BubbleChartData generateDummyData() {
+    public static NetChartData generateDummyData() {
         final int numValues = 4;
-        BubbleChartData data = new BubbleChartData();
+        final int numMax = 12;
+        final float faceRadius = 120;
+        final float circleRadius = 3.14f;
+        NetChartData data = new NetChartData();
         List<BubbleValue> values = new ArrayList<BubbleValue>(numValues);
-        values.add(new BubbleValue(0, 20, 15000));
-        values.add(new BubbleValue(3, 22, 20000));
-        values.add(new BubbleValue(5, 25, 5000));
-        values.add(new BubbleValue(7, 30, 30000));
-        values.add(new BubbleValue(11, 22, 10));
+        /***    Draw smile face     ***/
+        for (int i = 0; i < numMax; i++) {
+            float x = (float)(faceRadius * Math.cos(i * Math.PI / 6));
+            float y = (float)(faceRadius * Math.sin(i * Math.PI / 6));
+            values.add(new BubbleValue(x, y, circleRadius).setLabel(String .valueOf(i)));
+
+            if (i == 8 || i == 9 || i == 10) {
+                values.add(new BubbleValue(
+                        (float) (0.5 * faceRadius * Math.cos(i * Math.PI / 6)),
+                        (float) (0.5 * faceRadius * Math.sin(i * Math.PI / 6)),
+                        circleRadius
+                ).setLabel(String.valueOf(i)));
+            }
+        }
+
+        values.add(new BubbleValue(
+                (float) (0.5 * faceRadius * Math.cos(Math.PI / 4)),
+                (float) (0.5 * faceRadius * Math.sin(Math.PI / 4)),
+                2 * circleRadius
+        ).setLabel(""));
+        values.add(new BubbleValue(
+                (float) (0.5 * faceRadius * Math.cos(3 *Math.PI / 4)),
+                (float) (0.5 * faceRadius * Math.sin(3 * Math.PI / 4)),
+                2 * circleRadius
+        ).setLabel(""));
+
         data.setValues(values);
         return data;
     }
@@ -75,7 +102,7 @@ public class BubbleChartData extends AbstractChartData {
         return values;
     }
 
-    public BubbleChartData setValues(List<BubbleValue> values) {
+    public NetChartData setValues(List<BubbleValue> values) {
         if (null == values) {
             this.values = new ArrayList<BubbleValue>();
         } else {
@@ -84,11 +111,19 @@ public class BubbleChartData extends AbstractChartData {
         return this;
     }
 
+    public boolean hasLines() {
+        return hasLines;
+    }
+
+    public void setHasLines(boolean hasLines) {
+        this.hasLines = hasLines;
+    }
+
     public boolean hasLabels() {
         return hasLabels;
     }
 
-    public BubbleChartData setHasLabels(boolean hasLabels) {
+    public NetChartData setHasLabels(boolean hasLabels) {
         this.hasLabels = hasLabels;
         if (hasLabels) {
             hasLabelsOnlyForSelected = false;
@@ -107,7 +142,7 @@ public class BubbleChartData extends AbstractChartData {
      * Set true if you want to show value labels only for selected value, works best when chart has
      * isValueSelectionEnabled set to true {@link Chart#setValueSelectionEnabled(boolean)}.
      */
-    public BubbleChartData setHasLabelsOnlyForSelected(boolean hasLabelsOnlyForSelected) {
+    public NetChartData setHasLabelsOnlyForSelected(boolean hasLabelsOnlyForSelected) {
         this.hasLabelsOnlyForSelected = hasLabelsOnlyForSelected;
         if (hasLabelsOnlyForSelected) {
             this.hasLabels = false;
@@ -115,6 +150,9 @@ public class BubbleChartData extends AbstractChartData {
         return this;
     }
 
+    public int getMaxBubbleRadius() {
+        return maxBubbleRadius;
+    }
     /**
      * Returns minimal bubble radius in dp.
      *
@@ -149,11 +187,11 @@ public class BubbleChartData extends AbstractChartData {
         this.bubbleScale = bubbleScale;
     }
 
-    public BubbleChartValueFormatter getFormatter() {
+    public NetChartValueFormatter getFormatter() {
         return formatter;
     }
 
-    public BubbleChartData setFormatter(BubbleChartValueFormatter formatter) {
+    public NetChartData setFormatter(NetChartValueFormatter formatter) {
         if (null != formatter) {
             this.formatter = formatter;
         }

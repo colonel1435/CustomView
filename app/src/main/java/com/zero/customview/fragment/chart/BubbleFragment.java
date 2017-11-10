@@ -12,13 +12,16 @@ import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.github.hellocharts.listener.BubbleChartOnValueSelectListener;
+import com.github.hellocharts.listener.NetChartOnValueSelectListener;
 import com.github.hellocharts.model.Axis;
 import com.github.hellocharts.model.BubbleChartData;
 import com.github.hellocharts.model.BubbleValue;
+import com.github.hellocharts.model.NetChartData;
 import com.github.hellocharts.model.ValueShape;
 import com.github.hellocharts.model.Viewport;
 import com.github.hellocharts.util.ChartUtils;
 import com.github.hellocharts.view.BubbleChartView;
+import com.github.hellocharts.view.NetChartView;
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 import com.zero.customview.utils.TipUtils;
@@ -42,21 +45,19 @@ public class BubbleFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName() + " @wumin";
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    @BindView(R.id.bubble_view)
-    BubbleChartView bubbleView;
+    @BindView(R.id.net_view)
+    NetChartView netView;
     Unbinder unbinder;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    private static final int BUBBLES_NUM = 10;
+    private static final int BUBBLES_NUM = 20;
 
-    private BubbleChartData data;
+    private NetChartData data;
     private ValueShape shape = ValueShape.CIRCLE;
     private boolean hasLabels = true;
-    private float width;
-    private float height;
     public BubbleFragment() {
         // Required empty public constructor
     }
@@ -95,8 +96,7 @@ public class BubbleFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_bubble, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        bubbleView.setOnValueTouchListener(new ValueTouchListener());
-
+        netView.setOnValueTouchListener(new ValueTouchListener());
         generateData();
         return view;
     }
@@ -104,32 +104,44 @@ public class BubbleFragment extends Fragment {
     private void generateData() {
 
         List<BubbleValue> values = new ArrayList<BubbleValue>();
-        Random random = new Random();
-        Viewport maxView = bubbleView.getChartRenderer().getMaximumViewport();
-        bubbleView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                bubbleView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                width = bubbleView.getMeasuredWidth();
-                height = bubbleView.getMeasuredHeight();
-            }
-        });
-        Log.d(TAG, "generateData: widht -> " + width + " height -> " + height);
+        int step = 0;
+        int level = 1;
+        boolean reverse = false;
+        float coor_x;
+        float coor_y;
         for (int i = 0; i < BUBBLES_NUM; ++i) {
-            BubbleValue value = new BubbleValue((float)random.nextInt(400),
-                    (float)random.nextInt((int)600), 8f);
+            if (step > 5) {
+                level ++;
+                reverse = true;
+            }
+            if (step <= 0) {
+                level ++;
+                reverse = false;
+            }
+            if (!reverse) {
+                coor_x = 80 * step;
+                coor_y = 24 * level;
+                step ++;
+            } else {
+                step --;
+                coor_x = 80 * step;
+                coor_y = 24 * level;
+            }
+            BubbleValue value = new BubbleValue(coor_x,
+                    coor_y, 8f);
             value.setColor(ChartUtils.pickColor());
             value.setShape(shape);
             value.setLabel(String.valueOf(i));
             values.add(value);
         }
 
-        data = new BubbleChartData(values);
+        data = new NetChartData(values);
         data.setHasLabels(hasLabels);
+        data.setHasLines(true);
         data.setAxisXBottom(null);
         data.setAxisYLeft(null);
         data.setValueLabelBackgroundEnabled(false);
-        bubbleView.setBubbleChartData(data);
+        netView.setBubbleChartData(data);
 
     }
 
@@ -139,7 +151,7 @@ public class BubbleFragment extends Fragment {
         unbinder.unbind();
     }
 
-    private class ValueTouchListener implements BubbleChartOnValueSelectListener {
+    private class ValueTouchListener implements NetChartOnValueSelectListener {
 
         @Override
         public void onValueSelected(int bubbleIndex, BubbleValue value) {

@@ -8,6 +8,7 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.FontMetricsInt;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 
 import com.github.hellocharts.computator.ChartComputator;
 import com.github.hellocharts.model.ChartData;
@@ -15,6 +16,7 @@ import com.github.hellocharts.model.SelectedValue;
 import com.github.hellocharts.model.Viewport;
 import com.github.hellocharts.util.ChartUtils;
 import com.github.hellocharts.view.Chart;
+import com.zero.customview.R;
 
 /**
  * Abstract renderer implementation, every chart renderer extends this class(although it is not required it helps).
@@ -23,6 +25,7 @@ public abstract class AbstractChartRenderer implements ChartRenderer {
     public int DEFAULT_LABEL_MARGIN_DP = 4;
     protected Chart chart;
     protected ChartComputator computator;
+    protected Paint linePaint = new Paint();
     /**
      * Paint for value labels.
      */
@@ -69,6 +72,11 @@ public abstract class AbstractChartRenderer implements ChartRenderer {
 
         labelBackgroundPaint.setAntiAlias(true);
         labelBackgroundPaint.setStyle(Paint.Style.FILL);
+
+        linePaint.setAntiAlias(true);
+        linePaint.setStrokeWidth(4);
+        linePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        linePaint.setColor(ContextCompat.getColor(context, R.color.colorVirb));
     }
 
     @Override

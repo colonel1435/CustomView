@@ -14,6 +14,7 @@ public class ValueFormatterHelper {
     private char[] appendedText = new char[0];
     private char[] prependedText = new char[0];
     private char decimalSeparator = '.';
+    private static final int DEFAULT_LABEL_LENGTH = 16;
 
     public void determineDecimalSeparator() {
         NumberFormat numberFormat = NumberFormat.getInstance();
@@ -81,7 +82,7 @@ public class ValueFormatterHelper {
             int labelLength = label.length;
             if (labelLength > formattedValue.length) {
                 Log.w(TAG, "Label length is larger than buffer size(64chars), some chars will be skipped!");
-                labelLength = formattedValue.length;
+                labelLength = DEFAULT_LABEL_LENGTH;
             }
             System.arraycopy(label, 0, formattedValue, formattedValue.length - labelLength, labelLength);
             return labelLength;

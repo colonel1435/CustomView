@@ -1,5 +1,6 @@
 package com.github.hellocharts.provider;
 
+
 import com.github.hellocharts.model.BubbleChartData;
 
 public interface BubbleChartDataProvider {

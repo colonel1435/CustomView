@@ -6,56 +6,56 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.github.hellocharts.listener.BubbleChartOnValueSelectListener;
-import com.github.hellocharts.listener.DummyBubbleChartOnValueSelectListener;
-import com.github.hellocharts.model.BubbleChartData;
+import com.github.hellocharts.listener.DummyNetChartOnValueSelectListener;
+import com.github.hellocharts.listener.NetChartOnValueSelectListener;
 import com.github.hellocharts.model.BubbleValue;
 import com.github.hellocharts.model.BuildConfig;
 import com.github.hellocharts.model.ChartData;
+import com.github.hellocharts.model.NetChartData;
 import com.github.hellocharts.model.SelectedValue;
-import com.github.hellocharts.provider.BubbleChartDataProvider;
-import com.github.hellocharts.renderer.BubbleChartRenderer;
-
+import com.github.hellocharts.provider.NetChartDataProvider;
+import com.github.hellocharts.renderer.NetChartRenderer;
 
 /**
  * BubbleChart, supports circle bubbles and square bubbles.
  *
  * @author lecho
  */
-public class BubbleChartView extends AbstractChartView implements BubbleChartDataProvider {
+public class NetChartView extends AbstractChartView implements NetChartDataProvider {
     private static final String TAG = "BubbleChartView";
-    protected BubbleChartData data;
-    protected BubbleChartOnValueSelectListener onValueTouchListener = new DummyBubbleChartOnValueSelectListener();
+    protected NetChartData data;
+    protected NetChartOnValueSelectListener onValueTouchListener = new DummyNetChartOnValueSelectListener();
 
-    protected BubbleChartRenderer bubbleChartRenderer;
+    protected NetChartRenderer netChartRenderer;
 
-    public BubbleChartView(Context context) {
+    public NetChartView(Context context) {
         this(context, null, 0);
     }
 
-    public BubbleChartView(Context context, AttributeSet attrs) {
+    public NetChartView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public BubbleChartView(Context context, AttributeSet attrs, int defStyle) {
+    public NetChartView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        bubbleChartRenderer = new BubbleChartRenderer(context, this, this);
-        setChartRenderer(bubbleChartRenderer);
-        setBubbleChartData(BubbleChartData.generateDummyData());
+        netChartRenderer = new NetChartRenderer(context, this, this);
+        setChartRenderer(netChartRenderer);
+        setBubbleChartData(NetChartData.generateDummyData());
     }
 
     @Override
-    public BubbleChartData getBubbleChartData() {
+    public NetChartData getBubbleChartData() {
         return data;
     }
 
     @Override
-    public void setBubbleChartData(BubbleChartData data) {
+    public void setBubbleChartData(NetChartData data) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Setting data for BubbleChartView");
         }
 
-        if (null == data) {
-            this.data = BubbleChartData.generateDummyData();
+        if (null == data || 0 == data.getValues().size()) {
+            this.data = NetChartData.generateDummyData();
         } else {
             this.data = data;
         }
@@ -80,11 +80,11 @@ public class BubbleChartView extends AbstractChartView implements BubbleChartDat
         }
     }
 
-    public BubbleChartOnValueSelectListener getOnValueTouchListener() {
+    public NetChartOnValueSelectListener getOnValueTouchListener() {
         return onValueTouchListener;
     }
 
-    public void setOnValueTouchListener(BubbleChartOnValueSelectListener touchListener) {
+    public void setOnValueTouchListener(NetChartOnValueSelectListener touchListener) {
         if (null != touchListener) {
             this.onValueTouchListener = touchListener;
         }
@@ -94,10 +94,10 @@ public class BubbleChartView extends AbstractChartView implements BubbleChartDat
      * Removes empty spaces, top-bottom for portrait orientation and left-right for landscape. This method has to be
      * called after view View#onSizeChanged() method is called and chart data is set. This method may be inaccurate.
      *
-     * @see BubbleChartRenderer#removeMargins()
+     * @see NetChartRenderer#removeMargins()
      */
     public void removeMargins() {
-        bubbleChartRenderer.removeMargins();
+        netChartRenderer.removeMargins();
         ViewCompat.postInvalidateOnAnimation(this);
     }
 }

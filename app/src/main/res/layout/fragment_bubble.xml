@@ -6,12 +6,11 @@
     tools:context="com.zero.customview.fragment.chart.BubbleFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <com.github.hellocharts.view.BubbleChartView
-        android:id="@+id/bubble_view"
+    <com.github.hellocharts.view.NetChartView
+        android:id="@+id/net_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/colorCadeBlue"
+        android:background="@color/colorMenuDarkGray"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"

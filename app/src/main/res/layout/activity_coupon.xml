@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.zero.customview.activity.CouponActivity">
+
+    <com.zero.customview.view.CouponView
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        app:coupan_water_marker="VISA">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VIP"
+            android:textColor="@color/colorWhite"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123123123*******123122"
+            android:textColor="@color/colorWhite" />
+    </com.zero.customview.view.CouponView>
+</LinearLayout>

@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_OPENGL_3D = 11;
     private static final int ITEM_CIRCLE_MENU = 12;
     private static final int ITEM_ANIM_BOTTOM = 13;
+    private static final int ITEM_COUPON_VIEW = 14;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.opengl_3d));
         mDatas.add(getString(R.string.circle_menu));
         mDatas.add(getString(R.string.anim_bottom));
+        mDatas.add(getString(R.string.coupon_view));
 
     }
     private void initView() {
@@ -187,6 +189,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_ANIM_BOTTOM:
                 startActivity(new Intent(mContext, BottomBarActivity.class));
+                break;
+            case ITEM_COUPON_VIEW:
+                startActivity(new Intent(mContext, CouponActivity.class));
                 break;
             default:
                 break;

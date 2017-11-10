@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CouponView">
+        <attr name="coupon_seperaotr_width" format="dimension|reference"/>
+        <attr name="coupon_seperator_color" format="color|reference"/>
+        <attr name="coupon_border_color" format="color|reference"/>
+        <attr name="coupon_binder_radius" format="dimension|reference"/>
+        <attr name="coupon_check_radius" format="dimension|reference"/>
+        <attr name="coupon_backgroud" format="color"/>
+        <attr name="coupan_water_marker" format="string"/>
+        <attr name="coupan_marker_color" format="color|reference"/>
+        <attr name="coupon_marker_size" format="dimension|reference"/>
+    </declare-styleable>
+</resources>

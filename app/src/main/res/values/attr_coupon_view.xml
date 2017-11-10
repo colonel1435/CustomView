@@ -7,8 +7,10 @@
         <attr name="coupon_binder_radius" format="dimension|reference"/>
         <attr name="coupon_check_radius" format="dimension|reference"/>
         <attr name="coupon_backgroud" format="color"/>
-        <attr name="coupan_water_marker" format="string"/>
-        <attr name="coupan_marker_color" format="color|reference"/>
+        <attr name="coupon_water_marker" format="string"/>
+        <attr name="coupon_marker_color" format="color|reference"/>
         <attr name="coupon_marker_size" format="dimension|reference"/>
+        <attr name="coupon_left_color" format="color|reference"/>
+        <attr name="coupon_right_color" format="color|reference"/>
     </declare-styleable>
 </resources>

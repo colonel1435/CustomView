@@ -83,4 +83,11 @@
 
     <color name="colorCadeBlue">#4DB6AC</color>
     <color name="colorLightRed">#f85779</color>
+    
+    <color name="colorSlightBlue">#75c0e8</color>
+    <color name="colorHightBlue">#0dc4b9</color>
+    <color name="colorSlightPurple">#c3a9f8</color>
+    <color name="colorHightPurple">#8b9bfa</color>
+    <color name="colorSlightRed">#fa8ca8</color>
+    <color name="colorHightRed">#f98a85</color>
 </resources>

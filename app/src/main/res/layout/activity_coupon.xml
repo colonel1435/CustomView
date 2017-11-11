@@ -15,11 +15,17 @@
         app:coupon_left_color="@color/colorSlightBlue"
         app:coupon_right_color="@color/colorHightBlue">
 
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_barcode"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="96dp"
+            android:layout_marginLeft="48dp"
             android:layout_gravity="center">
             <TextView
                 android:layout_width="wrap_content"
@@ -54,12 +60,17 @@
         app:coupon_left_color="@color/colorSlightPurple"
         app:coupon_right_color="@color/colorHightPurple"
         app:coupon_marker_size="20sp">
-
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_barcode"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="96dp"
+            android:layout_marginLeft="48dp"
             android:layout_gravity="center">
             <TextView
                 android:layout_width="wrap_content"
@@ -94,12 +105,17 @@
         app:coupon_left_color="@color/colorSlightRed"
         app:coupon_right_color="@color/colorHightRed"
         app:coupon_marker_size="24sp">
-
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_barcode"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginLeft="96dp"
+            android:layout_marginLeft="48dp"
             android:layout_gravity="center">
             <TextView
                 android:layout_width="wrap_content"

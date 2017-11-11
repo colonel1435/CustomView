@@ -50,9 +50,10 @@
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:layout_margin="5dp"
-        app:coupon_water_marker="VISA"
+        app:coupon_water_marker="AliPay"
         app:coupon_left_color="@color/colorSlightPurple"
-        app:coupon_right_color="@color/colorHightPurple">
+        app:coupon_right_color="@color/colorHightPurple"
+        app:coupon_marker_size="20sp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -89,9 +90,10 @@
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:layout_margin="5dp"
-        app:coupon_water_marker="VISA"
+        app:coupon_water_marker="银联"
         app:coupon_left_color="@color/colorSlightRed"
-        app:coupon_right_color="@color/colorHightRed">
+        app:coupon_right_color="@color/colorHightRed"
+        app:coupon_marker_size="24sp">
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class CouponView extends LinearLayout {
     private final static int DEFAULT_SEPERATOR_WIDTH = 4;
     private final static float DEFAULT_MARKER_SIZE = 32;
     private final static int DEFAULT_MARKER_ALPHA = 64;
+    private final static int DEFAULT_MARKER_OFFSET = 6;
     private Context mContext;
     private Paint mBorderPaint;
     private Paint mLinePaint;
@@ -103,7 +105,6 @@ public class CouponView extends LinearLayout {
         mLinePaint.setPathEffect(pathEffect);
 
         mMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mMarkerPaint.setStyle(Paint.Style.FILL);
         mMarkerPaint.setColor(mMarkerColor);
 
         mBorderPath = new Path();
@@ -127,7 +128,7 @@ public class CouponView extends LinearLayout {
             mCheckHoleRadius = (float) (mHeight * 0.05);
         }
         if (mMarkerSize == DEFAULT_MARKER_SIZE) {
-            mMarkerSize = DisplayUtils.px2sp(mContext, (float) (mWidth * 0.35));
+            mMarkerSize = (float) (mHeight * 0.35);
         }
 
         postInvalidate();
@@ -193,14 +194,14 @@ public class CouponView extends LinearLayout {
     private void drawWaterMarker(Canvas canvas) {
         if (mWaterMarker != null && !"".equals(mWaterMarker)) {
             canvas.save();
-            Paint.FontMetrics fontMetrics = mMarkerPaint.getFontMetrics();
-            float baseline_x = baseRight;
-            float baseline_y = baseTop + mMarkerSize;
-            mMarkerPaint.setFakeBoldText(true);
+            mMarkerPaint.setTypeface(Typeface.DEFAULT_BOLD);
             mMarkerPaint.setTextSkewX(-0.3f);
             mMarkerPaint.setTextSize(mMarkerSize);
             mMarkerPaint.setTextAlign(Paint.Align.RIGHT);
             mMarkerPaint.setAlpha(mMarkerAlpha);
+            Paint.FontMetrics fontMetrics = mMarkerPaint.getFontMetrics();
+            float baseline_x = baseRight-DEFAULT_MARKER_OFFSET;
+            float baseline_y = baseTop + (-fontMetrics.ascent);
             canvas.drawText(mWaterMarker, baseline_x, baseline_y, mMarkerPaint);
             canvas.restore();
         }

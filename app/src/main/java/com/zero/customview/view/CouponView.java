@@ -21,6 +21,8 @@ import android.widget.LinearLayout;
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 
+import java.nio.channels.FileLock;
+
 
 /**
  * Description
@@ -35,17 +37,25 @@ public class CouponView extends LinearLayout {
     private final static int DEFAULT_CHECK_HOLE_RADIUS = 20;
     private final static int DEFAULT_SEPERATOR_WIDTH = 4;
     private final static float DEFAULT_MARKER_SIZE = 32;
-    private final static int DEFAULT_MARKER_ALPHA = 64;
+    private final static int DEFAULT_MARKER_ALPHA = 48;
     private final static int DEFAULT_MARKER_OFFSET = 6;
+    private final static float DEFAULT_MARKER_SKEW_ANGLE = 0f;
+    private final static int GRAVITY_UPPER_LEFT = 1;
+    private final static int GRAVITY_LOWER_LEFT = 2;
+    private final static int GRAVITY_UPPER_RIGHT = 3;
+    private final static int GRAVITY_LOWER_RIGHT = 4;
+    private final static int GRAVITY_CENTER = 5;
     private Context mContext;
     private Paint mBorderPaint;
     private Paint mLinePaint;
     private Paint mMarkerPaint;
     private Path mBorderPath;
+    private Path mMarkerPath;
     private float mSeperatorWidth;
     private int mSeperatorColor;
     private int mBorderColor;
     private int mMarkerColor;
+    private int mMarkerGravity;
     private int mLeftColor;
     private int mRightColor;
     private float mMarkerSize;
@@ -53,6 +63,7 @@ public class CouponView extends LinearLayout {
     private float mCheckHoleRadius;
     private String mWaterMarker;
     private int mMarkerAlpha;
+    private float mSkewAngle = 0f;
     private float mWidth;
     private float mHeight;
     private float baseX;
@@ -82,6 +93,10 @@ public class CouponView extends LinearLayout {
         mMarkerColor = ta.getColor(R.styleable.CouponView_coupon_marker_color, Color.WHITE);
         mMarkerSize = ta.getDimension(R.styleable.CouponView_coupon_marker_size,
                 DEFAULT_MARKER_SIZE);
+        mMarkerGravity = ta.getInt(R.styleable.CouponView_coupon_marker_gravity,
+                GRAVITY_UPPER_RIGHT);
+        mSkewAngle = ta.getFloat(R.styleable.CouponView_coupon_marker_skew_angle,
+                DEFAULT_MARKER_SKEW_ANGLE);
         mLeftColor = ta.getColor(R.styleable.CouponView_coupon_left_color, Color.BLUE);
         mRightColor = ta.getColor(R.styleable.CouponView_coupon_right_color, Color.GREEN);
         ta.recycle();
@@ -108,6 +123,7 @@ public class CouponView extends LinearLayout {
         mMarkerPaint.setColor(mMarkerColor);
 
         mBorderPath = new Path();
+        mMarkerPath = new Path();
     }
 
     @Override
@@ -200,9 +216,54 @@ public class CouponView extends LinearLayout {
             mMarkerPaint.setTextAlign(Paint.Align.RIGHT);
             mMarkerPaint.setAlpha(mMarkerAlpha);
             Paint.FontMetrics fontMetrics = mMarkerPaint.getFontMetrics();
-            float baseline_x = baseRight-DEFAULT_MARKER_OFFSET;
-            float baseline_y = baseTop + (-fontMetrics.ascent);
-            canvas.drawText(mWaterMarker, baseline_x, baseline_y, mMarkerPaint);
+            float textWidth = mMarkerPaint.measureText(mWaterMarker) + 2 * DEFAULT_MARKER_OFFSET;
+            float baseline_x;
+            float baseline_y;
+            float deltaX = (float) (textWidth * Math.cos(mSkewAngle));
+            float deltaY = (float) (textWidth * Math.sin(mSkewAngle));
+            switch (mMarkerGravity) {
+                case GRAVITY_UPPER_LEFT:
+                    mMarkerPaint.setTextAlign(Paint.Align.LEFT);
+                    baseline_x = baseX + mBinderHoleRadius;
+                    baseline_y = baseTop + (-fontMetrics.ascent);
+                    mMarkerPath.moveTo(baseline_x, baseline_y + (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.lineTo(baseline_x + deltaX, baseline_y);
+                    break;
+                case GRAVITY_LOWER_LEFT:
+                    mMarkerPaint.setTextAlign(Paint.Align.LEFT);
+                    baseline_x = baseX + mBinderHoleRadius;
+                    baseline_y = baseBottom + fontMetrics.descent;
+                    mMarkerPath.moveTo(baseline_x, baseline_y - (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.lineTo(baseline_x + deltaX, baseline_y);
+                    break;
+                case GRAVITY_UPPER_RIGHT:
+                    mMarkerPaint.setTextAlign(Paint.Align.RIGHT);
+                    baseline_x = baseRight -  DEFAULT_MARKER_OFFSET;
+                    baseline_y = baseTop + (-fontMetrics.ascent);
+                    mMarkerPath.moveTo(baseline_x - deltaX, baseline_y);
+                    mMarkerPath.lineTo(baseline_x, baseline_y + (float)(textWidth * Math.sin(mSkewAngle)));
+                    break;
+                case GRAVITY_LOWER_RIGHT:
+                    mMarkerPaint.setTextAlign(Paint.Align.RIGHT);
+                    baseline_x = baseRight - DEFAULT_MARKER_OFFSET;
+                    baseline_y = baseBottom - fontMetrics.descent - DEFAULT_MARKER_OFFSET;
+                    mMarkerPath.moveTo(baseline_x - deltaX, baseline_y);
+                    mMarkerPath.lineTo(baseline_x, baseline_y - (float)(textWidth * Math.sin(mSkewAngle)));
+                    break;
+                case GRAVITY_CENTER:
+                    mMarkerPaint.setTextAlign(Paint.Align.CENTER);
+                    baseline_x = (baseX + baseRight) / 2;
+                    baseline_y = baseY + fontMetrics.descent;
+                    mMarkerPath.moveTo(baseline_x - deltaX/2, baseline_y + deltaY/2);
+                    mMarkerPath.lineTo(baseline_x + deltaX/2, baseline_y - deltaY/2);
+                    break;
+                default:
+                    break;
+            }
+
+            canvas.drawTextOnPath(mWaterMarker, mMarkerPath,
+                    -2*DEFAULT_MARKER_OFFSET, -DEFAULT_MARKER_OFFSET,
+                    mMarkerPaint);
             canvas.restore();
         }
     }

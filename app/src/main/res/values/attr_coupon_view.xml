@@ -12,5 +12,13 @@
         <attr name="coupon_marker_size" format="dimension|reference"/>
         <attr name="coupon_left_color" format="color|reference"/>
         <attr name="coupon_right_color" format="color|reference"/>
+        <attr name="coupon_marker_gravity">
+            <enum name="upper_left" value="1"/>
+            <enum name="lower_left" value="2"/>
+            <enum name="upper_right" value="3"/>
+            <enum name="lower_right" value="4"/>
+            <enum name="center" value="5"/>
+        </attr>
+        <attr name="coupon_marker_skew_angle" format="float"/>
     </declare-styleable>
 </resources>

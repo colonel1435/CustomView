@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ThumbLikeView">
+        <attr name="thumb_like_color" format="color|reference"/>
+        <attr name="thumb_number_color" format="color|reference"/>
+        <attr name="thumb_number_size" format="dimension|reference"/>
+    </declare-styleable>
+</resources>

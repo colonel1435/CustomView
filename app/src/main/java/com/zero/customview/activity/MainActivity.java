@@ -7,18 +7,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.orhanobut.logger.Logger;
@@ -27,7 +27,6 @@ import com.zero.customview.adapter.recyclerview.MyGridDividerItemDecoration;
 import com.zero.customview.adapter.recyclerview.RecyclerItemClickListener;
 import com.zero.customview.adapter.recyclerview.RecyclerViewCommonAdapter;
 import com.zero.customview.adapter.recyclerview.RecyclerViewHolder;
-import com.zero.customview.view.CircleMenuView;
 import com.zero.customview.view.RoundImageDrawable;
 
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_CIRCLE_MENU = 12;
     private static final int ITEM_ANIM_BOTTOM = 13;
     private static final int ITEM_COUPON_VIEW = 14;
+    private static final int ITEM_LIKE_VIEW = 15;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.circle_menu));
         mDatas.add(getString(R.string.anim_bottom));
         mDatas.add(getString(R.string.coupon_view));
+        mDatas.add(getString(R.string.like_view));
 
     }
     private void initView() {
@@ -192,6 +193,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_COUPON_VIEW:
                 startActivity(new Intent(mContext, CouponActivity.class));
+                break;
+            case ITEM_LIKE_VIEW:
+                startActivity(new Intent(mContext, LikeViewActivity.class));
                 break;
             default:
                 break;

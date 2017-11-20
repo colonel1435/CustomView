@@ -29,8 +29,8 @@ public class LikeViewActivity extends AppCompatActivity {
             @Override
             public void onLike(boolean isLiked) {
                 Log.d("wumin", "onLike: ");
-                TipUtils.showTip(mContext, getString(R.string.msg_title),
-                        (isLiked?"Like it!":"Dislike it!"));
+//                TipUtils.showTip(mContext, getString(R.string.msg_title),
+//                        (isLiked?"Like it!":"Dislike it!"));
             }
         });
     }

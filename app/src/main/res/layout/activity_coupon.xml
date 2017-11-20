@@ -10,7 +10,7 @@
     <com.zero.customview.view.CouponView
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:layout_margin="5dp"
+        android:layout_margin="4dp"
         app:coupon_water_marker="VISA"
         app:coupon_left_color="@color/colorSlightBlue"
         app:coupon_right_color="@color/colorHightBlue"
@@ -69,11 +69,12 @@
     <com.zero.customview.view.CouponView
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:layout_margin="5dp"
+        android:layout_margin="4dp"
         app:coupon_water_marker="AliPay"
         app:coupon_left_color="@color/colorSlightPurple"
         app:coupon_right_color="@color/colorHightPurple"
         app:coupon_marker_gravity="lower_right"
+        app:coupon_marker_skew_angle="45"
         app:coupon_marker_size="20sp">
         <ImageView
             android:layout_width="48dp"
@@ -129,12 +130,12 @@
     <com.zero.customview.view.CouponView
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:layout_margin="5dp"
+        android:layout_margin="4dp"
         app:coupon_left_color="@color/colorSlightRed"
         app:coupon_right_color="@color/colorHightRed"
         app:coupon_water_marker="银联支付"
         app:coupon_marker_gravity="center"
-        app:coupon_marker_skew_angle="-75"
+        app:coupon_marker_skew_angle="30"
         app:coupon_marker_size="48sp">
         <ImageView
             android:layout_width="48dp"

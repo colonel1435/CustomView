@@ -210,6 +210,7 @@ public class CouponView extends LinearLayout {
     private void drawWaterMarker(Canvas canvas) {
         if (mWaterMarker != null && !"".equals(mWaterMarker)) {
             canvas.save();
+            mMarkerPath.reset();
             mMarkerPaint.setTypeface(Typeface.DEFAULT_BOLD);
             mMarkerPaint.setTextSkewX(-0.3f);
             mMarkerPaint.setTextSize(mMarkerSize);
@@ -219,21 +220,23 @@ public class CouponView extends LinearLayout {
             float textWidth = mMarkerPaint.measureText(mWaterMarker) + 2 * DEFAULT_MARKER_OFFSET;
             float baseline_x;
             float baseline_y;
-            float deltaX = (float) (textWidth * Math.cos(mSkewAngle));
-            float deltaY = (float) (textWidth * Math.sin(mSkewAngle));
+            float deltaX = (float) (textWidth * Math.cos(mSkewAngle * (Math.PI / 180)));
+            float deltaY = (float) (textWidth * Math.sin(mSkewAngle * (Math.PI / 180)));
+            Log.d(TAG, "drawWaterMarker: angle -> " + mSkewAngle + " textWidht -> " + textWidth
+                    + " deltaX -> " + deltaX + " deltaY -> " + deltaY);
             switch (mMarkerGravity) {
                 case GRAVITY_UPPER_LEFT:
                     mMarkerPaint.setTextAlign(Paint.Align.LEFT);
                     baseline_x = baseX + mBinderHoleRadius;
                     baseline_y = baseTop + (-fontMetrics.ascent);
-                    mMarkerPath.moveTo(baseline_x, baseline_y + (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.moveTo(baseline_x, baseline_y + deltaY);
                     mMarkerPath.lineTo(baseline_x + deltaX, baseline_y);
                     break;
                 case GRAVITY_LOWER_LEFT:
                     mMarkerPaint.setTextAlign(Paint.Align.LEFT);
                     baseline_x = baseX + mBinderHoleRadius;
                     baseline_y = baseBottom + fontMetrics.descent;
-                    mMarkerPath.moveTo(baseline_x, baseline_y - (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.moveTo(baseline_x, baseline_y - deltaY);
                     mMarkerPath.lineTo(baseline_x + deltaX, baseline_y);
                     break;
                 case GRAVITY_UPPER_RIGHT:
@@ -241,26 +244,25 @@ public class CouponView extends LinearLayout {
                     baseline_x = baseRight -  DEFAULT_MARKER_OFFSET;
                     baseline_y = baseTop + (-fontMetrics.ascent);
                     mMarkerPath.moveTo(baseline_x - deltaX, baseline_y);
-                    mMarkerPath.lineTo(baseline_x, baseline_y + (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.lineTo(baseline_x, baseline_y + deltaY);
                     break;
                 case GRAVITY_LOWER_RIGHT:
                     mMarkerPaint.setTextAlign(Paint.Align.RIGHT);
                     baseline_x = baseRight - DEFAULT_MARKER_OFFSET;
                     baseline_y = baseBottom - fontMetrics.descent - DEFAULT_MARKER_OFFSET;
                     mMarkerPath.moveTo(baseline_x - deltaX, baseline_y);
-                    mMarkerPath.lineTo(baseline_x, baseline_y - (float)(textWidth * Math.sin(mSkewAngle)));
+                    mMarkerPath.lineTo(baseline_x, baseline_y - deltaY);
                     break;
                 case GRAVITY_CENTER:
                     mMarkerPaint.setTextAlign(Paint.Align.CENTER);
                     baseline_x = (baseX + baseRight) / 2;
-                    baseline_y = baseY + fontMetrics.descent;
+                    baseline_y = baseY - (fontMetrics.descent + fontMetrics.ascent)/2;
                     mMarkerPath.moveTo(baseline_x - deltaX/2, baseline_y + deltaY/2);
                     mMarkerPath.lineTo(baseline_x + deltaX/2, baseline_y - deltaY/2);
                     break;
                 default:
                     break;
             }
-
             canvas.drawTextOnPath(mWaterMarker, mMarkerPath,
                     -2*DEFAULT_MARKER_OFFSET, -DEFAULT_MARKER_OFFSET,
                     mMarkerPaint);

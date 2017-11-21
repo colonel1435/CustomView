@@ -1,15 +1,9 @@
 package com.zero.customview.view;
 
-<<<<<<< HEAD
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.pm.PackageItemInfo;
-=======
-import android.content.Context;
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.drawable.BitmapDrawable;
@@ -27,17 +20,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-<<<<<<< HEAD
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
 
 import com.zero.customview.R;
 
-import org.w3c.dom.ProcessingInstruction;
-
-import uk.co.senab.photoview.log.LoggerDefault;
 
 /**
  * Description
@@ -48,7 +35,6 @@ import uk.co.senab.photoview.log.LoggerDefault;
 
 public class ThumbLikeView extends View {
     private static final String TAG = "ThumbLikeView@wumin";
-<<<<<<< HEAD
     private static final int DEFAULT_WIDTH = 256;
     private static final int DEFAULT_HEIGHT = 128;
     private static final float DEFAULT_NUMBER_SIZE = 24;
@@ -60,19 +46,10 @@ public class ThumbLikeView extends View {
     private static final float DEFAULT_ANIM_SCALE_MIN = 0.8f;
     private static final float DEFAULT_LIGHT_PAINT_WIDTH = 2f;
 
-    private Context mContext;
-    private Paint mLikePaint;
-    private Paint mLightPaint;
-=======
-    private static final int DEFAULT_WIDTH = 192;
-    private static final int DEFAULT_HEIGHT = 96;
-    private static final float DEFAULT_NUMBER_SIZE = 24;
-    private static final int DEFAULT_PADDING = 2;
-    private static final int DEFAULT_NUMBER = 0;
 
     private Context mContext;
     private Paint mLikePaint;
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
+    private Paint mLightPaint;
     private Region mLikeRegion;
     private RectF mLikeRect;
     private Path mLikePath;
@@ -83,27 +60,18 @@ public class ThumbLikeView extends View {
     private float mNumberSize;
     private int mLikeColor;
     private float mLikeRadius;
-<<<<<<< HEAD
     private float mLikeMaxRadius;
     private float mLightRadius;
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
     private int mWidth;
     private int mHeight;
     private float baseX;
     private float baseY;
     private Drawable mThumbDrawable;
-<<<<<<< HEAD
     private Drawable mThumbUpDrawable;
-    private boolean isTouched = false;
-    private boolean isLiked = false;
     private ValueAnimator lightAnimator;
     private ValueAnimator scaleAnimator;
-=======
     private boolean isTouched = false;
     private boolean isLiked = false;
-    private float animDurationTime;
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
 
     private onLikeListener mClickListener;
     public ThumbLikeView(Context context) {
@@ -132,14 +100,11 @@ public class ThumbLikeView extends View {
         mLikePaint.setColor(mLikeColor);
         mLikePaint.setStyle(Paint.Style.STROKE);
 
-<<<<<<< HEAD
         mLightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLightPaint.setColor(Color.GRAY);
         mLightPaint.setStyle(Paint.Style.STROKE);
         mLightPaint.setStrokeWidth(DEFAULT_LIGHT_PAINT_WIDTH);
 
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
         mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mNumberPaint.setColor(mNumberColor);
         mNumberPaint.setTextSize(mNumberSize);
@@ -148,7 +113,6 @@ public class ThumbLikeView extends View {
         mLikeRegion = new Region();
         mMatrix = new Matrix();
         mThumbDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up);
-<<<<<<< HEAD
         mThumbUpDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_like);
 
         mLightRadius = 0.0f;
@@ -188,8 +152,6 @@ public class ThumbLikeView extends View {
                 invalidate();
             }
         });
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
     }
 
     @Override
@@ -205,20 +167,13 @@ public class ThumbLikeView extends View {
         mWidth = w;
         mHeight = h;
         mLikeRadius = (w / 2 - DEFAULT_PADDING - getPaddingTop() - getPaddingBottom()) / 2;
-<<<<<<< HEAD
         mLikeMaxRadius = mLikeRadius;
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
         baseX = (float)(mWidth / 2);
         baseY = (float)(mHeight / 2);
 
         mMatrix.reset();
         Region globalRegion = new Region(0, 0, w, h);
-<<<<<<< HEAD
         float cx = mWidth / 4;
-=======
-        float cx = (mWidth / 2 - getPaddingLeft() - DEFAULT_PADDING) / 2;
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
         float cy = baseY;
         mLikeRect = new RectF(cx - mLikeRadius, cy - mLikeRadius,
                 cx + mLikeRadius, cy + mLikeRadius);
@@ -232,10 +187,7 @@ public class ThumbLikeView extends View {
             canvas.getMatrix().invert(mMatrix);
         }
         drawIcon(canvas);
-<<<<<<< HEAD
         drawLightCircle(canvas);
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
         drawNumber(canvas);
     }
 
@@ -272,24 +224,18 @@ public class ThumbLikeView extends View {
     }
 
     private void onClicked() {
-<<<<<<< HEAD
         if (isAnimatorRunning()) {
             return;
         }
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
         isLiked = isLiked ? false:true;
         startLikeAnimation();
         mClickListener.onLike(isLiked);
     }
 
-<<<<<<< HEAD
     private boolean isAnimatorRunning() {
         return lightAnimator.isRunning() || scaleAnimator.isRunning();
     }
 
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
     private void startLikeAnimation() {
         if (isLiked) {
             startLightAnimation();
@@ -298,19 +244,11 @@ public class ThumbLikeView extends View {
     }
 
     private void startScaleAnimation() {
-<<<<<<< HEAD
         scaleAnimator.start();
     }
 
     private void startLightAnimation() {
         lightAnimator.start();
-=======
-
-    }
-
-    private void startLightAnimation() {
-
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
     }
 
     private int measureDimension(int measureSpec, int defaultSize) {
@@ -328,7 +266,6 @@ public class ThumbLikeView extends View {
     private void drawIcon(Canvas canvas) {
         RectF dst = new RectF(mLikeRect);
         dst.inset(2*DEFAULT_PADDING, 2*DEFAULT_PADDING);
-<<<<<<< HEAD
         Bitmap bmp;
         if (isLiked) {
             bmp = ((BitmapDrawable)mThumbUpDrawable).getBitmap();
@@ -344,15 +281,9 @@ public class ThumbLikeView extends View {
             canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLightRadius, mLightPaint);
             Log.d(TAG, "drawLightCircle: " + mLightRadius);
         }
-    }
-
-=======
-        Bitmap bmp = ((BitmapDrawable)mThumbDrawable).getBitmap();
         canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeRadius, mLikePaint);
-        canvas.drawBitmap(bmp, null, dst, null);
     }
 
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
     private void drawNumber(Canvas canvas) {
         Paint.FontMetrics fontMetrics = mNumberPaint.getFontMetrics();
 

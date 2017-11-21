@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.zero.customview.R;
-import com.zero.customview.utils.TipUtils;
 import com.zero.customview.view.ThumbLikeView;
 
 import butterknife.BindView;
@@ -29,13 +28,8 @@ public class LikeViewActivity extends AppCompatActivity {
             @Override
             public void onLike(boolean isLiked) {
                 Log.d("wumin", "onLike: ");
-<<<<<<< HEAD
 //                TipUtils.showTip(mContext, getString(R.string.msg_title),
 //                        (isLiked?"Like it!":"Dislike it!"));
-=======
-                TipUtils.showTip(mContext, getString(R.string.msg_title),
-                        (isLiked?"Like it!":"Dislike it!"));
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
             }
         });
     }

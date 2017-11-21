@@ -23,10 +23,7 @@
             android:id="@+id/thumb_like_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-<<<<<<< HEAD
             android:padding="5dp"
-=======
->>>>>>> 432a4e174c4232d359f9712382ca1c01423123a2
             app:thumb_number_size="16sp"/>
     </LinearLayout>
 

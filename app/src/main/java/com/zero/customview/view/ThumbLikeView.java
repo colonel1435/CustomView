@@ -2,6 +2,7 @@ package com.zero.customview.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -55,7 +56,7 @@ public class ThumbLikeView extends View {
     private Path mLikePath;
     private Matrix mMatrix;
     private Paint mNumberPaint;
-    private String mNumber = String.valueOf(DEFAULT_NUMBER);
+    private int mNumber = DEFAULT_NUMBER;
     private int mNumberColor;
     private float mNumberSize;
     private int mLikeColor;
@@ -70,8 +71,11 @@ public class ThumbLikeView extends View {
     private Drawable mThumbUpDrawable;
     private ValueAnimator lightAnimator;
     private ValueAnimator scaleAnimator;
+    private ObjectAnimator textTransAnimator;
     private boolean isTouched = false;
     private boolean isLiked = false;
+    private String[] textValues = new String[3];
+    private float textTransY = 0.0f;
 
     private onLikeListener mClickListener;
     public ThumbLikeView(Context context) {
@@ -223,34 +227,6 @@ public class ThumbLikeView extends View {
         return mLikeRegion.contains(x, y);
     }
 
-    private void onClicked() {
-        if (isAnimatorRunning()) {
-            return;
-        }
-        isLiked = isLiked ? false:true;
-        startLikeAnimation();
-        mClickListener.onLike(isLiked);
-    }
-
-    private boolean isAnimatorRunning() {
-        return lightAnimator.isRunning() || scaleAnimator.isRunning();
-    }
-
-    private void startLikeAnimation() {
-        if (isLiked) {
-            startLightAnimation();
-        }
-        startScaleAnimation();
-    }
-
-    private void startScaleAnimation() {
-        scaleAnimator.start();
-    }
-
-    private void startLightAnimation() {
-        lightAnimator.start();
-    }
-
     private int measureDimension(int measureSpec, int defaultSize) {
         int result;
         int mode = MeasureSpec.getMode(measureSpec);
@@ -272,7 +248,7 @@ public class ThumbLikeView extends View {
         } else {
             bmp = ((BitmapDrawable) mThumbDrawable).getBitmap();
         }
-//        canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeMaxRadius, mLikePaint);
+        canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeMaxRadius, mLikePaint);
         canvas.drawBitmap(bmp, null, dst, null);
     }
 
@@ -285,21 +261,108 @@ public class ThumbLikeView extends View {
     }
 
     private void drawNumber(Canvas canvas) {
+        String numStr = String.valueOf(mNumber);
         Paint.FontMetrics fontMetrics = mNumberPaint.getFontMetrics();
 
-        float textWidth = mNumberPaint.measureText(mNumber);
+        float textWidth = mNumberPaint.measureText(numStr);
         float baseline_x = baseX + (mWidth / 2 - textWidth) / 2;
         float baseline_y = baseY - (fontMetrics.descent + fontMetrics.ascent) / 2;
-        canvas.drawText(mNumber, baseline_x, baseline_y, mNumberPaint);
+        canvas.drawText(numStr, baseline_x, baseline_y, mNumberPaint);
         canvas.drawLine(0, baseY, mWidth, baseY, mNumberPaint);
     }
 
-    public String getNumber() {
+    private void onLike() {
+        textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, 1);
+        textTransAnimator.setDuration(DEFAULT_ANIM_DURATION);
+        textTransAnimator.start();
+    }
+
+    private void onDislike() {
+        textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, -1);
+        textTransAnimator.setDuration(DEFAULT_ANIM_DURATION);
+        textTransAnimator.start();
+    }
+
+    private void onClicked() {
+        if (isAnimatorRunning()) {
+            return;
+        }
+        isLiked = isLiked ? false:true;
+        startTextChanged();
+        startLikeAnimation();
+        mClickListener.onLike(isLiked);
+    }
+
+    private boolean isAnimatorRunning() {
+        return lightAnimator.isRunning() || scaleAnimator.isRunning();
+    }
+
+    private void parseText(int previous, int current) {
+        String previewText = String.valueOf(previous);
+        String currentText = String.valueOf(current);
+        if (previewText.length() != currentText.length()) {
+            textValues[0] = "";
+            textValues[1] = previewText;
+            textValues[2] = currentText;
+        } else {
+            for (int i = 0; i < previewText.length(); i++) {
+                if (previewText.charAt(i) != currentText.charAt(i)) {
+                    if (i != 0) {
+                        textValues[0] = "";
+                    } else {
+                        textValues[0] = previewText.substring(0, i);
+                    }
+                    textValues[1] = previewText.substring(i);
+                    textValues[2] = currentText.substring(i);
+                    break;
+                }
+            }
+        }
+    }
+    private void  startTextChanged() {
+        int previousNumber = mNumber;
+        parseText(previousNumber, mNumber);
+        if (isLiked) {
+            onLike();
+        } else {
+            if (mNumber > 0) {
+                mNumber --;
+            }
+            onDislike();
+        }
+    }
+
+    private void startLikeAnimation() {
+        if (isLiked) {
+            startLightAnimation();
+        }
+        startScaleAnimation();
+    }
+
+    private void startScaleAnimation() {
+        scaleAnimator.start();
+    }
+
+    private void startLightAnimation() {
+        lightAnimator.start();
+    }
+
+    public int getNumber() {
         return mNumber;
     }
 
-    public void setNumber(String mNumber) {
+    public void setNumber(int mNumber) {
         this.mNumber = mNumber;
+        invalidate();
+    }
+
+    public float getTextTransY() {
+        return textTransY;
+    }
+
+    public void setTextTransY(float mTextTransY) {
+        this.textTransY = mTextTransY;
+        invalidate();
     }
 
     public onLikeListener getClickListener() {

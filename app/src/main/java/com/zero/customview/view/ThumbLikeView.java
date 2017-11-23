@@ -156,6 +156,8 @@ public class ThumbLikeView extends View {
                 invalidate();
             }
         });
+
+        parseText(0, 0);
     }
 
     @Override
@@ -267,18 +269,34 @@ public class ThumbLikeView extends View {
         float textWidth = mNumberPaint.measureText(numStr);
         float baseline_x = baseX + (mWidth / 2 - textWidth) / 2;
         float baseline_y = baseY - (fontMetrics.descent + fontMetrics.ascent) / 2;
-        canvas.drawText(numStr, baseline_x, baseline_y, mNumberPaint);
         canvas.drawLine(0, baseY, mWidth, baseY, mNumberPaint);
+//        canvas.drawText(numStr, baseline_x, baseline_y, mNumberPaint);
+        float constTextWidth = 0;
+        float variantTextWidth = mNumberPaint.measureText(textValues[1]);
+        float cX = baseX + (mWidth / 2 - variantTextWidth) / 2;
+        if (!"".equals(textValues[0])) {
+            constTextWidth = mNumberPaint.measureText(textValues[0]);
+            cX = baseX + (mWidth / 2 - constTextWidth - variantTextWidth) / 2 + constTextWidth / 2;
+            canvas.drawText(textValues[0], cX, baseline_y, mNumberPaint);
+        }
+
+        float vX = cX + constTextWidth / 2 + constTextWidth / 2;
+        /*** Draw last text ***/
+        canvas.drawText(textValues[1], vX, baseline_y - (mHeight / 2) * textTransY, mNumberPaint);
+        /*** Draw current text ***/
+        canvas.drawText(textValues[2], vX, baseline_y + (mHeight / 2) * (1 - textTransY), mNumberPaint);
     }
 
     private void onLike() {
         textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, 1);
+        textTransAnimator.setInterpolator(new AccelerateInterpolator());
         textTransAnimator.setDuration(DEFAULT_ANIM_DURATION);
         textTransAnimator.start();
     }
 
     private void onDislike() {
         textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, -1);
+        textTransAnimator.setInterpolator(new AccelerateInterpolator());
         textTransAnimator.setDuration(DEFAULT_ANIM_DURATION);
         textTransAnimator.start();
     }
@@ -327,8 +345,8 @@ public class ThumbLikeView extends View {
         } else {
             if (mNumber > 0) {
                 mNumber --;
+                onDislike();
             }
-            onDislike();
         }
     }
 

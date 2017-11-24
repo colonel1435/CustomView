@@ -45,25 +45,6 @@ public class LikeViewActivity extends AppCompatActivity {
 //                        (isLiked?"Like it!":"Dislike it!"));
             }
         });
-
-        etThumbEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() > 0) {
-                    thumbLikeView.setNumber(Integer.valueOf(s.toString()));
-                }
-            }
-        });
     }
 
     @OnClick({R.id.iv_thumb_add, R.id.iv_thumb_sub})
@@ -71,10 +52,17 @@ public class LikeViewActivity extends AppCompatActivity {
         AnimatorFactory.getClickScaleAnimtor(view).start();
         switch (view.getId()) {
             case R.id.iv_thumb_add:
-                thumbLikeView.setNumber(thumbLikeView.getNumber() + 1);
+                if (!"".equals(etThumbEdit.getText().toString())) {
+                    thumbLikeView.setPreNumber(0);
+                    thumbLikeView.setNumber(Integer.valueOf(etThumbEdit.getText().toString()));
+                } else {
+                    thumbLikeView.setNumber(thumbLikeView.getNumber() + 1);
+                }
                 break;
             case R.id.iv_thumb_sub:
                 thumbLikeView.setNumber(thumbLikeView.getNumber() - 1);
+                break;
+            default:
                 break;
         }
     }

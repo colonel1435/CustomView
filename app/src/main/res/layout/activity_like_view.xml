@@ -26,20 +26,21 @@
             android:padding="5dp"
             app:thumb_number_size="16sp"/>
         <ImageView
-            android:id="@+id/iv_thumb_add"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@mipmap/ic_add_circle_blue_700_36dp"/>
+            android:id="@+id/iv_thumb_sub"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/ic_remove_circle_outline_blue_700_36dp"/>
         <EditText
             android:id="@+id/et_thumb_edit"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:inputType="number"/>
         <ImageView
-            android:id="@+id/iv_thumb_sub"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@mipmap/ic_remove_circle_outline_blue_700_36dp"/>
+            android:id="@+id/iv_thumb_add"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@mipmap/ic_add_circle_blue_700_36dp"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

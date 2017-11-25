@@ -3,8 +3,6 @@ package com.zero.customview.activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -13,6 +11,7 @@ import android.widget.ImageView;
 import com.zero.customview.R;
 import com.zero.customview.anim.AnimatorFactory;
 import com.zero.customview.view.ThumbLikeView;
+import com.zero.customview.view.likeview.ShiftNumberView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +25,8 @@ public class LikeViewActivity extends AppCompatActivity {
     EditText etThumbEdit;
     @BindView(R.id.iv_thumb_sub)
     ImageView ivThumbSub;
+    @BindView(R.id.shift_number_view)
+    ShiftNumberView shiftNumberView;
     private Context mContext;
     @BindView(R.id.thumb_like_view)
     ThumbLikeView thumbLikeView;
@@ -58,9 +59,11 @@ public class LikeViewActivity extends AppCompatActivity {
                 } else {
                     thumbLikeView.setNumber(thumbLikeView.getNumber() + 1);
                 }
+                shiftNumberView.setText(String.valueOf(thumbLikeView.getNumber()));
                 break;
             case R.id.iv_thumb_sub:
                 thumbLikeView.setNumber(thumbLikeView.getNumber() - 1);
+                shiftNumberView.setText(String.valueOf(thumbLikeView.getNumber()));
                 break;
             default:
                 break;

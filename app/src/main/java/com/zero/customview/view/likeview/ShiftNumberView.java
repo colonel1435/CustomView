@@ -103,9 +103,6 @@ public class ShiftNumberView extends View {
         mHeight = h;
         centerX = w / 2;
         centerY = h / 2;
-        Log.d(TAG, "onSizeChanged: width[" + w +"],height[" + h + "], left[" +
-            getLeft() + "],top[" + getTop() + "], right[" + getRight() + "],bottom[" +
-            getBottom() + "]");
     }
 
     @Override
@@ -120,8 +117,10 @@ public class ShiftNumberView extends View {
             Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
             float textWidth = mTextPaint.measureText(mText);
             float textHeight = (fontMetrics.descent - fontMetrics.ascent);
-            float baseline_x = (mWidth - textWidth) / 2;
-            float baseline_y = centerY - (fontMetrics.descent + fontMetrics.ascent) / 2;
+            float baseline_x = (mWidth - textWidth) / 2
+                            + getPaddingLeft() - getPaddingRight();
+            float baseline_y = centerY - (fontMetrics.descent + fontMetrics.ascent) / 2
+                            + getPaddingTop() - getPaddingBottom();
             canvas.drawLine(0, baseline_y, mWidth, baseline_y, mTextPaint);
             canvas.drawLine(centerX, 0, centerX, mHeight, mTextPaint);
 

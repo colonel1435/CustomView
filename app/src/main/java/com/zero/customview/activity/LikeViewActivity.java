@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.zero.customview.R;
 import com.zero.customview.anim.AnimatorFactory;
-import com.zero.customview.view.ThumbLikeView;
+import com.zero.customview.view.likeview.ThumbUpView;
 import com.zero.customview.view.likeview.ShiftNumberView;
 
 import butterknife.BindView;
@@ -29,7 +29,7 @@ public class LikeViewActivity extends AppCompatActivity {
     ShiftNumberView shiftNumberView;
     private Context mContext;
     @BindView(R.id.thumb_like_view)
-    ThumbLikeView thumbLikeView;
+    ThumbUpView thumbUpView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class LikeViewActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mContext = this;
-        thumbLikeView.setClickListener(new ThumbLikeView.onLikeListener() {
+        thumbUpView.setClickListener(new ThumbUpView.onLikeListener() {
             @Override
             public void onLike(boolean isLiked) {
                 Log.d("wumin", "onLike: ");
@@ -51,19 +51,17 @@ public class LikeViewActivity extends AppCompatActivity {
     @OnClick({R.id.iv_thumb_add, R.id.iv_thumb_sub})
     public void onViewClicked(View view) {
         AnimatorFactory.getClickScaleAnimtor(view).start();
+        int number = Integer.valueOf(shiftNumberView.getText());
         switch (view.getId()) {
             case R.id.iv_thumb_add:
                 if (!"".equals(etThumbEdit.getText().toString())) {
-                    thumbLikeView.setPreNumber(0);
-                    thumbLikeView.setNumber(Integer.valueOf(etThumbEdit.getText().toString()));
+                    shiftNumberView.setText(String.valueOf(etThumbEdit.getText().toString()));
                 } else {
-                    thumbLikeView.setNumber(thumbLikeView.getNumber() + 1);
+                    shiftNumberView.setText(String.valueOf(number + 1));
                 }
-                shiftNumberView.setText(String.valueOf(thumbLikeView.getNumber()));
                 break;
             case R.id.iv_thumb_sub:
-                thumbLikeView.setNumber(thumbLikeView.getNumber() - 1);
-                shiftNumberView.setText(String.valueOf(thumbLikeView.getNumber()));
+                shiftNumberView.setText(String.valueOf(number - 1));
                 break;
             default:
                 break;

@@ -1,4 +1,4 @@
-package com.zero.customview.view;
+package com.zero.customview.view.likeview;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,7 +18,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.EventLog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,8 +25,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
 import com.zero.customview.R;
-
-import io.reactivex.internal.operators.maybe.MaybeNever;
 
 
 /**
@@ -37,12 +34,12 @@ import io.reactivex.internal.operators.maybe.MaybeNever;
  * Date   : 2017/11/20 0020 15:09
  */
 
-public class ThumbLikeView extends View {
+public class ThumbUpView extends View {
     private static final String TAG = "ThumbLikeView@wumin";
-    private static final int DEFAULT_WIDTH = 256;
+    private static final int DEFAULT_WIDTH = 128;
     private static final int DEFAULT_HEIGHT = 128;
     private static final float DEFAULT_NUMBER_SIZE = 24;
-    private static final int DEFAULT_PADDING = 10;
+    private static final int DEFAULT_PADDING = 5;
     private static final int DEFAULT_NUMBER = 10;
     private static final int DEFAULT_ANIM_DURATION = 300;
     private static final float DEFAULT_ANIM_SCALE_MAX = 1.2f;
@@ -73,29 +70,32 @@ public class ThumbLikeView extends View {
     private float baseY;
     private Drawable mThumbDrawable;
     private Drawable mThumbUpDrawable;
+    private Drawable mThumbUpLightDrawable;
     private ValueAnimator lightAnimator;
-    private ValueAnimator scaleAnimator;
+    private ObjectAnimator scaleUpAnimator;
     private ObjectAnimator textTransAnimator;
     private boolean isTouched = false;
     private boolean isLiked = false;
-    private String[] textValues = new String[3];
-    private float textTransY = 0.0f;
+    private float scaleDownIndex;
+    private float scaleUpIndex;
+    private Matrix scaleDownMatrix;
+    private Matrix scaleUpMxtrix;
 
     private onLikeListener mClickListener;
-    public ThumbLikeView(Context context) {
+    public ThumbUpView(Context context) {
         this(context, null);
     }
 
-    public ThumbLikeView(Context context, @Nullable AttributeSet attrs) {
+    public ThumbUpView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ThumbLikeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ThumbUpView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ThumbLikeView);
-        mLikeColor = ta.getColor(R.styleable.ThumbLikeView_thumb_like_color, Color.RED);
-        mNumberColor = ta.getColor(R.styleable.ThumbLikeView_thumb_number_color, Color.GRAY);
-        mNumberSize = ta.getDimension(R.styleable.ThumbLikeView_thumb_number_size,
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ThumbUpView);
+        mLikeColor = ta.getColor(R.styleable.ThumbUpView_thumb_like_color, Color.RED);
+        mNumberColor = ta.getColor(R.styleable.ThumbUpView_thumb_number_color, Color.GRAY);
+        mNumberSize = ta.getDimension(R.styleable.ThumbUpView_thumb_number_size,
                 DEFAULT_NUMBER_SIZE);
         ta.recycle();
         mContext = context;
@@ -120,8 +120,11 @@ public class ThumbLikeView extends View {
         mLikePath = new Path();
         mLikeRegion = new Region();
         mMatrix = new Matrix();
-        mThumbDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up);
-        mThumbUpDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_like);
+        scaleDownMatrix = new Matrix();
+        scaleUpMxtrix = new Matrix();
+        mThumbDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_normal);
+        mThumbUpDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_selected);
+        mThumbUpLightDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_selected_shining);
 
         mLightRadius = 0.0f;
         lightAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_MAX);
@@ -143,21 +146,26 @@ public class ThumbLikeView extends View {
             }
         });
 
-        scaleAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_NORMAL,
-                DEFAULT_ANIM_SCALE_MAX);
-        scaleAnimator.setDuration(DEFAULT_ANIM_DURATION);
-        scaleAnimator.setInterpolator(new OvershootInterpolator());
-        scaleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float scaleValue = (float)animation.getAnimatedValue();
-                mLikeMaxRadius = mLikeRadius * scaleValue;
-                RectF rectF = new RectF(mLikeRect.centerX() - mLikeMaxRadius, mLikeRect.centerY() - mLikeMaxRadius,
-                        mLikeRect.centerX() + mLikeMaxRadius, mLikeRect.centerY() + mLikeMaxRadius);
-                mLikeRect.set(rectF);
-                invalidate();
-            }
-        });
+        scaleUpAnimator = ObjectAnimator.ofFloat(this,
+                "scaleUpIndex", DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_NORMAL);
+        scaleUpAnimator.setInterpolator(new OvershootInterpolator());
+        scaleUpAnimator.setDuration(DEFAULT_ANIM_DURATION);
+
+//        scaleAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_NORMAL,
+//                DEFAULT_ANIM_SCALE_MAX);
+//        scaleAnimator.setDuration(DEFAULT_ANIM_DURATION);
+//        scaleAnimator.setInterpolator(new OvershootInterpolator());
+//        scaleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//            @Override
+//            public void onAnimationUpdate(ValueAnimator animation) {
+//                float scaleValue = (float)animation.getAnimatedValue();
+//                mLikeMaxRadius = mLikeRadius * scaleValue;
+//                RectF rectF = new RectF(mLikeRect.centerX() - mLikeMaxRadius, mLikeRect.centerY() - mLikeMaxRadius,
+//                        mLikeRect.centerX() + mLikeMaxRadius, mLikeRect.centerY() + mLikeMaxRadius);
+//                mLikeRect.set(rectF);
+//                invalidate();
+//            }
+//        });
 
     }
 
@@ -173,17 +181,15 @@ public class ThumbLikeView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         mWidth = w;
         mHeight = h;
-        mLikeRadius = (w / 2 - DEFAULT_PADDING - getPaddingTop() - getPaddingBottom()) / 2;
+        mLikeRadius = (w - DEFAULT_PADDING - getPaddingTop() - getPaddingBottom()) / 2;
         mLikeMaxRadius = mLikeRadius;
         baseX = (float)(mWidth / 2);
         baseY = (float)(mHeight / 2);
 
         mMatrix.reset();
         Region globalRegion = new Region(0, 0, w, h);
-        float cx = mWidth / 4;
-        float cy = baseY;
-        mLikeRect = new RectF(cx - mLikeRadius, cy - mLikeRadius,
-                cx + mLikeRadius, cy + mLikeRadius);
+        mLikeRect = new RectF(baseX - mLikeRadius, baseY - mLikeRadius,
+                baseX + mLikeRadius, baseY + mLikeRadius);
         mLikePath.addRect(mLikeRect, Path.Direction.CW);
         mLikeRegion.setPath(mLikePath, globalRegion);
     }
@@ -195,7 +201,6 @@ public class ThumbLikeView extends View {
         }
         drawIcon(canvas);
         drawLightCircle(canvas);
-        drawNumber(canvas);
     }
 
     @Override
@@ -248,11 +253,18 @@ public class ThumbLikeView extends View {
         Bitmap bmp;
         if (isLiked) {
             bmp = ((BitmapDrawable)mThumbUpDrawable).getBitmap();
+            Log.d(TAG, "drawIcon: bmp width -> " + bmp.getWidth() + " height -> " + bmp.getHeight()
+                + " rect width -> " + dst.width() + " height -> " + dst.height());
+            Bitmap scaleBmp = Bitmap.createBitmap(bmp, 0, 0,
+                    bmp.getWidth(), bmp.getHeight(), scaleUpMxtrix, true);
+
+            canvas.drawBitmap(scaleBmp, null, dst, null);
         } else {
             bmp = ((BitmapDrawable) mThumbDrawable).getBitmap();
+            canvas.drawBitmap(bmp, null, dst, null);
+            canvas.drawRect(mLikeRect, mLightPaint);
+            canvas.drawPoint(mLikeRect.left, mLikeRect.top, mLightPaint);
         }
-        canvas.drawBitmap(bmp, null, dst, null);
-//        canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeMaxRadius, mLikePaint);
     }
 
     private void drawLightCircle(Canvas canvas) {
@@ -262,112 +274,17 @@ public class ThumbLikeView extends View {
         canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeRadius, mLikePaint);
     }
 
-    private void drawNumber(Canvas canvas) {
-        if (mPreNumber != mNumber) {
-            parseText(mPreNumber, mNumber);
-        }
-
-        String numStr = String.valueOf(mNumber);
-        Paint.FontMetrics fontMetrics = mNumberPaint.getFontMetrics();
-
-        float textWidth = mNumberPaint.measureText(numStr);
-        float baseline_x = baseX + (mWidth / 2 - textWidth) / 2;
-        float baseline_y = baseY - (fontMetrics.descent + fontMetrics.ascent) / 2;
-        canvas.drawLine(0, baseY, mWidth, baseY, mNumberPaint);
-
-        if (mPreNumber == mNumber) {
-            canvas.drawText(numStr, baseline_x, baseline_y, mNumberPaint);
-        } else {
-            float constTextWidth = 0;
-            float variantTextWidth = mNumberPaint.measureText(textValues[1]);
-            float textHeight = (fontMetrics.descent - fontMetrics.ascent);
-            float cX = baseX + (mWidth / 2 - variantTextWidth) / 2;
-            if (!"".equals(textValues[0])) {
-                constTextWidth = mNumberPaint.measureText(textValues[0]);
-                cX = baseX + (mWidth / 2 - constTextWidth - variantTextWidth) / 2 + constTextWidth / 2;
-                mNumberPaint.setAlpha(255);
-                canvas.drawText(textValues[0], cX, baseline_y, mNumberPaint);
-            }
-
-            float vX = cX + constTextWidth / 2 + constTextWidth / 2;
-            float vY;
-            if (isLiked) {
-                vY = baseline_y + 0.5f * (mHeight + textHeight) * (1 - textTransY);
-            } else {
-                vY = baseline_y - 0.5f * (mHeight + textHeight) * (1 + textTransY);
-            }
-            /*** Draw last text ***/
-            canvas.drawText(textValues[1], vX, baseline_y - 0.5f * (mHeight + textHeight) * textTransY, mNumberPaint);
-            /*** Draw current text ***/
-            canvas.drawText(textValues[2], vX, vY, mNumberPaint);
-        }
-    }
-
-    private void onLike() {
-        incNumber();
-        startLikeAnimation(true);
-    }
-
-    private void onDislike() {
-        decNumber();
-        startLikeAnimation(false);
-    }
-
     private void onClicked() {
         if (isAnimatorRunning()) {
             return;
         }
         isLiked = isLiked ? false:true;
-        startTextChanged(isLiked);
+        startLikeAnimation(isLiked);
         mClickListener.onLike(isLiked);
     }
 
     private boolean isAnimatorRunning() {
-        return lightAnimator.isRunning() || scaleAnimator.isRunning();
-    }
-
-    private void parseText(int previous, int current) {
-        String previewText = String.valueOf(previous);
-        String currentText = String.valueOf(current);
-        if (previewText.length() != currentText.length()) {
-            textValues[0] = "";
-            textValues[1] = previewText;
-            textValues[2] = currentText;
-        } else {
-            for (int i = 0; i < previewText.length(); i++) {
-                if (previewText.charAt(i) != currentText.charAt(i)) {
-                    if (i == 0) {
-                        textValues[0] = "";
-                    } else {
-                        textValues[0] = previewText.substring(0, i);
-                    }
-                    textValues[1] = previewText.substring(i);
-                    textValues[2] = currentText.substring(i);
-                    break;
-                }
-            }
-        }
-        Log.d(TAG, "parseText: const -> " + textValues[0] +
-                " last -> " + textValues[1] + " Current -> " + textValues[2]);
-    }
-    private void  startTextChanged(boolean liked) {
-        if (liked) {
-            onLike();
-        } else {
-            if (mNumber > 0) {
-                onDislike();
-            }
-        }
-    }
-
-    private void incNumber() {
-        this.mPreNumber = this.mNumber;
-        this.mNumber ++;
-    }
-
-    private void decNumber() {
-        this.mPreNumber = this.mNumber;
-        this.mNumber --;
+        return lightAnimator.isRunning() || scaleUpAnimator.isRunning();
     }
 
     private void startLikeAnimation(boolean liked) {
@@ -375,55 +292,36 @@ public class ThumbLikeView extends View {
             startLightAnimation();
         }
         startScaleAnimation();
-        startNumberAnimation(liked);
     }
 
-    private void startNumberAnimation(boolean liked) {
-        if (liked) {
-            textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, 1);
-        } else {
-            textTransAnimator = ObjectAnimator.ofFloat(this, "textTransY", 0, -1);
-        }
-        textTransAnimator.setInterpolator(new AccelerateInterpolator());
-        textTransAnimator.setDuration(DEFAULT_ANIM_DURATION);
-        textTransAnimator.start();
-    }
 
     private void startScaleAnimation() {
-        scaleAnimator.start();
+        scaleUpAnimator.start();
     }
 
     private void startLightAnimation() {
         lightAnimator.start();
     }
 
-    public int getNumber() {
-        return mNumber;
+
+    public float getScaleDownIndex() {
+        return scaleDownIndex;
     }
 
-    public void setNumber(int number) {
-        this.mPreNumber = this.mNumber;
-        this.mNumber = number;
-        if (this.mNumber > this.mPreNumber) {
-            isLiked = true;
-        } else {
-            isLiked = false;
-        }
-        startLikeAnimation(isLiked);
-        Log.d(TAG, "setNumber: last -> " + mPreNumber + " current -> " + mNumber);
+    public void setScaleDownIndex(float scaleDownIndex) {
+        this.scaleDownIndex = scaleDownIndex;
+        scaleDownMatrix.postScale(scaleDownIndex, scaleDownIndex);
+        postInvalidate();
     }
 
-    public void setPreNumber(int number) {
-        this.mPreNumber = number;
+    public float getScaleUpIndex() {
+        return scaleUpIndex;
     }
 
-    public float getTextTransY() {
-        return textTransY;
-    }
-
-    public void setTextTransY(float mTextTransY) {
-        this.textTransY = mTextTransY;
-        invalidate();
+    public void setScaleUpIndex(float scaleUpIndex) {
+        this.scaleUpIndex = scaleUpIndex;
+        scaleUpMxtrix.postScale(scaleUpIndex, scaleUpIndex);
+        postInvalidate();
     }
 
     public onLikeListener getClickListener() {

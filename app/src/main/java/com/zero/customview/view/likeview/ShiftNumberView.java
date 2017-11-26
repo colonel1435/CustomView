@@ -121,8 +121,8 @@ public class ShiftNumberView extends View {
                             + getPaddingLeft() - getPaddingRight();
             float baseline_y = centerY - (fontMetrics.descent + fontMetrics.ascent) / 2
                             + getPaddingTop() - getPaddingBottom();
-            canvas.drawLine(0, baseline_y, mWidth, baseline_y, mTextPaint);
-            canvas.drawLine(centerX, 0, centerX, mHeight, mTextPaint);
+//            canvas.drawLine(0, baseline_y, mWidth, baseline_y, mTextPaint);
+//            canvas.drawLine(centerX, 0, centerX, mHeight, mTextPaint);
 
             /**
              *  Draw const text

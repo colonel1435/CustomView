@@ -3,6 +3,7 @@ package com.zero.customview.view.likeview;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -46,6 +48,7 @@ public class ThumbUpView extends View {
     private static final int DEFAULT_PADDING = 5;
     private static final int DEFAULT_NUMBER = 10;
     private static final int DEFAULT_ANIM_DURATION = 300;
+    private static final int DEFAULT_ANIM_DURATION_SHORT = 150;
     private static final float DEFAULT_ANIM_SCALE_MAX = 1.2f;
     private static final float DEFAULT_ANIM_SCALE_NORMAL = 1.0f;
     private static final float DEFAULT_ANIM_SCALE_MIN = 0.8f;
@@ -65,10 +68,13 @@ public class ThumbUpView extends View {
     private int mLikeColor;
     private float mLikeRadius;
     private float mLightRadius;
+    private int mLightStartColor;
+    private int mLightEndColor;
     private int mWidth;
     private int mHeight;
     private float baseX;
     private float baseY;
+    private ArgbEvaluator argbEvaluator;
     private Bitmap mThumbUpBmp;
     private Bitmap mThumbNormalBmp;
     private Bitmap mThumnLightBmp;
@@ -114,6 +120,9 @@ public class ThumbUpView extends View {
         mLightPaint.setStyle(Paint.Style.STROKE);
         mLightPaint.setStrokeWidth(DEFAULT_LIGHT_PAINT_WIDTH);
 
+        mLightStartColor = Color.parseColor("#BFBFBF");
+        mLightEndColor = Color.parseColor("#E4583E");
+
         mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mNumberPaint.setColor(mNumberColor);
         mNumberPaint.setTextSize(mNumberSize);
@@ -125,16 +134,17 @@ public class ThumbUpView extends View {
         lightMatrix = new Matrix();
 
         mLightRadius = 0.0f;
-        lightAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_NORMAL);
+        argbEvaluator = new ArgbEvaluator();
+        lightAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_MAX);
         lightAnimator.setDuration(DEFAULT_ANIM_DURATION);
-        lightAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        lightAnimator.setInterpolator(new AccelerateInterpolator());
         lightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float scaleValue = (float) animation.getAnimatedValue();
-                mLightRadius = (mLikeRadius - DEFAULT_PADDING) * scaleValue;
-                Log.d(TAG, "onAnimationUpdate: scaleValue-> " + scaleValue);
-                lightMatrix.postScale(scaleValue, scaleValue);
+                mLightRadius = (mLikeRadius - 2 * DEFAULT_PADDING) * scaleValue;
+                lightMatrix.setScale(scaleValue, scaleValue);
+                mLightPaint.setColor((int)argbEvaluator.evaluate((scaleValue - 0.2f), mLightStartColor, mLightEndColor));
                 invalidate();
             }
         });
@@ -142,7 +152,6 @@ public class ThumbUpView extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mLightRadius = 0.0f;
-                lightMatrix.reset();
             }
         });
 
@@ -164,7 +173,7 @@ public class ThumbUpView extends View {
         scaleDownAnimator = ObjectAnimator.ofFloat(this,
                 "scaleIndex", DEFAULT_ANIM_SCALE_NORMAL, DEFAULT_ANIM_SCALE_MIN);
         scaleDownAnimator.setInterpolator(new AccelerateInterpolator());
-        scaleDownAnimator.setDuration(DEFAULT_ANIM_DURATION);
+        scaleDownAnimator.setDuration(DEFAULT_ANIM_DURATION_SHORT);
         scaleDownAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -219,7 +228,6 @@ public class ThumbUpView extends View {
             drawLight(canvas);
             drawLightCircle(canvas);
         }
-        canvas.drawRect(mLikeRect, mLightPaint);
     }
 
     @Override
@@ -294,11 +302,10 @@ public class ThumbUpView extends View {
     }
 
     private void drawLight(Canvas canvas) {
-        Log.d(TAG, "drawLight: matrix -> " + lightMatrix.toString());
         Bitmap lightBmp = Bitmap.createBitmap(mThumnLightBmp, 0, 0,
                 mThumnLightBmp.getWidth(), mThumnLightBmp.getWidth(), lightMatrix, true);
-        RectF rectF = new RectF(baseX - lightBmp.getWidth() * 0.5f, baseY * 0.5f - lightBmp.getHeight() + 2 * DEFAULT_PADDING,
-                baseX + lightBmp.getWidth() * 0.5f, baseY * 0.5f + 2 * DEFAULT_PADDING);
+        RectF rectF = new RectF(baseX - lightBmp.getWidth() * 0.5f, baseY * 0.5f - lightBmp.getHeight() * 0.5f,
+                baseX + lightBmp.getWidth() * 0.5f, baseY * 0.5f + lightBmp.getHeight() * 0.5f);
         canvas.drawBitmap(lightBmp, null, rectF, null);
     }
 
@@ -327,6 +334,22 @@ public class ThumbUpView extends View {
             animatorSet.play(scaleUpAnimator).after(scaleDownAnimator);
         }
         animatorSet.start();
+    }
+
+    public int getmLightStartColor() {
+        return mLightStartColor;
+    }
+
+    public void setmLightStartColor(int mLightStartColor) {
+        this.mLightStartColor = mLightStartColor;
+    }
+
+    public int getmLightEndColor() {
+        return mLightEndColor;
+    }
+
+    public void setmLightEndColor(int mLightEndColor) {
+        this.mLightEndColor = mLightEndColor;
     }
 
     public float getScaleIndex() {

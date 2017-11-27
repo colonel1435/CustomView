@@ -2,11 +2,13 @@ package com.zero.customview.view.likeview;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -18,9 +20,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 
@@ -46,7 +50,7 @@ public class ThumbUpView extends View {
     private static final float DEFAULT_ANIM_SCALE_NORMAL = 1.0f;
     private static final float DEFAULT_ANIM_SCALE_MIN = 0.8f;
     private static final float DEFAULT_LIGHT_PAINT_WIDTH = 2f;
-
+    private enum SCALE_TYPE{SCALE_UP, SCALE_DOWN}
 
     private Context mContext;
     private Paint mLikePaint;
@@ -56,30 +60,27 @@ public class ThumbUpView extends View {
     private Path mLikePath;
     private Matrix mMatrix;
     private Paint mNumberPaint;
-    private int mNumber = DEFAULT_NUMBER;
-    private int mPreNumber = DEFAULT_NUMBER;
     private int mNumberColor;
     private float mNumberSize;
     private int mLikeColor;
     private float mLikeRadius;
-    private float mLikeMaxRadius;
     private float mLightRadius;
     private int mWidth;
     private int mHeight;
     private float baseX;
     private float baseY;
-    private Drawable mThumbDrawable;
-    private Drawable mThumbUpDrawable;
-    private Drawable mThumbUpLightDrawable;
+    private Bitmap mThumbUpBmp;
+    private Bitmap mThumbNormalBmp;
+    private Bitmap mThumnLightBmp;
     private ValueAnimator lightAnimator;
     private ObjectAnimator scaleUpAnimator;
-    private ObjectAnimator textTransAnimator;
+    private ObjectAnimator scaleDownAnimator;
     private boolean isTouched = false;
     private boolean isLiked = false;
-    private float scaleDownIndex;
-    private float scaleUpIndex;
-    private Matrix scaleDownMatrix;
-    private Matrix scaleUpMxtrix;
+    private float scaleIndex;
+    private Matrix lightMatrix;
+    private Matrix scaleMatrix;
+    private SCALE_TYPE scaleType = SCALE_TYPE.SCALE_UP;
 
     private onLikeListener mClickListener;
     public ThumbUpView(Context context) {
@@ -120,21 +121,20 @@ public class ThumbUpView extends View {
         mLikePath = new Path();
         mLikeRegion = new Region();
         mMatrix = new Matrix();
-        scaleDownMatrix = new Matrix();
-        scaleUpMxtrix = new Matrix();
-        mThumbDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_normal);
-        mThumbUpDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_selected);
-        mThumbUpLightDrawable = mContext.getResources().getDrawable(R.mipmap.ic_thumb_up_selected_shining);
+        scaleMatrix = new Matrix();
+        lightMatrix = new Matrix();
 
         mLightRadius = 0.0f;
-        lightAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_MAX);
+        lightAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_NORMAL);
         lightAnimator.setDuration(DEFAULT_ANIM_DURATION);
-        lightAnimator.setInterpolator(new AccelerateInterpolator());
+        lightAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         lightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float scaleValue = (float) animation.getAnimatedValue();
-                mLightRadius = mLikeRadius * scaleValue;
+                mLightRadius = (mLikeRadius - DEFAULT_PADDING) * scaleValue;
+                Log.d(TAG, "onAnimationUpdate: scaleValue-> " + scaleValue);
+                lightMatrix.postScale(scaleValue, scaleValue);
                 invalidate();
             }
         });
@@ -142,31 +142,46 @@ public class ThumbUpView extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mLightRadius = 0.0f;
-                invalidate();
+                lightMatrix.reset();
             }
         });
 
+        scaleIndex = DEFAULT_ANIM_SCALE_NORMAL;
         scaleUpAnimator = ObjectAnimator.ofFloat(this,
-                "scaleUpIndex", DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_NORMAL);
+                "scaleIndex", DEFAULT_ANIM_SCALE_MIN, DEFAULT_ANIM_SCALE_NORMAL);
         scaleUpAnimator.setInterpolator(new OvershootInterpolator());
         scaleUpAnimator.setDuration(DEFAULT_ANIM_DURATION);
+        scaleUpAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Log.d(TAG, "onAnimationStart: scale up...");
+                scaleMatrix.reset();
+                scaleType = SCALE_TYPE.SCALE_UP;
+            }
+        });
 
-//        scaleAnimator = ValueAnimator.ofFloat(DEFAULT_ANIM_SCALE_NORMAL,
-//                DEFAULT_ANIM_SCALE_MAX);
-//        scaleAnimator.setDuration(DEFAULT_ANIM_DURATION);
-//        scaleAnimator.setInterpolator(new OvershootInterpolator());
-//        scaleAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//            @Override
-//            public void onAnimationUpdate(ValueAnimator animation) {
-//                float scaleValue = (float)animation.getAnimatedValue();
-//                mLikeMaxRadius = mLikeRadius * scaleValue;
-//                RectF rectF = new RectF(mLikeRect.centerX() - mLikeMaxRadius, mLikeRect.centerY() - mLikeMaxRadius,
-//                        mLikeRect.centerX() + mLikeMaxRadius, mLikeRect.centerY() + mLikeMaxRadius);
-//                mLikeRect.set(rectF);
-//                invalidate();
-//            }
-//        });
+        scaleDownAnimator = ObjectAnimator.ofFloat(this,
+                "scaleIndex", DEFAULT_ANIM_SCALE_NORMAL, DEFAULT_ANIM_SCALE_MIN);
+        scaleDownAnimator.setInterpolator(new AccelerateInterpolator());
+        scaleDownAnimator.setDuration(DEFAULT_ANIM_DURATION);
+        scaleDownAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Log.d(TAG, "onAnimationStart: scale down...");
+                scaleMatrix.reset();
+                scaleType = SCALE_TYPE.SCALE_DOWN;
+            }
+        });
 
+        initBitmap();
+    }
+
+    private void initBitmap() {
+        mThumbUpBmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_thumb_up_selected);
+        mThumbNormalBmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_thumb_up_normal);
+        mThumnLightBmp = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_thumb_up_selected_shining);
     }
 
     @Override
@@ -182,7 +197,6 @@ public class ThumbUpView extends View {
         mWidth = w;
         mHeight = h;
         mLikeRadius = (w - DEFAULT_PADDING - getPaddingTop() - getPaddingBottom()) / 2;
-        mLikeMaxRadius = mLikeRadius;
         baseX = (float)(mWidth / 2);
         baseY = (float)(mHeight / 2);
 
@@ -200,7 +214,12 @@ public class ThumbUpView extends View {
             canvas.getMatrix().invert(mMatrix);
         }
         drawIcon(canvas);
-        drawLightCircle(canvas);
+        if (isLiked && (scaleType == SCALE_TYPE.SCALE_UP)) {
+            Log.d(TAG, "onDraw: draw light & circle...");
+            drawLight(canvas);
+            drawLightCircle(canvas);
+        }
+        canvas.drawRect(mLikeRect, mLightPaint);
     }
 
     @Override
@@ -249,29 +268,42 @@ public class ThumbUpView extends View {
 
     private void drawIcon(Canvas canvas) {
         RectF dst = new RectF(mLikeRect);
-        dst.inset(2*DEFAULT_PADDING, 2*DEFAULT_PADDING);
-        Bitmap bmp;
-        if (isLiked) {
-            bmp = ((BitmapDrawable)mThumbUpDrawable).getBitmap();
-            Log.d(TAG, "drawIcon: bmp width -> " + bmp.getWidth() + " height -> " + bmp.getHeight()
-                + " rect width -> " + dst.width() + " height -> " + dst.height());
-            Bitmap scaleBmp = Bitmap.createBitmap(bmp, 0, 0,
-                    bmp.getWidth(), bmp.getHeight(), scaleUpMxtrix, true);
-
-            canvas.drawBitmap(scaleBmp, null, dst, null);
+        Bitmap scaleDownBmp;
+        Bitmap scaleUpBmp;
+        dst.inset(dst.width() * (1 - scaleIndex) + 2*DEFAULT_PADDING,
+                dst.height() * (1 - scaleIndex) + 2*DEFAULT_PADDING);
+        if (scaleType == SCALE_TYPE.SCALE_UP) {
+            if (isLiked) {
+                scaleUpBmp = Bitmap.createBitmap(mThumbUpBmp, 0, 0,
+                        mThumbUpBmp.getWidth(), mThumbUpBmp.getHeight(), scaleMatrix, true);
+            } else {
+                scaleUpBmp = Bitmap.createBitmap(mThumbNormalBmp, 0, 0,
+                        mThumbNormalBmp.getWidth(), mThumbNormalBmp.getHeight(), scaleMatrix, true);
+            }
+            canvas.drawBitmap(scaleUpBmp, null, dst, null);
         } else {
-            bmp = ((BitmapDrawable) mThumbDrawable).getBitmap();
-            canvas.drawBitmap(bmp, null, dst, null);
-            canvas.drawRect(mLikeRect, mLightPaint);
-            canvas.drawPoint(mLikeRect.left, mLikeRect.top, mLightPaint);
+            if (isLiked) {
+                scaleDownBmp = Bitmap.createBitmap(mThumbNormalBmp, 0, 0,
+                        mThumbNormalBmp.getWidth(), mThumbNormalBmp.getHeight(), scaleMatrix, true);
+            } else {
+                scaleDownBmp = Bitmap.createBitmap(mThumbUpBmp, 0, 0,
+                        mThumbUpBmp.getWidth(), mThumbUpBmp.getHeight(), scaleMatrix, true);
+            }
+            canvas.drawBitmap(scaleDownBmp, null, dst, null);
         }
     }
 
+    private void drawLight(Canvas canvas) {
+        Log.d(TAG, "drawLight: matrix -> " + lightMatrix.toString());
+        Bitmap lightBmp = Bitmap.createBitmap(mThumnLightBmp, 0, 0,
+                mThumnLightBmp.getWidth(), mThumnLightBmp.getWidth(), lightMatrix, true);
+        RectF rectF = new RectF(baseX - lightBmp.getWidth() * 0.5f, baseY * 0.5f - lightBmp.getHeight() + 2 * DEFAULT_PADDING,
+                baseX + lightBmp.getWidth() * 0.5f, baseY * 0.5f + 2 * DEFAULT_PADDING);
+        canvas.drawBitmap(lightBmp, null, rectF, null);
+    }
+
     private void drawLightCircle(Canvas canvas) {
-        if (isLiked) {
-            canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLightRadius, mLightPaint);
-        }
-        canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLikeRadius, mLikePaint);
+        canvas.drawCircle(mLikeRect.centerX(), mLikeRect.centerY(), mLightRadius, mLightPaint);
     }
 
     private void onClicked() {
@@ -288,40 +320,23 @@ public class ThumbUpView extends View {
     }
 
     private void startLikeAnimation(boolean liked) {
+        AnimatorSet animatorSet = new AnimatorSet();
         if (liked) {
-            startLightAnimation();
+            animatorSet.play(scaleUpAnimator).with(lightAnimator).after(scaleDownAnimator);
+        } else {
+            animatorSet.play(scaleUpAnimator).after(scaleDownAnimator);
         }
-        startScaleAnimation();
+        animatorSet.start();
     }
 
-
-    private void startScaleAnimation() {
-        scaleUpAnimator.start();
+    public float getScaleIndex() {
+        return scaleIndex;
     }
 
-    private void startLightAnimation() {
-        lightAnimator.start();
-    }
-
-
-    public float getScaleDownIndex() {
-        return scaleDownIndex;
-    }
-
-    public void setScaleDownIndex(float scaleDownIndex) {
-        this.scaleDownIndex = scaleDownIndex;
-        scaleDownMatrix.postScale(scaleDownIndex, scaleDownIndex);
-        postInvalidate();
-    }
-
-    public float getScaleUpIndex() {
-        return scaleUpIndex;
-    }
-
-    public void setScaleUpIndex(float scaleUpIndex) {
-        this.scaleUpIndex = scaleUpIndex;
-        scaleUpMxtrix.postScale(scaleUpIndex, scaleUpIndex);
-        postInvalidate();
+    public void setScaleIndex(float scaleIndex) {
+        this.scaleIndex = scaleIndex;
+        scaleMatrix.postScale(scaleIndex, scaleIndex);
+        invalidate();
     }
 
     public onLikeListener getClickListener() {

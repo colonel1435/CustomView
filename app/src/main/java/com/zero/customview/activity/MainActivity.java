@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_ANIM_BOTTOM = 13;
     private static final int ITEM_COUPON_VIEW = 14;
     private static final int ITEM_LIKE_VIEW = 15;
+    private static final int ITEM_RULER_VIEW = 16;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.anim_bottom));
         mDatas.add(getString(R.string.coupon_view));
         mDatas.add(getString(R.string.like_view));
+        mDatas.add(getString(R.string.ruler_view));
 
     }
     private void initView() {
@@ -196,6 +198,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_LIKE_VIEW:
                 startActivity(new Intent(mContext, LikeViewActivity.class));
+                break;
+            case ITEM_RULER_VIEW:
+                startActivity(new Intent(mContext, RulerActivity.class));
                 break;
             default:
                 break;

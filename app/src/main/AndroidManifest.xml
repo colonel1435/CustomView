@@ -67,7 +67,8 @@
             android:label="@string/title_activity_bottom_bar"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.CouponActivity" />
-        <activity android:name=".activity.LikeViewActivity"></activity>
+        <activity android:name=".activity.LikeViewActivity" />
+        <activity android:name=".activity.RulerActivity"></activity>
     </application>
 
 </manifest>

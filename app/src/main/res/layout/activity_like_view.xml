@@ -20,12 +20,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.zero.customview.view.likeview.ThumbUpView
-            android:id="@+id/thumb_like_view"
+        <com.zero.customview.view.likeview.ThumbLikeView
+            android:id="@+id/thumb_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            app:thumb_number_size="16sp"/>
+            app:thumb_number_size="28sp">
+
+        </com.zero.customview.view.likeview.ThumbLikeView>
         <ImageView
             android:id="@+id/iv_thumb_sub"
             android:layout_width="36dp"
@@ -43,14 +44,4 @@
             android:layout_height="36dp"
             android:src="@mipmap/ic_add_circle_blue_700_36dp"/>
     </LinearLayout>
-
-    <com.zero.customview.view.likeview.ShiftNumberView
-        android:id="@+id/shift_number_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_thumb_like"
-        app:shift_textview="0"
-        app:shift_textview_size="24sp"/>
 </android.support.constraint.ConstraintLayout>

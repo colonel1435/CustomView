@@ -44,9 +44,7 @@ public class ThumbUpView extends View {
     private static final String TAG = "ThumbLikeView@wumin";
     private static final int DEFAULT_WIDTH = 128;
     private static final int DEFAULT_HEIGHT = 128;
-    private static final float DEFAULT_NUMBER_SIZE = 24;
     private static final int DEFAULT_PADDING = 5;
-    private static final int DEFAULT_NUMBER = 10;
     private static final int DEFAULT_ANIM_DURATION = 300;
     private static final int DEFAULT_ANIM_DURATION_SHORT = 150;
     private static final float DEFAULT_ANIM_SCALE_MAX = 1.2f;
@@ -56,16 +54,11 @@ public class ThumbUpView extends View {
     private enum SCALE_TYPE{SCALE_UP, SCALE_DOWN}
 
     private Context mContext;
-    private Paint mLikePaint;
     private Paint mLightPaint;
     private Region mLikeRegion;
     private RectF mLikeRect;
     private Path mLikePath;
     private Matrix mMatrix;
-    private Paint mNumberPaint;
-    private int mNumberColor;
-    private float mNumberSize;
-    private int mLikeColor;
     private float mLikeRadius;
     private float mLightRadius;
     private int mLightStartColor;
@@ -88,7 +81,7 @@ public class ThumbUpView extends View {
     private Matrix scaleMatrix;
     private SCALE_TYPE scaleType = SCALE_TYPE.SCALE_UP;
 
-    private onLikeListener mClickListener;
+    private OnThumbUpListener mClickListener;
     public ThumbUpView(Context context) {
         this(context, null);
     }
@@ -99,22 +92,12 @@ public class ThumbUpView extends View {
 
     public ThumbUpView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.ThumbUpView);
-        mLikeColor = ta.getColor(R.styleable.ThumbUpView_thumb_like_color, Color.RED);
-        mNumberColor = ta.getColor(R.styleable.ThumbUpView_thumb_number_color, Color.GRAY);
-        mNumberSize = ta.getDimension(R.styleable.ThumbUpView_thumb_number_size,
-                DEFAULT_NUMBER_SIZE);
-        ta.recycle();
         mContext = context;
         initView();
     }
 
     private void initView() {
         this.setClickable(true);
-        mLikePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mLikePaint.setColor(mLikeColor);
-        mLikePaint.setStyle(Paint.Style.STROKE);
-
         mLightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLightPaint.setColor(Color.GRAY);
         mLightPaint.setStyle(Paint.Style.STROKE);
@@ -122,10 +105,6 @@ public class ThumbUpView extends View {
 
         mLightStartColor = Color.parseColor("#BFBFBF");
         mLightEndColor = Color.parseColor("#E4583E");
-
-        mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mNumberPaint.setColor(mNumberColor);
-        mNumberPaint.setTextSize(mNumberSize);
 
         mLikePath = new Path();
         mLikeRegion = new Region();
@@ -319,7 +298,9 @@ public class ThumbUpView extends View {
         }
         isLiked = isLiked ? false:true;
         startLikeAnimation(isLiked);
-        mClickListener.onLike(isLiked);
+        if (mClickListener != null) {
+            mClickListener.onLike(isLiked);
+        }
     }
 
     private boolean isAnimatorRunning() {
@@ -336,19 +317,19 @@ public class ThumbUpView extends View {
         animatorSet.start();
     }
 
-    public int getmLightStartColor() {
+    public int getLightStartColor() {
         return mLightStartColor;
     }
 
-    public void setmLightStartColor(int mLightStartColor) {
+    public void setLightStartColor(int mLightStartColor) {
         this.mLightStartColor = mLightStartColor;
     }
 
-    public int getmLightEndColor() {
+    public int getLightEndColor() {
         return mLightEndColor;
     }
 
-    public void setmLightEndColor(int mLightEndColor) {
+    public void setLightEndColor(int mLightEndColor) {
         this.mLightEndColor = mLightEndColor;
     }
 
@@ -362,15 +343,24 @@ public class ThumbUpView extends View {
         invalidate();
     }
 
-    public onLikeListener getClickListener() {
+    public ArgbEvaluator getArgbEvaluator() {
+        return argbEvaluator;
+    }
+
+    public void setArgbEvaluator(ArgbEvaluator evaluator) {
+        this.argbEvaluator = evaluator;
+        invalidate();
+    }
+
+    public OnThumbUpListener getClickListener() {
         return mClickListener;
     }
 
-    public void setClickListener(onLikeListener mClickListener) {
+    public void setClickListener(OnThumbUpListener mClickListener) {
         this.mClickListener = mClickListener;
     }
 
-    public interface onLikeListener {
+    public interface OnThumbUpListener {
         void onLike(boolean isLike);
     }
 }

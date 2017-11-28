@@ -10,8 +10,8 @@ import android.widget.ImageView;
 
 import com.zero.customview.R;
 import com.zero.customview.anim.AnimatorFactory;
-import com.zero.customview.view.likeview.ThumbUpView;
 import com.zero.customview.view.likeview.ShiftNumberView;
+import com.zero.customview.view.likeview.ThumbLikeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,17 +19,16 @@ import butterknife.OnClick;
 
 public class LikeViewActivity extends AppCompatActivity {
 
+    private static final String TAG = "LikeViewActivity@wuming";
     @BindView(R.id.iv_thumb_add)
     ImageView ivThumbAdd;
     @BindView(R.id.et_thumb_edit)
     EditText etThumbEdit;
     @BindView(R.id.iv_thumb_sub)
     ImageView ivThumbSub;
-    @BindView(R.id.shift_number_view)
-    ShiftNumberView shiftNumberView;
+    @BindView(R.id.thumb_like)
+    ThumbLikeView thumbLike;
     private Context mContext;
-    @BindView(R.id.thumb_like_view)
-    ThumbUpView thumbUpView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +37,10 @@ public class LikeViewActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mContext = this;
-        thumbUpView.setClickListener(new ThumbUpView.onLikeListener() {
+        thumbLike.setLikeListener(new ThumbLikeView.OnLikeListener() {
             @Override
             public void onLike(boolean isLiked) {
-                Log.d("wumin", "onLike: ");
-//                TipUtils.showTip(mContext, getString(R.string.msg_title),
-//                        (isLiked?"Like it!":"Dislike it!"));
+                Log.d(TAG, "onLike: " + (isLiked ? "Like it!" : "Leave it!"));
             }
         });
     }
@@ -51,17 +48,19 @@ public class LikeViewActivity extends AppCompatActivity {
     @OnClick({R.id.iv_thumb_add, R.id.iv_thumb_sub})
     public void onViewClicked(View view) {
         AnimatorFactory.getClickScaleAnimtor(view).start();
-        int number = Integer.valueOf(shiftNumberView.getText());
+        int number = thumbLike.getNumber();
+        String input = etThumbEdit.getText().toString();
         switch (view.getId()) {
             case R.id.iv_thumb_add:
-                if (!"".equals(etThumbEdit.getText().toString())) {
-                    shiftNumberView.setText(String.valueOf(etThumbEdit.getText().toString()));
+                if (!"".equals(input)) {
+                    etThumbEdit.setText("");
+                    thumbLike.setNumber(Integer.valueOf(input));
                 } else {
-                    shiftNumberView.setText(String.valueOf(number + 1));
+                    thumbLike.setNumber(number + 1);
                 }
                 break;
             case R.id.iv_thumb_sub:
-                shiftNumberView.setText(String.valueOf(number - 1));
+                thumbLike.setNumber(number - 1);
                 break;
             default:
                 break;

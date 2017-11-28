@@ -69,7 +69,7 @@ public class ShiftNumberView extends View {
         mTextPaint.setColor(mTextColor);
         mTextPaint.setTextSize(mTextSize);
 
-        if ("".equals(mText)) {
+        if (mText == null || "".equals(mText)) {
             mText = String.valueOf(0);
         }
         mPreviousText = mText;

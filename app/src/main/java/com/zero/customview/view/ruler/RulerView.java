@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.OverScroller;
 import android.widget.Scroller;
 
 import com.github.hellocharts.animation.ChartAnimationListener;
@@ -89,7 +90,7 @@ public class RulerView extends View {
     private float mScaleStepOffset;
 
     private GestureDetector mGestureDetector;
-    private Scroller mScroller;
+    private OverScroller mScroller;
 
     private OnCurrentChangeListener mListener;
     public RulerView(Context context) {
@@ -153,7 +154,7 @@ public class RulerView extends View {
         mScaleStepOffset = DEFAULT_SCALE_STEP_OFFSET;
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
-        mScroller = new Scroller(mContext, new AccelerateDecelerateInterpolator());
+        mScroller = new OverScroller(mContext);
         minFingDistance = DEFAULT_FING_DISTANCE;
         minFingVelocity = DEFAULT_FING_VELOCITY;
     }
@@ -202,35 +203,46 @@ public class RulerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP:
-                checkAlign();
-                break;
-            default:
-                break;
-        }
         return mGestureDetector.onTouchEvent(event);
+    }
+
+    @Override
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        if (!mScroller.isFinished()) {
+            int oldX = getScrollX();
+            int oldY = getScrollY();
+            scrollTo(scrollX,scrollY);
+            onScrollChanged(scrollX,scrollY,oldX,oldY);
+            if (clampedX) {
+                Log.e("TEST1","springBack");
+                mScroller.springBack(getScrollX(),getScrollY(),0,(int)mScaleStepDist,0, 0);
+            }
+        } else {
+            super.scrollTo(scrollX,scrollY);
+        }
     }
 
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
+            int oldX = getScrollX();
+            int oldY = getScrollY();
+            int x = mScroller.getCurrX();
+            int y = mScroller.getCurrY();
+
             int currX = mScroller.getCurrX();
             float deltaX = currX - mFingStart;
             mScaleStepOffset = (mScaleStepOffset + deltaX) % mScaleStepDist;
             float step = -deltaX / mScaleStepDist;
-            Log.d(TAG, "computeScroll: start -> " + mFingStart + " curr -> " + currX + " step -> "  +step
-                + " offset -> " + mScaleStepOffset);
             mFingStart = currX;
             mCurrentNumber += step * mScaleStepNumber;
             if (mListener != null) {
                 mListener.onChange(Math.round(mCurrentNumber * 10)/10.0f);
             }
-            invalidate();
-        } else {
-            if (mScaleStepOffset > DEFAULT_SCALE_STEP_OFFSET) {
-                Log.d(TAG, "computeScroll: check align");
-                checkAlign();
+            if (oldX != x || oldY != y) {
+                overScrollBy(x-oldX,y-oldY,oldX,oldY,
+                        (int)mScaleStepOffset,0
+                        ,0, (int)mScaleStepOffset,false);
             }
         }
     }
@@ -285,15 +297,6 @@ public class RulerView extends View {
         canvas.save();
         canvas.drawLine(mCenterX, mTop, mCenterX, mTop + mCurrentLineHeight, mCurrentPaint);
         canvas.restore();
-    }
-
-    private void checkAlign() {
-        if (mScaleStepOffset < mScaleStepDist * 0.5f) {
-            mScaleStepOffset = - mScaleStepDist;
-        } else {
-            mScaleStepOffset = mScaleStepDist;
-        }
-        invalidate();
     }
 
     public void setCurrentNumber(float number) {

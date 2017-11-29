@@ -41,9 +41,10 @@ public class RulerView extends View {
     private static final float DEFAULT_CURRENT_LINE_EHIGHT = 16;
     private static final float DEFAULT_SCALE_BOLD_LINE_HEIGHT = 12;
     private static final float DEFAULT_SCALE_LINE_HEIGHT = 6;
-    private static final int DEFAULT_SCALE_LINE_MAX = 30;
+    private static final int DEFAULT_SCALE_LINE_MAX = 32;
     private static final int DEFAULT_SCALE_LINE_INT = 10;
     private static final int DEFAULT_SCALE_RATIO = 1;
+    private static final float DEFAULT_SCALE_STEP_OFFSET = 0.0f;
     private static final int DEFAULT_CURRENT_NUMBER = 0;
     private static final int DEFAULT_SCALE_NUMBER_PADDING = 8;
     private static final float DEFAULT_FING_DISTANCE = 5;
@@ -85,6 +86,7 @@ public class RulerView extends View {
     private float mBottom;
     private float mScaleStepDist;
     private float mScaleStepNumber;
+    private float mScaleStepOffset;
 
     private GestureDetector mGestureDetector;
     private Scroller mScroller;
@@ -148,6 +150,7 @@ public class RulerView extends View {
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
         mScaleStepNumber = (float) mScaleRatio / DEFAULT_SCALE_LINE_INT;
+        mScaleStepOffset = DEFAULT_SCALE_STEP_OFFSET;
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new Scroller(mContext, new AccelerateDecelerateInterpolator());
@@ -199,6 +202,13 @@ public class RulerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_UP:
+                checkAlign();
+                break;
+            default:
+                break;
+        }
         return mGestureDetector.onTouchEvent(event);
     }
 
@@ -206,38 +216,52 @@ public class RulerView extends View {
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
             int currX = mScroller.getCurrX();
-            float step = -(currX - mFingStart) / mScaleStepDist;
-            Log.d(TAG, "computeScroll: start -> " + mFingStart + " curr -> " + currX + " step -> "  +step);
+            float deltaX = currX - mFingStart;
+            mScaleStepOffset = (mScaleStepOffset + deltaX) % mScaleStepDist;
+            float step = -deltaX / mScaleStepDist;
+            Log.d(TAG, "computeScroll: start -> " + mFingStart + " curr -> " + currX + " step -> "  +step
+                + " offset -> " + mScaleStepOffset);
             mFingStart = currX;
             mCurrentNumber += step * mScaleStepNumber;
             if (mListener != null) {
                 mListener.onChange(Math.round(mCurrentNumber * 10)/10.0f);
             }
             invalidate();
+        } else {
+            if (mScaleStepOffset > DEFAULT_SCALE_STEP_OFFSET) {
+                Log.d(TAG, "computeScroll: check align");
+                checkAlign();
+            }
         }
     }
 
     private void drawBorder(Canvas canvas) {
         /***    Draw top border   ***/
         if (enableTopBorder) {
+            canvas.save();
             canvas.drawLine(mLeft, mTop, mRight, mTop, mBorderPaint);
+            canvas.restore();
         }
         if (enableBottomBorder) {
+            canvas.save();
             canvas.drawLine(mLeft, mBottom, mRight, mBottom, mBorderPaint);
+            canvas.restore();
         }
 
     }
 
     private void drawScale(Canvas canvas) {
         /***    Draw scale  line    ***/
-        float stepPos;
+        canvas.save();
+        float stepPos = mLeft + mScaleStepOffset;
         Paint.FontMetrics fontMetrics = mScalePaint.getFontMetrics();
         /***    Init left scale number  ***/
         float scaleNumber = mCurrentNumber - DEFAULT_SCALE_LINE_MAX * 0.5f * mScaleStepNumber;
-        for (int i = 0; i < DEFAULT_SCALE_LINE_MAX; i++) {
-            stepPos = mLeft + i * mScaleStepDist;
-            /***    Keep a decimal place    ***/
-            if (0 != i) {
+        int count = 0;
+        while (stepPos < mRight) {
+            if (count != 0) {
+                stepPos += mScaleStepDist;
+                /***    Keep a decimal place    ***/
                 scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * 10)) / 10;
             }
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
@@ -251,14 +275,26 @@ public class RulerView extends View {
                 mScalePaint.setStrokeWidth(mBoarderLineWidth);
                 canvas.drawLine(stepPos, mTop, stepPos, mTop + mScaleLineHeight, mScalePaint);
             }
+            count ++;
         }
+        canvas.restore();
     }
 
     private void drawCurrentLine(Canvas canvas) {
         /***    Draw current line   ***/
+        canvas.save();
         canvas.drawLine(mCenterX, mTop, mCenterX, mTop + mCurrentLineHeight, mCurrentPaint);
+        canvas.restore();
     }
 
+    private void checkAlign() {
+        if (mScaleStepOffset < mScaleStepDist * 0.5f) {
+            mScaleStepOffset = - mScaleStepDist;
+        } else {
+            mScaleStepOffset = mScaleStepDist;
+        }
+        invalidate();
+    }
 
     public void setCurrentNumber(float number) {
         this.mCurrentNumber = number;
@@ -278,12 +314,15 @@ public class RulerView extends View {
         @Override
         public boolean onDown(MotionEvent e) {
             Log.d(TAG, "onDown: ");
+            mScaleStepOffset = DEFAULT_SCALE_STEP_OFFSET;
             return true;
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             float step = distanceX / mScaleStepDist;
+            mScaleStepOffset = (mScaleStepOffset + distanceX) % mScaleStepDist;
+            Log.d(TAG, "onScroll: " + distanceX + " step: "  + step + " offset: " + mScaleStepOffset);
             mCurrentNumber = mCurrentNumber + step * mScaleStepNumber;
             if (mListener != null) {
                 mListener.onChange(Math.round(mCurrentNumber * 10)/10.0f);
@@ -297,6 +336,7 @@ public class RulerView extends View {
             int deltaX = (int)(e1.getX() - e2.getX());
             if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
                 Log.d(TAG, "onFling: success!");
+                mScaleStepOffset = DEFAULT_SCALE_STEP_OFFSET;
                 mFingStart = (int)e2.getX();
                 mScroller.fling((int)e1.getX(), (int)e2.getX(), (int)velocityX, 0,
                         (int)e2.getX() - mWidth, (int)e2.getX() + mWidth, 0, 0);
@@ -304,6 +344,7 @@ public class RulerView extends View {
             }
             return super.onFling(e1, e2, velocityX, velocityY);
         }
+
     }
 
 

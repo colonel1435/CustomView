@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.zero.customview.R;
+import com.zero.customview.utils.DisplayUtils;
 import com.zero.customview.view.bottombar.MessageTab;
 
 /**
@@ -35,7 +36,8 @@ public class RulerView extends View {
     private static final int DEFAULT_SCALE_LINE_INT = 10;
     private static final int DEFAULT_SCALE_RATIO = 1;
     private static final int DEFAULT_CURRENT_NUMBER = 0;
-    private static final int DEFAULT_SCALE_NUMBER_PADDING = 20;
+    private static final int DEFAULT_SCALE_NUMBER_PADDING = 8;
+    private Context mContext;
     private Paint mBorderPaint;
     private Paint mScalePaint;
     private Paint mCurrentPaint;
@@ -49,11 +51,12 @@ public class RulerView extends View {
     private float mScaleLineWidth;
     private float mScaleBoldLineHeight;
     private float mScaleSize;
+    private float mScaleNumberPadding;
     private float mCurrentSize;
     private boolean isBoundary;
     private int mStartNumber;
     private int mEndNumber;
-    private int mCurrentNumber;
+    private float mCurrentNumber;
     private int mScaleRatio;
 
     private int mWidth;
@@ -81,7 +84,9 @@ public class RulerView extends View {
         mScaleColor = ta.getColor(R.styleable.RulerView_ruler_scale_line_color, Color.GRAY);
         mScaleNumberColor = ta.getColor(R.styleable.RulerView_ruler_scale_number_color, Color.BLACK);
         mCurrentColor = ta.getColor(R.styleable.RulerView_ruler_current_line_color, Color.RED);
+        mScaleSize = ta.getDimension(R.styleable.RulerView_ruler_scale_number_size, DEFAULT_SCALE_SIZE);
         ta.recycle();
+        mContext = context;
         initView();
     }
 
@@ -100,6 +105,7 @@ public class RulerView extends View {
         mScalePaint.setColor(mScaleColor);
         mScalePaint.setStrokeCap(Paint.Cap.ROUND);
         mScalePaint.setTextAlign(Paint.Align.CENTER);
+        mScalePaint.setTextSize(mScaleSize);
 
         mCurrentLineHeight = DEFAULT_CURRENT_LINE_EHIGHT;
         mCurrentPaint = new Paint();
@@ -111,6 +117,7 @@ public class RulerView extends View {
 
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
+        mScaleNumberPadding = DisplayUtils.px2dip(mContext, DEFAULT_SCALE_NUMBER_PADDING);
     }
 
     private int measureDimension(int measureSpec, int defaultSize) {
@@ -158,16 +165,23 @@ public class RulerView extends View {
         canvas.drawLine(mLeft, mTop, mRight, mTop, mBorderPaint);
         /***    Draw scale  line    ***/
         float step = (mCenterX - mLeft) / (DEFAULT_SCALE_LINE_MAX * 0.5f);
-        float stepNumber = mScaleRatio / DEFAULT_SCALE_LINE_INT;
+        float stepNumber = (float) mScaleRatio / DEFAULT_SCALE_LINE_INT;
         float stepPos;
-        float scaleNumber = mCurrentNumber - (int)(DEFAULT_SCALE_LINE_MAX * 0.5f * stepNumber);
+        Paint.FontMetrics fontMetrics = mScalePaint.getFontMetrics();
+        /***    Init left scale number  ***/
+        float scaleNumber = mCurrentNumber - DEFAULT_SCALE_LINE_MAX * 0.5f * stepNumber;
         for (int i = 0; i < DEFAULT_SCALE_LINE_MAX; i++) {
             stepPos = mLeft + i * step;
-            scaleNumber += stepNumber * step;
-            if (0 == i % DEFAULT_SCALE_LINE_INT) {
+            /***    Keep a decimal place    ***/
+            if (0 != i) {
+                scaleNumber = (float) (Math.round((scaleNumber + stepNumber) * 10)) / 10;
+            }
+            if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 canvas.drawLine(stepPos, mTop, stepPos, mTop + mScaleBoldLineHeight, mScalePaint);
-                canvas.drawText(String.valueOf(scaleNumber), stepPos,
-                        mTop + mScaleBoldLineHeight + DEFAULT_SCALE_NUMBER_PADDING, mScalePaint);
+                canvas.drawText(String.valueOf(Math.round(scaleNumber)),
+                        stepPos,
+                        mTop + mScaleBoldLineHeight + (-fontMetrics.ascent) + mScaleNumberPadding,
+                        mScalePaint);
             } else {
                 canvas.drawLine(stepPos, mTop, stepPos, mTop + mScaleLineHeight, mScalePaint);
             }
@@ -180,7 +194,7 @@ public class RulerView extends View {
     }
 
 
-    public void setCurrentNumber(int number) {
+    public void setCurrentNumber(float number) {
         this.mCurrentNumber = number;
         invalidate();
     }

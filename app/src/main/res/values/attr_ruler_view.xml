@@ -6,5 +6,6 @@
         <attr name="ruler_border_line_color" format="color|reference"/>
         <attr name="ruler_scale_line_color" format="color|reference"/>
         <attr name="ruler_current_line_color" format="color|reference"/>
+        <attr name="ruler_scale_number_size" format="dimension|reference"/>
     </declare-styleable>
 </resources>

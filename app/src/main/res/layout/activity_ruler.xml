@@ -24,5 +24,6 @@
         android:layout_height="96dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:ruler_background="@color/colorLightBoohee"
         app:ruler_scale_number_size="16sp"/>
 </android.support.constraint.ConstraintLayout>

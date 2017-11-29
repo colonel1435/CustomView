@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="RulerView">
+        <attr name="ruler_enable_top_border" format="boolean"/>
+        <attr name="ruler_enable_bottom_border" format="boolean"/>
         <attr name="ruler_is_boundary" format="boolean"/>
+        <attr name="ruler_background" format="color|reference"/>
         <attr name="ruler_scale_number_color" format="color|reference"/>
         <attr name="ruler_border_line_color" format="color|reference"/>
         <attr name="ruler_scale_line_color" format="color|reference"/>
         <attr name="ruler_current_line_color" format="color|reference"/>
         <attr name="ruler_scale_number_size" format="dimension|reference"/>
+        <attr name="ruler_scale_number_padding" format="dimension|reference"/>
     </declare-styleable>
 </resources>

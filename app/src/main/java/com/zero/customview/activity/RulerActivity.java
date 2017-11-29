@@ -35,6 +35,7 @@ public class RulerActivity extends AppCompatActivity {
             @Override
             public void onChange(float current) {
                 Log.d(TAG, "onChange: " + current);
+                tvCurrent.setText(String.valueOf(current));
             }
         });
     }

@@ -46,6 +46,10 @@
     <color name="colorAccent_translucent">#66FF4081</color>
     <color name="md_deep_teal_300_translucent">#664db6ac</color>
     <color name="colorLightCoral">#F37B7A</color>
+    <color name="colorBoohee">#F6F9F6</color>
+    <color name="colorLightBoohee">#BBE3DA</color>
+    <color name="colorDarkBoohee">#94D4BA</color>
+    <color name="colorBooheeGreen">#77DFBA</color>
 
     <color name="colorSeaGreen">#2B8537</color>
     <color name="colorDarkCyan">#1D9C7E</color>

@@ -18,7 +18,7 @@ public class RulerActivity extends AppCompatActivity {
     @BindView(R.id.tv_current)
     TextView tvCurrent;
 
-    private float mNumber = 60f;
+    private float mNumber = 60.5f;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

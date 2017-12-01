@@ -230,22 +230,21 @@ public class RulerView extends View {
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
-            int oldX = getScrollX();
-            int oldY = getScrollY();
-            int x = mScroller.getCurrX();
-            int y = mScroller.getCurrY();
-
+            int lastX = getScrollX();
+            int lastY = getScrollY();
             int currX = mScroller.getCurrX();
-            float deltaX = currX - mFingStart;
+            int currY = mScroller.getCurrY();
+            float deltaX = currX - lastX;
+            float deltaY = currY - lastY;
             float step = deltaX / mScaleStepDist;
-            mFingStart = currX;
             mCurrentNumber += step * mScaleStepNumber;
             if (mListener != null) {
                 mListener.onChange(Math.round(mCurrentNumber * 10)/10.0f);
             }
-            Log.d(TAG, "computeScroll: deltaX " + deltaX );
+            Log.d(TAG, "computeScroll: deltaX " + deltaX + " lastX -> " + lastX + " currX -> " + currX
+                + " number -> " + mCurrentNumber);
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-//            if (oldX != x || oldY != y) {
+//            if (lastX != currX || lastY != currY) {
 //                overScrollBy(x-oldX,y-oldY,oldX,oldY,
 //                        (int)mRulerLength,mHeight,
 //                        (int)mScaleStepOffset, 0,false);
@@ -298,19 +297,6 @@ public class RulerView extends View {
         }
         Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax);
         while (stepMin < stepMax) {
-            if (count != 0) {
-                if (leftToRight) {
-                    stepMin += mScaleStepDist;
-                    /***    Keep a decimal place    ***/
-                    scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * 10)) / 10;
-                    coordX = stepMin;
-                } else {
-                    stepMax -= mScaleStepDist;
-                    /***    Keep a decimal place    ***/
-                    scaleNumber = (float) (Math.round((scaleNumber - mScaleStepNumber) * 10)) / 10;
-                    coordX = stepMax;
-                }
-            }
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
                 canvas.drawLine(coordX, mTop, coordX, mTop + mScaleBoldLineHeight, mScalePaint);
@@ -322,7 +308,18 @@ public class RulerView extends View {
                 mScalePaint.setStrokeWidth(mBoarderLineWidth);
                 canvas.drawLine(coordX, mTop, coordX, mTop + mScaleLineHeight, mScalePaint);
             }
-            count++;
+
+            if (leftToRight) {
+                stepMin += mScaleStepDist;
+                /***    Keep a decimal place    ***/
+                scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * 10)) / 10;
+                coordX = stepMin;
+            } else {
+                stepMax -= mScaleStepDist;
+                /***    Keep a decimal place    ***/
+                scaleNumber = (float) (Math.round((scaleNumber - mScaleStepNumber) * 10)) / 10;
+                coordX = stepMax;
+            }
         }
         canvas.restore();
     }
@@ -356,7 +353,6 @@ public class RulerView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.d(TAG, "onScroll: distanceX -> " + distanceX);
             mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), (int)distanceX, 0);
             invalidate();
             return super.onScroll(e1, e2, distanceX, distanceY);

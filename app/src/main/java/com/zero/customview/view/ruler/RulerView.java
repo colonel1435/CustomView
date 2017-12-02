@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.OverScroller;
 
 import com.zero.customview.R;
@@ -78,8 +79,8 @@ public class RulerView extends View {
     private int mFingStart;
     private int minPostion;
     private int maxPosition;
-    private float leftHalf;
-    private float rightHalf;
+    float stepMin;
+    float stepMax;
 
     private int mWidth;
     private int mHeight;
@@ -197,8 +198,6 @@ public class RulerView extends View {
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
         minPostion = (int)mLeft;
         maxPosition = (int)mRight;
-        leftHalf = mNumberMin - mCurrentNumber;
-        rightHalf = mNumberMax - mCurrentNumber;
     }
 
     @Override
@@ -248,9 +247,9 @@ public class RulerView extends View {
                 + " number -> " + mCurrentNumber);
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
 //            if (lastX != currX || lastY != currY) {
-//                overScrollBy(x-oldX,y-oldY,oldX,oldY,
-//                        (int)mRulerLength,mHeight,
-//                        (int)mScaleStepOffset, 0,false);
+//                overScrollBy(currX-lastX,currY-lastY,lastX,lastY,
+//                        (int)(mRulerLength * mScaleStepDist),mHeight,
+//                        (int)deltaX, 0,false);
 //            }
             postInvalidate();
         }
@@ -274,8 +273,6 @@ public class RulerView extends View {
         Paint.FontMetrics fontMetrics = mScalePaint.getFontMetrics();
         /***    Init left scale number  ***/
         float scrollX = getScrollX();
-        float stepMin;
-        float stepMax;
         Log.d(TAG, "drawScale: getScroll -> " + getScrollX());
         float scaleNumber;
         float coordX;
@@ -360,14 +357,16 @@ public class RulerView extends View {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-//            int deltaX = (int)(e1.getX() - e2.getX());
-//            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
-//                Log.d(TAG, "onFling: success!");
+            int deltaX = (int)(e1.getX() - e2.getX());
+            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
+                Log.d(TAG, "onFling: success!");
 //                mScroller.fling((int)e1.getX(), 0, (int)velocityX, 0,
-//                        minPostion - mWidth, maxPosition + mWidth,
+//                        (int)stepMin, (int)stepMax,
 //                        0, 0);
-//                invalidate();
-//            }
+                mScroller.fling(getScrollX(), 0, (int)velocityX, 0,
+                        (int)stepMin, (int)stepMax, 0, 0);
+                invalidate();
+            }
             return super.onFling(e1, e2, velocityX, velocityY);
         }
 

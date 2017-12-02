@@ -47,6 +47,7 @@ public class RulerView extends View {
     private static final float DEFAULT_FING_VELOCITY = 5;
     private static final int DEFAULT_NUMBER_MIN = 0;
     private static final int DEFAULT_NUMBER_MAX = 200;
+    private static final int SCROLL_ANIMATION_DURATION = 500;
     private Context mContext;
     private boolean enableTopBorder;
     private boolean enableBottomBorder;
@@ -77,6 +78,8 @@ public class RulerView extends View {
     private int mFingStart;
     private int minPostion;
     private int maxPosition;
+    private float leftHalf;
+    private float rightHalf;
 
     private int mWidth;
     private int mHeight;
@@ -87,7 +90,6 @@ public class RulerView extends View {
     private float mBottom;
     private float mScaleStepDist;
     private float mScaleStepNumber;
-    private float mScaleStepOffset;
 
     private GestureDetector mGestureDetector;
     private OverScroller mScroller;
@@ -153,7 +155,6 @@ public class RulerView extends View {
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
         mScaleStepNumber = (float) mScaleRatio / DEFAULT_SCALE_LINE_INT;
-        mScaleStepOffset = DEFAULT_SCALE_STEP_OFFSET;
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new OverScroller(mContext);
@@ -196,6 +197,8 @@ public class RulerView extends View {
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
         minPostion = (int)mLeft;
         maxPosition = (int)mRight;
+        leftHalf = mNumberMin - mCurrentNumber;
+        rightHalf = mNumberMax - mCurrentNumber;
     }
 
     @Override
@@ -256,14 +259,10 @@ public class RulerView extends View {
     private void drawBorder(Canvas canvas) {
         /***    Draw top border   ***/
         if (enableTopBorder) {
-            canvas.save();
             canvas.drawLine(mLeft + getScrollX(), mTop, mRight + getScrollX(), mTop, mBorderPaint);
-            canvas.restore();
         }
         if (enableBottomBorder) {
-            canvas.save();
             canvas.drawLine(mLeft + getScrollX(), mBottom, mRight + getScrollX(), mBottom, mBorderPaint);
-            canvas.restore();
         }
 
     }
@@ -279,23 +278,23 @@ public class RulerView extends View {
         float stepMax;
         Log.d(TAG, "drawScale: getScroll -> " + getScrollX());
         float scaleNumber;
-        int count = 0;
         float coordX;
         float leftHalf = mNumberMin - mCurrentNumber;
         float rightHalf = mNumberMax - mCurrentNumber;
         boolean leftToRight = Math.abs(leftHalf) < Math.abs(rightHalf);
         if (leftToRight) {
-            stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist;
+            stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
             stepMax = getRight() + scrollX;
             scaleNumber = mNumberMin;
             coordX = stepMin;
         } else {
             stepMin = getLeft() + scrollX;
-            stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist;
+            stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
             scaleNumber = mNumberMax;
             coordX = stepMax;
         }
-        Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax);
+        Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax +
+                " scaleNumber -> " + scaleNumber);
         while (stepMin < stepMax) {
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
@@ -353,7 +352,8 @@ public class RulerView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), (int)distanceX, 0);
+            mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), (int)distanceX, 0,
+                    SCROLL_ANIMATION_DURATION);
             invalidate();
             return super.onScroll(e1, e2, distanceX, distanceY);
         }

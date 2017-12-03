@@ -77,8 +77,8 @@ public class RulerView extends View {
     private float minFingDistance;
     private float minFingVelocity;
     private int mFingStart;
-    private int minPostion;
-    private int maxPosition;
+    private float minPostion;
+    private float maxPosition;
     float stepMin;
     float stepMax;
 
@@ -196,8 +196,8 @@ public class RulerView extends View {
         mBottom = mHeight - getPaddingBottom() - DEFAULT_PADDING;
         mScaleStepDist = (mWidth) / (DEFAULT_SCALE_LINE_MAX);
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
-        minPostion = (int)mLeft;
-        maxPosition = (int)mRight;
+        minPostion = mLeft;
+        maxPosition = mRight;
     }
 
     @Override
@@ -230,28 +230,30 @@ public class RulerView extends View {
     }
 
     @Override
+    public void scrollTo(int x, int y) {
+        super.scrollTo(x, y);
+    }
+
+    @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
             int lastX = getScrollX();
-            int lastY = getScrollY();
             int currX = mScroller.getCurrX();
-            int currY = mScroller.getCurrY();
             float deltaX = currX - lastX;
-            float deltaY = currY - lastY;
             float step = deltaX / mScaleStepDist;
             mCurrentNumber += step * mScaleStepNumber;
+            float formatNumber = Math.round(mCurrentNumber * 10)/10.0f;
             if (mListener != null) {
-                mListener.onChange(Math.round(mCurrentNumber * 10)/10.0f);
+                mListener.onChange(formatNumber);
             }
             Log.d(TAG, "computeScroll: deltaX " + deltaX + " lastX -> " + lastX + " currX -> " + currX
                 + " number -> " + mCurrentNumber);
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-//            if (lastX != currX || lastY != currY) {
-//                overScrollBy(currX-lastX,currY-lastY,lastX,lastY,
-//                        (int)(mRulerLength * mScaleStepDist),mHeight,
-//                        (int)deltaX, 0,false);
-//            }
-            postInvalidate();
+            if(!mScroller.computeScrollOffset() &&
+                    Math.abs(Math.round(mCurrentNumber * 100)/100.0f - formatNumber) > 1e-4) {
+                scrollToNearest();
+            }
+            invalidate();
         }
     }
 
@@ -281,12 +283,14 @@ public class RulerView extends View {
         boolean leftToRight = Math.abs(leftHalf) < Math.abs(rightHalf);
         if (leftToRight) {
             stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
+            minPostion = stepMin;
             stepMax = getRight() + scrollX;
             scaleNumber = mNumberMin;
             coordX = stepMin;
         } else {
             stepMin = getLeft() + scrollX;
             stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
+            maxPosition = stepMax;
             scaleNumber = mNumberMax;
             coordX = stepMax;
         }
@@ -358,21 +362,31 @@ public class RulerView extends View {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             int deltaX = (int)(e1.getX() - e2.getX());
-            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
-                Log.d(TAG, "onFling: success!");
-//                mScroller.fling((int)e1.getX(), 0, (int)velocityX, 0,
-//                        (int)stepMin, (int)stepMax,
-//                        0, 0);
-                mScroller.fling(getScrollX(), 0, (int)velocityX, 0,
-                        (int)stepMin, (int)stepMax, 0, 0);
-                invalidate();
-            }
+//            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
+//                Log.d(TAG, "onFling: success!");
+////                mScroller.fling((int)e1.getX(), 0, (int)velocityX, 0,
+////                        (int)stepMin, (int)stepMax,
+////                        0, 0);
+//                mScroller.fling(getScrollX(), 0, (int)velocityX, 0,
+//                        (int)stepMin, (int)stepMax, 0, 0);
+//                invalidate();
+//            }
             return super.onFling(e1, e2, velocityX, velocityY);
         }
 
     }
 
+    private int scaleToPosition(float scale) {
+        return (int)(minPostion + (scale - mNumberMin)/mScaleStepNumber * mScaleStepDist);
+    }
 
+    private void scrollToNearest() {
+        Log.d(TAG, "scrollToNearest: currentNUmber -> " + mCurrentNumber
+                + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrX());
+        mScroller.startScroll(mScroller.getCurrX(), 0,
+                scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrX(), 0);
+        invalidate();
+    }
     public interface OnCurrentChangeListener {
         void onChange(float current);
     }

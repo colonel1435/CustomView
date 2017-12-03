@@ -6,11 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.OverScroller;
 
@@ -81,6 +83,7 @@ public class RulerView extends View {
     private float maxPosition;
     float stepMin;
     float stepMax;
+    boolean leftToRight;
 
     private int mWidth;
     private int mHeight;
@@ -159,8 +162,8 @@ public class RulerView extends View {
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new OverScroller(mContext);
-        minFingDistance = DEFAULT_FING_DISTANCE;
-        minFingVelocity = DEFAULT_FING_VELOCITY;
+        minFingDistance = ViewConfiguration.get(mContext).getScaledTouchSlop();
+        minFingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
     }
 
     private int measureDimension(int measureSpec, int defaultSize) {
@@ -214,24 +217,20 @@ public class RulerView extends View {
     }
 
     @Override
-    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-//        if (!mScroller.isFinished()) {
-//            int oldX = getScrollX();
-//            int oldY = getScrollY();
-//            scrollTo(scrollX,scrollY);
-//            onScrollChanged(scrollX,scrollY,oldX,oldY);
-//            if (clampedX) {
-//                Log.e("TEST1","springBack");
-//                mScroller.springBack(getScrollX(),getScrollY(),0,(int)mScaleStepDist,0, 0);
-//            }
-//        } else {
-//            super.scrollTo(scrollX,scrollY);
-//        }
-    }
-
-    @Override
     public void scrollTo(int x, int y) {
-        super.scrollTo(x, y);
+        if (x < Math.round(minPostion)) {
+            x = Math.round(minPostion);
+        }
+
+        if ( x > Math.round(maxPosition)) {
+            x = Math.round(maxPosition);
+        }
+
+        Log.d(TAG, "scrollTo: x -> " + x + "  y -> " + y + " getScroox -> " + getScrollX()
+            + " minPos -> " + minPostion + " maxPos -> " + maxPosition);
+        if (x != getScrollX()) {
+            super.scrollTo(x, y);
+        }
     }
 
     @Override
@@ -239,6 +238,10 @@ public class RulerView extends View {
         if (mScroller.computeScrollOffset()) {
             int lastX = getScrollX();
             int currX = mScroller.getCurrX();
+//            if ((currX < minPostion && leftToRight)
+//                    || (currX > maxPosition && !leftToRight)) {
+//                return;
+//            }
             float deltaX = currX - lastX;
             float step = deltaX / mScaleStepDist;
             mCurrentNumber += step * mScaleStepNumber;
@@ -251,7 +254,7 @@ public class RulerView extends View {
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             if(!mScroller.computeScrollOffset() &&
                     Math.abs(Math.round(mCurrentNumber * 100)/100.0f - formatNumber) > 1e-4) {
-                scrollToNearest();
+//                scrollToNearest();
             }
             invalidate();
         }
@@ -284,18 +287,18 @@ public class RulerView extends View {
         if (leftToRight) {
             stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
             minPostion = stepMin;
-            stepMax = getRight() + scrollX;
+            stepMax = mWidth*0.5f + scrollX;
             scaleNumber = mNumberMin;
             coordX = stepMin;
         } else {
-            stepMin = getLeft() + scrollX;
+            stepMin = getLeft() + scrollX - mWidth*0.5f;
             stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
             maxPosition = stepMax;
             scaleNumber = mNumberMax;
             coordX = stepMax;
         }
         Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax +
-                " scaleNumber -> " + scaleNumber);
+                " scaleNumber -> " + scaleNumber + (leftToRight?"Left -> Right":"RIght -> Left"));
         while (stepMin < stepMax) {
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
@@ -362,22 +365,23 @@ public class RulerView extends View {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             int deltaX = (int)(e1.getX() - e2.getX());
-//            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
-//                Log.d(TAG, "onFling: success!");
-////                mScroller.fling((int)e1.getX(), 0, (int)velocityX, 0,
-////                        (int)stepMin, (int)stepMax,
-////                        0, 0);
-//                mScroller.fling(getScrollX(), 0, (int)velocityX, 0,
-//                        (int)stepMin, (int)stepMax, 0, 0);
-//                invalidate();
-//            }
+            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
+                Log.d(TAG, "onFling: success! velocityX -> " + velocityX);
+                mScroller.fling(getScrollX(), 0, (int)(-0.5f * velocityX), 0,
+                        (int)minPostion, (int)maxPosition, 0, 0);
+                invalidate();
+            }
             return super.onFling(e1, e2, velocityX, velocityY);
         }
 
     }
 
     private int scaleToPosition(float scale) {
-        return (int)(minPostion + (scale - mNumberMin)/mScaleStepNumber * mScaleStepDist);
+        if (leftToRight) {
+            return (int) (minPostion + (scale - mNumberMin) / mScaleStepNumber * mScaleStepDist);
+        } else {
+            return (int) (maxPosition - (mNumberMax - scale) / mScaleStepNumber * mScaleStepDist);
+        }
     }
 
     private void scrollToNearest() {

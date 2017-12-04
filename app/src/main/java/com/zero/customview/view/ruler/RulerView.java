@@ -195,8 +195,8 @@ public class RulerView extends View {
         mBottom = mHeight - getPaddingBottom() - DEFAULT_PADDING;
         mScaleStepDist = (mWidth) / (DEFAULT_SCALE_LINE_MAX);
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
-        minPostion = mLeft;
-        maxPosition = mRight;
+        minPostion = ((mNumberMin - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
+        maxPosition = ((mNumberMax - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
     }
 
     @Override

@@ -254,7 +254,7 @@ public class RulerView extends View {
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             if(!mScroller.computeScrollOffset() &&
                     Math.abs(Math.round(mCurrentNumber * 100)/100.0f - formatNumber) > 1e-4) {
-//                scrollToNearest();
+                scrollToNearest();
             }
             invalidate();
         }
@@ -283,17 +283,21 @@ public class RulerView extends View {
         float coordX;
         float leftHalf = mNumberMin - mCurrentNumber;
         float rightHalf = mNumberMax - mCurrentNumber;
-        boolean leftToRight = Math.abs(leftHalf) < Math.abs(rightHalf);
+        leftToRight = Math.abs(leftHalf) < Math.abs(rightHalf);
         if (leftToRight) {
             stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
-            minPostion = stepMin;
+            if (stepMin < minPostion) {
+                minPostion = stepMin;
+            }
             stepMax = mWidth*0.5f + scrollX;
             scaleNumber = mNumberMin;
             coordX = stepMin;
         } else {
             stepMin = getLeft() + scrollX - mWidth*0.5f;
             stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
-            maxPosition = stepMax;
+            if (stepMax > maxPosition) {
+                maxPosition = stepMax;
+            }
             scaleNumber = mNumberMax;
             coordX = stepMax;
         }

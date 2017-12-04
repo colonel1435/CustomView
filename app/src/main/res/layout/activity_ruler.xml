@@ -7,23 +7,54 @@
     tools:context="com.zero.customview.activity.RulerActivity">
 
     <TextView
-        android:id="@+id/tv_current"
+        android:id="@+id/tv_horizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="12dp"
         android:gravity="center"
-        android:text="0"
-        app:layout_constraintBottom_toTopOf="@+id/ruler"
+        android:text="10"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.zero.customview.view.ruler.RulerView
-        android:id="@+id/ruler"
+    <com.zero.customview.view.ruler.HorizontalRuler
+        android:id="@+id/ht_ruler"
         android:layout_width="match_parent"
         android:layout_height="96dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:ruler_background="@color/colorLightBoohee"
-        app:ruler_scale_number_size="16sp"/>
+        app:ruler_border_line_color="@color/colorLightBoohee"
+        app:ruler_scale_line_color="@color/colorLightGray"
+        app:ruler_current_line_color="@color/colorDarkCyan"
+        app:ruler_scale_number_color="@color/colorBlack"
+        app:ruler_scale_number_size="16sp" />
+
+    <TextView
+        android:id="@+id/tv_horizontal_arrow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="10"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ht_ruler" />
+
+    <com.zero.customview.view.ruler.HorizontalArrowRuler
+        android:id="@+id/arrow_ruler"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_horizontal_arrow"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:ruler_background="@color/colorYellow"
+        app:ruler_border_line_color="@color/colorYellow"
+        app:ruler_scale_line_color="@color/colorWhite"
+        app:ruler_current_line_color="@color/colorWhite"
+        app:ruler_scale_number_color="@color/colorWhite"
+        app:ruler_scale_number_size="16sp" />
 </android.support.constraint.ConstraintLayout>

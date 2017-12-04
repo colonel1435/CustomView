@@ -56,5 +56,6 @@
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_current_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
-        app:ruler_scale_number_size="16sp" />
+        app:ruler_scale_number_size="16sp"
+        app:ruler_enable_edge="true"/>
 </android.support.constraint.ConstraintLayout>

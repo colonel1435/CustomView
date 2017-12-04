@@ -45,8 +45,8 @@ public class RulerActivity extends AppCompatActivity {
             }
         });
 
-        tvHorizontalArrow.setText(String.valueOf(100));
-        arrowRuler.setCurrentNumber(100);
+        tvHorizontalArrow.setText(String.valueOf(40));
+        arrowRuler.setCurrentNumber(40);
         arrowRuler.setOnCurrentChangeListener(new BaseRuler.OnCurrentChangeListener() {
             @Override
             public void onChange(float current) {

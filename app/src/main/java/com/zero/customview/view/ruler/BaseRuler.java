@@ -3,13 +3,16 @@ package com.zero.customview.view.ruler;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.EdgeEffectCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.EdgeEffect;
 import android.widget.OverScroller;
 
 import com.zero.customview.utils.DisplayUtils;
@@ -41,17 +44,23 @@ public abstract class BaseRuler extends View implements IRuler{
     protected static final int DEFAULT_NUMBER_MIN = 0;
     protected static final int DEFAULT_NUMBER_MAX = 200;
     protected static final int SCROLL_ANIMATION_DURATION = 300;
+    protected static final int DEFAULT_EDGE_WIDTH = 64;
     protected Context mContext;
     protected boolean enableTopBorder;
     protected boolean enableBottomBorder;
+    protected boolean mEnableEdge;
     protected int mBackgoundColor;
     protected Paint mBorderPaint;
     protected Paint mScalePaint;
     protected Paint mCurrentPaint;
+    protected EdgeEffect mMinEdge;
+    protected EdgeEffect mMaxEdge;
     protected int mBorderColor;
     protected int mScaleLineColor;
     protected int mScaleNumberColor;
     protected int mCurrentColor;
+    protected int mEdgeColor;
+
     protected float mCurrentLineHeight;
     protected float mCurrentLineWidth;
     protected float mBoarderLineWidth;
@@ -60,7 +69,6 @@ public abstract class BaseRuler extends View implements IRuler{
     protected float mScaleBoldLineHeight;
     protected float mScaleSize;
     protected float mScaleNumberPadding;
-    protected boolean isBoundary;
     protected int mNumberMin;
     protected int mNumberMax;
     protected float mRulerLength;
@@ -73,6 +81,7 @@ public abstract class BaseRuler extends View implements IRuler{
     protected float stepMin;
     protected float stepMax;
     protected boolean leftToRight;
+    protected int mEdgeWidth;
 
     protected int mWidth;
     protected int mHeight;
@@ -125,6 +134,14 @@ public abstract class BaseRuler extends View implements IRuler{
         mCurrentPaint.setStrokeWidth(mCurrentLineWidth);
         mCurrentPaint.setColor(mCurrentColor);
 
+        mMinEdge = new EdgeEffect(mContext);
+        mMaxEdge = new EdgeEffect(mContext);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            mMinEdge.setColor(mEdgeColor);
+            mMinEdge.setColor(mEdgeColor);
+        }
+        mEdgeWidth = DisplayUtils.dip2px(mContext, DEFAULT_EDGE_WIDTH);
+
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
         mScaleStepNumber = (float) mScaleRatio / DEFAULT_SCALE_LINE_INT;
@@ -173,10 +190,21 @@ public abstract class BaseRuler extends View implements IRuler{
         drawBorder(canvas);
         drawScale(canvas);
         drawCurrentLine(canvas);
+        if (mEnableEdge) {
+            drawEdge(canvas);
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_UP:
+                releaseEdgeEffect();
+                break;
+            default:
+                break;
+
+        }
         return mGestureDetector.onTouchEvent(event);
     }
 
@@ -186,9 +214,9 @@ public abstract class BaseRuler extends View implements IRuler{
             int currX = mScroller.getCurrX();
             boolean lower = currX < minPostion && leftToRight;
             boolean upper = currX > maxPosition && !leftToRight;
-            if (lower || upper) {
-                return;
-            }
+//            if (lower || upper) {
+//                return;
+//            }
 
             scrollNumber();
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
@@ -226,6 +254,43 @@ public abstract class BaseRuler extends View implements IRuler{
             return super.onFling(e1, e2, velocityX, velocityY);
         }
 
+    }
+
+    @Override
+    public void startMinEdge(int position) {
+        if (mEnableEdge) {
+            Log.d(TAG, "startMinEdge: ");
+            if (!mScroller.isFinished()) {
+                mMinEdge.onAbsorb((int) mScroller.getCurrVelocity());
+                mScroller.abortAnimation();
+            } else {
+                mMinEdge.onPull((minPostion - position) / (mEdgeWidth) * 3 + 0.3f);
+                mMinEdge.setSize(mEdgeWidth, mHeight);
+            }
+            postInvalidateOnAnimation();
+        }
+    }
+
+    @Override
+    public void startMaxEdge(int position) {
+        if (mEnableEdge) {
+            Log.d(TAG, "startMaxEdge: ");
+            if (!mScroller.isFinished()) {
+                mMaxEdge.onAbsorb((int) mScroller.getCurrVelocity());
+                mScroller.abortAnimation();
+            } else {
+                mMaxEdge.onPull((position - maxPosition) / (mEdgeWidth) * 3 + 0.3f);
+                mMaxEdge.setSize(mEdgeWidth, mHeight);
+            }
+            postInvalidateOnAnimation();
+        }
+    }
+
+    private void releaseEdgeEffect() {
+        if (mEnableEdge) {
+            mMinEdge.onRelease();
+            mMaxEdge.onRelease();
+        }
     }
 
     public void setScaleRatio(int ratio) {

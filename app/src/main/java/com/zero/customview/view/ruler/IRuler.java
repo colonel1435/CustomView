@@ -29,6 +29,12 @@ public interface IRuler {
      */
     void drawCurrentLine(Canvas canvas);
     /**
+    *   Draw edge effort
+    *  @param canvas
+    *  @return void
+    */
+    void drawEdge(Canvas canvas);
+    /**
      *  Start scroll ruler
      *  @param distX
      *  @param distY
@@ -60,4 +66,16 @@ public interface IRuler {
      *  @return
      */
     void scrollNumber();
+    /**
+    *   Start drag min scale line edge efforts
+    * @param
+    * @return
+    */
+    void startMinEdge(int position);
+    /**
+     *   Start drag max scale line edge efforts
+     * @param
+     * @return
+     */
+    void startMaxEdge(int position);
 }

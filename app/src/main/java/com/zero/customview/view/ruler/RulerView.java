@@ -110,7 +110,6 @@ public class RulerView extends View {
         enableTopBorder = ta.getBoolean(R.styleable.RulerView_ruler_enable_top_border, true);
         enableBottomBorder = ta.getBoolean(R.styleable.RulerView_ruler_enable_bottom_border, true);
         mBackgoundColor = ta.getColor(R.styleable.RulerView_ruler_background, Color.WHITE);
-        isBoundary = ta.getBoolean(R.styleable.RulerView_ruler_is_boundary, false);
         mBorderColor = ta.getColor(R.styleable.RulerView_ruler_border_line_color, Color.GRAY);
         mScaleColor = ta.getColor(R.styleable.RulerView_ruler_scale_line_color, Color.GRAY);
         mScaleNumberColor = ta.getColor(R.styleable.RulerView_ruler_scale_number_color, Color.BLACK);

@@ -35,10 +35,11 @@ public class HorizontalRuler extends BaseRuler {
         enableTopBorder = ta.getBoolean(R.styleable.RulerView_ruler_enable_top_border, true);
         enableBottomBorder = ta.getBoolean(R.styleable.RulerView_ruler_enable_bottom_border, true);
         mBackgoundColor = ta.getColor(R.styleable.RulerView_ruler_background, Color.WHITE);
-        isBoundary = ta.getBoolean(R.styleable.RulerView_ruler_is_boundary, false);
+        mEnableEdge = ta.getBoolean(R.styleable.RulerView_ruler_enable_edge, false);
         mBorderColor = ta.getColor(R.styleable.RulerView_ruler_border_line_color, Color.GRAY);
         mScaleLineColor = ta.getColor(R.styleable.RulerView_ruler_scale_line_color, Color.GRAY);
         mScaleNumberColor = ta.getColor(R.styleable.RulerView_ruler_scale_number_color, Color.BLACK);
+        mEdgeColor = ta.getColor(R.styleable.RulerView_ruler_edge_color, Color.GRAY);
         mCurrentColor = ta.getColor(R.styleable.RulerView_ruler_current_line_color, Color.RED);
         mScaleSize = ta.getDimension(R.styleable.RulerView_ruler_scale_number_size,
                 DisplayUtils.sp2px(mContext, DEFAULT_SCALE_SIZE));
@@ -146,6 +147,51 @@ public class HorizontalRuler extends BaseRuler {
         mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
         canvas.drawLine(center, bridge,
                 center, mTop + mCurrentLineHeight, mCurrentPaint);
+    }
+
+    @Override
+    public void drawEdge(Canvas canvas) {
+        if (mEnableEdge) {
+            if (!mMinEdge.isFinished()) {
+                int count = canvas.save();
+                canvas.rotate(270);
+                canvas.translate(minPostion, 0);
+                if (mMinEdge.draw(canvas)) {
+                    postInvalidateOnAnimation();
+                }
+                canvas.restoreToCount(count);
+            } else {
+                mMinEdge.finish();
+            }
+            if (!mMaxEdge.isFinished()) {
+                int count = canvas.save();
+                canvas.rotate(90);
+                canvas.translate(maxPosition, 0);
+                if (mMaxEdge.draw(canvas)) {
+                    postInvalidateOnAnimation();
+                }
+                canvas.restoreToCount(count);
+            } else {
+                mMaxEdge.finish();
+            }
+        }
+    }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        if (x < Math.round(minPostion)) {
+            x = Math.round(minPostion);
+            startMinEdge(x);
+        }
+
+        if ( x > Math.round(maxPosition)) {
+            x = Math.round(maxPosition);
+            startMaxEdge(x);
+        }
+
+        if (x != getScrollX()) {
+            super.scrollTo(x, y);
+        }
     }
 
     @Override

@@ -26,13 +26,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:ruler_background="@color/colorLightBoohee"
         app:ruler_scale_number_size="16sp"/>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_indicate_line"
-        app:layout_constraintTop_toBottomOf="@+id/tv_current"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteY="194dp" />
 </android.support.constraint.ConstraintLayout>

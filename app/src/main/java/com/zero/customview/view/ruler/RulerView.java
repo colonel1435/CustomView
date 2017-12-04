@@ -33,24 +33,21 @@ public class RulerView extends View {
     private static final int DEFAULT_WIDTH = 800;
     private static final int DEFAULT_HEIGHT = 640;
     private static final float DEFAULT_SCALE_SIZE = 16;
-    private static final float DEFAULT_SCALE_WIDTH = 4;
-    private static final float DEFAULT_BORDER_LINE_WIDTH = 2;
-    private static final float DEFAULT_CURRENT_SCALE_WIDTH = 6;
+    private static final float DEFAULT_SCALE_WIDTH = 2;
+    private static final float DEFAULT_BORDER_LINE_WIDTH = 1;
+    private static final float DEFAULT_CURRENT_LINE_WIDTH = 4;
     private static final float DEFAULT_PADDING = 2;
-    private static final float DEFAULT_CURRENT_LINE_EHIGHT = 16;
-    private static final float DEFAULT_SCALE_BOLD_LINE_HEIGHT = 12;
-    private static final float DEFAULT_SCALE_LINE_HEIGHT = 6;
-    private static final int DEFAULT_SCALE_LINE_MAX = 32;
+    private static final float DEFAULT_CURRENT_LINE_EHIGHT = 28;
+    private static final float DEFAULT_SCALE_BOLD_LINE_HEIGHT = 24;
+    private static final float DEFAULT_SCALE_LINE_HEIGHT = 12;
+    private static final int DEFAULT_SCALE_LINE_MAX = 30;
     private static final int DEFAULT_SCALE_LINE_INT = 10;
     private static final int DEFAULT_SCALE_RATIO = 1;
-    private static final float DEFAULT_SCALE_STEP_OFFSET = 0.0f;
     private static final int DEFAULT_CURRENT_NUMBER = 0;
-    private static final int DEFAULT_SCALE_NUMBER_PADDING = 8;
-    private static final float DEFAULT_FING_DISTANCE = 5;
-    private static final float DEFAULT_FING_VELOCITY = 5;
+    private static final int DEFAULT_SCALE_NUMBER_PADDING = 16;
     private static final int DEFAULT_NUMBER_MIN = 0;
     private static final int DEFAULT_NUMBER_MAX = 200;
-    private static final int SCROLL_ANIMATION_DURATION = 500;
+    private static final int SCROLL_ANIMATION_DURATION = 300;
     private Context mContext;
     private boolean enableTopBorder;
     private boolean enableBottomBorder;
@@ -63,13 +60,13 @@ public class RulerView extends View {
     private int mScaleNumberColor;
     private int mCurrentColor;
     private float mCurrentLineHeight;
+    private float mCurrentLineWidth;
     private float mBoarderLineWidth;
     private float mScaleLineHeight;
     private float mScaleLineWidth;
     private float mScaleBoldLineHeight;
     private float mScaleSize;
     private float mScaleNumberPadding;
-    private float mCurrentSize;
     private boolean isBoundary;
     private int mNumberMin;
     private int mNumberMax;
@@ -78,7 +75,6 @@ public class RulerView extends View {
     private int mScaleRatio;
     private float minFingDistance;
     private float minFingVelocity;
-    private int mFingStart;
     private float minPostion;
     private float maxPosition;
     float stepMin;
@@ -131,15 +127,15 @@ public class RulerView extends View {
 
     private void initView() {
         setBackgroundColor(mBackgoundColor);
-        mBoarderLineWidth = DEFAULT_BORDER_LINE_WIDTH;
+        mBoarderLineWidth = DisplayUtils.dip2px(mContext, DEFAULT_BORDER_LINE_WIDTH);
         mBorderPaint = new Paint();
         mBorderPaint.setAntiAlias(true);
         mBorderPaint.setColor(mBorderColor);
         mBorderPaint.setStrokeWidth(mBoarderLineWidth);
 
-        mScaleLineWidth = DEFAULT_SCALE_WIDTH;
-        mScaleLineHeight = DEFAULT_SCALE_LINE_HEIGHT;
-        mScaleBoldLineHeight = DEFAULT_SCALE_BOLD_LINE_HEIGHT;
+        mScaleLineWidth = DisplayUtils.dip2px(mContext, DEFAULT_SCALE_WIDTH);
+        mScaleLineHeight = DisplayUtils.dip2px(mContext, DEFAULT_SCALE_LINE_HEIGHT);
+        mScaleBoldLineHeight = DisplayUtils.dip2px(mContext, DEFAULT_SCALE_BOLD_LINE_HEIGHT);
         mScalePaint = new Paint();
         mScalePaint.setStyle(Paint.Style.FILL);
         mScalePaint.setAntiAlias(true);
@@ -148,13 +144,13 @@ public class RulerView extends View {
         mScalePaint.setTextAlign(Paint.Align.CENTER);
         mScalePaint.setTextSize(mScaleSize);
 
-        mCurrentLineHeight = DEFAULT_CURRENT_LINE_EHIGHT;
+        mCurrentLineWidth = DisplayUtils.dip2px(mContext, DEFAULT_CURRENT_LINE_WIDTH);
+        mCurrentLineHeight = DisplayUtils.dip2px(mContext, DEFAULT_CURRENT_LINE_EHIGHT);
         mCurrentPaint = new Paint();
         mCurrentPaint.setAntiAlias(true);
         mCurrentPaint.setStyle(Paint.Style.FILL);
-        mCurrentPaint.setStrokeWidth(mScaleLineWidth);
+        mCurrentPaint.setStrokeWidth(mCurrentLineWidth);
         mCurrentPaint.setColor(mCurrentColor);
-        mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
 
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
@@ -238,10 +234,13 @@ public class RulerView extends View {
         if (mScroller.computeScrollOffset()) {
             int lastX = getScrollX();
             int currX = mScroller.getCurrX();
-//            if ((currX < minPostion && leftToRight)
-//                    || (currX > maxPosition && !leftToRight)) {
-//                return;
-//            }
+            boolean lower = currX < minPostion && leftToRight;
+            boolean upper = currX > maxPosition && !leftToRight;
+            if (lower || upper) {
+                Log.d(TAG, "computeScroll: currx -> " + currX + "position -> "
+                        + (leftToRight? minPostion + "left2right":maxPosition + "right2left"));
+                return;
+            }
             float deltaX = currX - lastX;
             float step = deltaX / mScaleStepDist;
             mCurrentNumber += step * mScaleStepNumber;
@@ -306,7 +305,8 @@ public class RulerView extends View {
         while (stepMin < stepMax) {
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
-                canvas.drawLine(coordX, mTop, coordX, mTop + mScaleBoldLineHeight, mScalePaint);
+                canvas.drawLine(coordX, mTop + mBoarderLineWidth, coordX,
+                        mTop + mScaleBoldLineHeight + mBoarderLineWidth, mScalePaint);
                 canvas.drawText(String.valueOf(Math.round(scaleNumber)),
                         coordX,
                         mTop + mScaleBoldLineHeight + (-fontMetrics.ascent) + mScaleNumberPadding,
@@ -334,7 +334,13 @@ public class RulerView extends View {
     private void drawCurrentLine(Canvas canvas) {
         /***    Draw current line   ***/
         float center = (mLeft + getScrollX() + mRight + getScrollX()) / 2;
-        canvas.drawLine(center, mTop, center, mTop + mCurrentLineHeight, mCurrentPaint);
+        float bridge = mTop + mCurrentLineHeight * 0.5f;
+        mCurrentPaint.setStrokeCap(Paint.Cap.BUTT);
+        canvas.drawLine(center, mTop + mBoarderLineWidth*0.5f,
+                center, bridge, mCurrentPaint);
+        mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
+        canvas.drawLine(center, bridge,
+                center, mTop + mCurrentLineHeight, mCurrentPaint);
     }
 
     public void setCurrentNumber(float number) {
@@ -392,7 +398,8 @@ public class RulerView extends View {
         Log.d(TAG, "scrollToNearest: currentNUmber -> " + mCurrentNumber
                 + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrX());
         mScroller.startScroll(mScroller.getCurrX(), 0,
-                scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrX(), 0);
+                scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrX(), 0,
+                SCROLL_ANIMATION_DURATION);
         invalidate();
     }
     public interface OnCurrentChangeListener {

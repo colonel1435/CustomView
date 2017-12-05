@@ -196,6 +196,37 @@ public abstract class BaseRuler extends View implements IRuler{
     }
 
     @Override
+    public void drawEdge(Canvas canvas) {
+        if (mEnableEdge) {
+            if (!mMinEdge.isFinished()) {
+                int count = canvas.save();
+                canvas.rotate(270);
+                canvas.translate(-mHeight, minPostion + mWidth * 0.5f);
+                if (mMinEdge.draw(canvas)) {
+                    postInvalidateOnAnimation();
+                }
+                canvas.restoreToCount(count);
+                Log.d(TAG, "drawEdge: min edge minPos -> " + minPostion);
+            } else {
+                Log.d(TAG, "drawEdge: finish");
+                mMinEdge.finish();
+            }
+            if (!mMaxEdge.isFinished()) {
+                int count = canvas.save();
+                canvas.rotate(90);
+                canvas.translate(0, -maxPosition - mWidth * 0.5f);
+                if (mMaxEdge.draw(canvas)) {
+                    postInvalidateOnAnimation();
+                }
+                canvas.restoreToCount(count);
+                Log.d(TAG, "drawEdge: max edge");
+            } else {
+                mMaxEdge.finish();
+            }
+        }
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_UP:
@@ -261,10 +292,12 @@ public abstract class BaseRuler extends View implements IRuler{
         if (mEnableEdge) {
             Log.d(TAG, "startMinEdge: ");
             if (!mScroller.isFinished()) {
+                Log.d(TAG, "startMinEdge: onAbsorb");
                 mMinEdge.onAbsorb((int) mScroller.getCurrVelocity());
                 mScroller.abortAnimation();
             } else {
-                mMinEdge.onPull((minPostion - position) / (mEdgeWidth) * 3 + 0.3f);
+                Log.d(TAG, "startMinEdge: onPull position -> " + position + " minPostion -> " + minPostion);
+                mMinEdge.onPull((minPostion - position) / (mEdgeWidth));
                 mMinEdge.setSize(mEdgeWidth, mHeight);
             }
             postInvalidateOnAnimation();
@@ -276,10 +309,13 @@ public abstract class BaseRuler extends View implements IRuler{
         if (mEnableEdge) {
             Log.d(TAG, "startMaxEdge: ");
             if (!mScroller.isFinished()) {
+                Log.d(TAG, "startMaxEdge: onAbsorb");
                 mMaxEdge.onAbsorb((int) mScroller.getCurrVelocity());
                 mScroller.abortAnimation();
             } else {
-                mMaxEdge.onPull((position - maxPosition) / (mEdgeWidth) * 3 + 0.3f);
+                Log.d(TAG, "startMaxEdge: onPull");
+                Log.d(TAG, "startMinEdge: onPull position -> " + position + " maxPostion -> " + maxPosition);
+                mMaxEdge.onPull((position - maxPosition) / (mEdgeWidth));
                 mMaxEdge.setSize(mEdgeWidth, mHeight);
             }
             postInvalidateOnAnimation();
@@ -288,6 +324,7 @@ public abstract class BaseRuler extends View implements IRuler{
 
     private void releaseEdgeEffect() {
         if (mEnableEdge) {
+            Log.d(TAG, "releaseEdgeEffect: ");
             mMinEdge.onRelease();
             mMaxEdge.onRelease();
         }

@@ -150,43 +150,15 @@ public class HorizontalRuler extends BaseRuler {
     }
 
     @Override
-    public void drawEdge(Canvas canvas) {
-        if (mEnableEdge) {
-            if (!mMinEdge.isFinished()) {
-                int count = canvas.save();
-                canvas.rotate(270);
-                canvas.translate(minPostion, 0);
-                if (mMinEdge.draw(canvas)) {
-                    postInvalidateOnAnimation();
-                }
-                canvas.restoreToCount(count);
-            } else {
-                mMinEdge.finish();
-            }
-            if (!mMaxEdge.isFinished()) {
-                int count = canvas.save();
-                canvas.rotate(90);
-                canvas.translate(maxPosition, 0);
-                if (mMaxEdge.draw(canvas)) {
-                    postInvalidateOnAnimation();
-                }
-                canvas.restoreToCount(count);
-            } else {
-                mMaxEdge.finish();
-            }
-        }
-    }
-
-    @Override
     public void scrollTo(int x, int y) {
         if (x < Math.round(minPostion)) {
-            x = Math.round(minPostion);
             startMinEdge(x);
+            x = Math.round(minPostion);
         }
 
         if ( x > Math.round(maxPosition)) {
-            x = Math.round(maxPosition);
             startMaxEdge(x);
+            x = Math.round(maxPosition);
         }
 
         if (x != getScrollX()) {

@@ -26,8 +26,6 @@ import com.zero.customview.utils.DisplayUtils;
 
 public abstract class BaseRuler extends View implements IRuler{
     protected static final String TAG = "BaseRuler@wumin";
-    protected static final int DEFAULT_WIDTH = 800;
-    protected static final int DEFAULT_HEIGHT = 640;
     protected static final float DEFAULT_SCALE_SIZE = 16;
     protected static final float DEFAULT_SCALE_WIDTH = 2;
     protected static final float DEFAULT_BORDER_LINE_WIDTH = 1;
@@ -83,9 +81,12 @@ public abstract class BaseRuler extends View implements IRuler{
     protected boolean leftToRight;
     protected int mEdgeWidth;
 
+    protected int defaultWidth;
+    protected int defaultHeight;
     protected int mWidth;
     protected int mHeight;
     protected float mCenterX;
+    protected float mCenterY;
     protected float mLeft;
     protected float mTop;
     protected float mRight;
@@ -169,8 +170,8 @@ public abstract class BaseRuler extends View implements IRuler{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(measureDimension(widthMeasureSpec, DEFAULT_WIDTH),
-                measureDimension(heightMeasureSpec, DEFAULT_HEIGHT));
+        setMeasuredDimension(measureDimension(widthMeasureSpec, defaultWidth),
+                measureDimension(heightMeasureSpec, defaultHeight));
     }
 
     @Override
@@ -242,13 +243,6 @@ public abstract class BaseRuler extends View implements IRuler{
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
-            int currX = mScroller.getCurrX();
-            boolean lower = currX < minPostion && leftToRight;
-            boolean upper = currX > maxPosition && !leftToRight;
-//            if (lower || upper) {
-//                return;
-//            }
-
             scrollNumber();
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             float formatNumber = Math.round(mCurrentNumber * 10)/10.0f;
@@ -279,7 +273,9 @@ public abstract class BaseRuler extends View implements IRuler{
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             int deltaX = (int)(e1.getX() - e2.getX());
-            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity) {
+            int deltaY = (int)(e1.getY() - e2.getY());
+            if (Math.abs(deltaX) > minFingDistance && Math.abs(velocityX) > minFingVelocity ||
+                    (Math.abs(deltaY) > minFingDistance && Math.abs(velocityY) > minFingVelocity)) {
                 startFling(velocityX, velocityY);
             }
             return super.onFling(e1, e2, velocityX, velocityY);

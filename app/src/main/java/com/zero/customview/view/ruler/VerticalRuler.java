@@ -14,24 +14,24 @@ import com.zero.customview.utils.DisplayUtils;
 
 /**
  * Description
+ *
  * @author : Mr.wuming
- * @email  : fusu1435@163.com
- * @date   : 2017/12/4 0004 13:41
+ * @email : fusu1435@163.com
+ * @date : 2017/12/6 0006 14:28
  */
 
-public class HorizontalRuler extends BaseRuler {
-    protected static final int HORIZONTAL_DEFAULT_WIDTH = 640;
-    protected static final int HORIZONTAL_DEFAULT_HEIGHT = 96;
-
-    public HorizontalRuler(Context context) {
+public class VerticalRuler extends BaseRuler {
+    protected static final int VERTICAL_DEFAULT_WIDTH = 96;
+    protected static final int VERTICAL_DEFAULT_HEIGHT = 640;
+    public VerticalRuler(Context context) {
         this(context, null);
     }
 
-    public HorizontalRuler(Context context, @Nullable AttributeSet attrs) {
+    public VerticalRuler(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public HorizontalRuler(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public VerticalRuler(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RulerView);
@@ -51,8 +51,8 @@ public class HorizontalRuler extends BaseRuler {
         mNumberMin = ta.getInt(R.styleable.RulerView_ruler_number_min, DEFAULT_NUMBER_MIN);
         mNumberMax = ta.getInt(R.styleable.RulerView_ruler_number_max, DEFAULT_NUMBER_MAX);
         ta.recycle();
-        defaultWidth = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_WIDTH);
-        defaultHeight = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_HEIGHT);
+        defaultWidth = DisplayUtils.dip2px(mContext, VERTICAL_DEFAULT_WIDTH);
+        defaultHeight = DisplayUtils.dip2px(mContext, VERTICAL_DEFAULT_HEIGHT);
         initRuler();
     }
 
@@ -61,7 +61,7 @@ public class HorizontalRuler extends BaseRuler {
         super.onSizeChanged(w, h, oldw, oldh);
         mCenterX = w * 0.5f;
         mCenterY = h * 0.5f;
-        mScaleStepDist = (mWidth) / (DEFAULT_SCALE_LINE_MAX);
+        mScaleStepDist = (mHeight) / (DEFAULT_SCALE_LINE_MAX);
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
         minPostion = ((mNumberMin - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
         maxPosition = ((mNumberMax - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
@@ -71,42 +71,42 @@ public class HorizontalRuler extends BaseRuler {
     public void drawBorder(Canvas canvas) {
         /***    Draw top border   ***/
         if (enableTopBorder) {
-            canvas.drawLine(mLeft + getScrollX(), mTop, mRight + getScrollX(), mTop, mBorderPaint);
+            canvas.drawLine(mLeft, mTop + getScrollY(), mLeft, mBottom + getScrollY(), mBorderPaint);
         }
         if (enableBottomBorder) {
-            canvas.drawLine(mLeft + getScrollX(), mBottom, mRight + getScrollX(), mBottom, mBorderPaint);
+            canvas.drawLine(mRight, mTop + getScrollY(), mRight, mBottom + getScrollY(), mBorderPaint);
         }
     }
 
     @Override
     public void drawScale(Canvas canvas) {
         canvas.save();
-        canvas.translate(mCenterX, 0);
+        canvas.translate(0, mCenterY);
         Paint.FontMetrics fontMetrics = mScalePaint.getFontMetrics();
         /***    Init left scale number  ***/
-        float scrollX = getScrollX();
-        Log.d(TAG, "drawScale: getScroll -> " + getScrollX());
+        float scrollY = getScrollY();
+        Log.d(TAG, "drawScale: getScroll -> " + getScrollY());
         float scaleNumber;
-        float coordX;
+        float coordY;
         float leftHalf = mNumberMin - mCurrentNumber;
         float rightHalf = mNumberMax - mCurrentNumber;
         leftToRight = Math.abs(leftHalf) < Math.abs(rightHalf);
         if (leftToRight) {
-            stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
+            stepMin = (leftHalf / mScaleStepNumber) * mScaleStepDist + scrollY;
             if (stepMin < minPostion) {
                 minPostion = stepMin;
             }
-            stepMax = mWidth*0.5f + scrollX;
+            stepMax = mHeight*0.5f + scrollY;
             scaleNumber = mNumberMin;
-            coordX = stepMin;
+            coordY = stepMin;
         } else {
-            stepMin = getLeft() + scrollX - mWidth*0.5f;
-            stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
+            stepMin = getLeft() + scrollY - mHeight*0.5f;
+            stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollY;
             if (stepMax > maxPosition) {
                 maxPosition = stepMax;
             }
             scaleNumber = mNumberMax;
-            coordX = stepMax;
+            coordY = stepMax;
         }
         Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax +
                 " scaleNumber -> " + scaleNumber + (leftToRight?"Left -> Right":"RIght -> Left"));
@@ -114,29 +114,29 @@ public class HorizontalRuler extends BaseRuler {
             if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
                 mScalePaint.setColor(mScaleLineColor);
-                canvas.drawLine(coordX, mTop + mBoarderLineWidth, coordX,
-                        mTop + mScaleBoldLineHeight + mBoarderLineWidth, mScalePaint);
+                canvas.drawLine(mLeft + mBoarderLineWidth, coordY,
+                        mLeft + mBoarderLineWidth + mScaleBoldLineHeight, coordY, mScalePaint);
                 mScalePaint.setColor(mScaleNumberColor);
                 canvas.drawText(String.valueOf(Math.round(scaleNumber)),
-                        coordX,
-                        mTop + mScaleBoldLineHeight + (-fontMetrics.ascent) + mScaleNumberPadding,
+                        mLeft + mScaleBoldLineHeight + mScaleNumberPadding,
+                        coordY - (fontMetrics.descent + fontMetrics.ascent)/2,
                         mScalePaint);
             } else {
                 mScalePaint.setStrokeWidth(mBoarderLineWidth);
                 mScalePaint.setColor(mScaleLineColor);
-                canvas.drawLine(coordX, mTop, coordX, mTop + mScaleLineHeight, mScalePaint);
+                canvas.drawLine(mLeft, coordY, mLeft + mScaleLineHeight, coordY, mScalePaint);
             }
 
             if (leftToRight) {
                 stepMin += mScaleStepDist;
                 /***    Keep a decimal place    ***/
                 scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * 10)) / 10;
-                coordX = stepMin;
+                coordY = stepMin;
             } else {
                 stepMax -= mScaleStepDist;
                 /***    Keep a decimal place    ***/
                 scaleNumber = (float) (Math.round((scaleNumber - mScaleStepNumber) * 10)) / 10;
-                coordX = stepMax;
+                coordY = stepMax;
             }
         }
         canvas.restore();
@@ -144,53 +144,53 @@ public class HorizontalRuler extends BaseRuler {
 
     @Override
     public void drawCurrentLine(Canvas canvas) {
-        float center = (mLeft + getScrollX() + mRight + getScrollX()) / 2;
-        float bridge = mTop + mCurrentLineHeight * 0.5f;
+        float center = (mTop + getScrollY() + mBottom + getScrollY()) / 2;
+        float bridge = mLeft + mCurrentLineHeight * 0.5f;
         mCurrentPaint.setStrokeCap(Paint.Cap.BUTT);
-        canvas.drawLine(center, mTop + mBoarderLineWidth*0.5f,
-                center, bridge, mCurrentPaint);
+        canvas.drawLine(mLeft + mBoarderLineWidth * 0.5f, center,
+                bridge, center, mCurrentPaint);
         mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
-        canvas.drawLine(center, bridge,
-                center, mTop + mCurrentLineHeight, mCurrentPaint);
+        canvas.drawLine(bridge, center,
+                mLeft + mCurrentLineHeight, center, mCurrentPaint);
     }
 
     @Override
     public void scrollTo(int x, int y) {
-        if (x < Math.round(minPostion)) {
-            startMinEdge(x);
-            x = Math.round(minPostion);
+        if (y < Math.round(minPostion)) {
+            startMinEdge(y);
+            y = Math.round(minPostion);
         }
 
-        if ( x > Math.round(maxPosition)) {
-            startMaxEdge(x);
-            x = Math.round(maxPosition);
+        if ( y > Math.round(maxPosition)) {
+            startMaxEdge(y);
+            y = Math.round(maxPosition);
         }
 
-        if (x != getScrollX()) {
+        if (y != getScrollY()) {
             super.scrollTo(x, y);
         }
     }
 
     @Override
     public void startScroll(float distX, float distY) {
-        mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), (int)distX, 0,
+        mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), 0, (int)distY,
                 SCROLL_ANIMATION_DURATION);
         invalidate();
     }
 
     @Override
     public void startFling(float velocityX, float velocityY) {
-        mScroller.fling(getScrollX(), 0, (int)(-0.5f * velocityX), 0,
-                (int)minPostion, (int)maxPosition, 0, 0);
+        mScroller.fling(0, getScrollY(), 0, (int)(-0.5f * velocityY),
+                0, 0, (int)minPostion, (int)maxPosition);
         invalidate();
     }
 
     @Override
     public void scrollToNearest() {
         Log.d(TAG, "scrollToNearest: currentNUmber -> " + mCurrentNumber
-                + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrX());
-        mScroller.startScroll(mScroller.getCurrX(), 0,
-                scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrX(), 0,
+                + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrY());
+        mScroller.startScroll(0, mScroller.getCurrY(),
+                0, scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrY(),
                 SCROLL_ANIMATION_DURATION);
         invalidate();
     }
@@ -206,17 +206,17 @@ public class HorizontalRuler extends BaseRuler {
 
     @Override
     public void scrollNumber() {
-        int lastX = getScrollX();
-        int currX = mScroller.getCurrX();
-        boolean lower = currX < minPostion && leftToRight;
-        boolean upper = currX > maxPosition && !leftToRight;
+        int lastY = getScrollY();
+        int currY = mScroller.getCurrY();
+        boolean lower = currY < minPostion && leftToRight;
+        boolean upper = currY > maxPosition && !leftToRight;
         if (lower || upper) {
-            Log.d(TAG, "computeScroll: currx -> " + currX + "position -> "
+            Log.d(TAG, "computeScroll: currx -> " + currY + "position -> "
                     + (leftToRight? minPostion + "left2right":maxPosition + "right2left"));
             return;
         }
-        float deltaX = currX - lastX;
-        float step = deltaX / mScaleStepDist;
+        float deltaY = currY - lastY;
+        float step = deltaY / mScaleStepDist;
         mCurrentNumber += step * mScaleStepNumber;
         float formatNumber = Math.round(mCurrentNumber * 10)/10.0f;
         if (mListener != null) {

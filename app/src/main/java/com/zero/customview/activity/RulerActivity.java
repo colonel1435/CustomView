@@ -5,9 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.zero.customview.R;
-import com.zero.customview.view.ruler.HorizontalArrowRuler;
 import com.zero.customview.view.ruler.BaseRuler;
+import com.zero.customview.view.ruler.HorizontalArrowRuler;
 import com.zero.customview.view.ruler.HorizontalRuler;
+import com.zero.customview.view.ruler.VerticalRuler;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +23,8 @@ public class RulerActivity extends AppCompatActivity {
     TextView tvHorizontalArrow;
     @BindView(R.id.arrow_ruler)
     HorizontalArrowRuler arrowRuler;
+    @BindView(R.id.vertical_ruler)
+    VerticalRuler verticalRuler;
 
     private float mNumber = 60.5f;
 
@@ -53,5 +56,7 @@ public class RulerActivity extends AppCompatActivity {
                 tvHorizontalArrow.setText(String.valueOf(current));
             }
         });
+
+        verticalRuler.setCurrentNumber(99);
     }
 }

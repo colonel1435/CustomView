@@ -58,7 +58,8 @@
         app:ruler_enable_edge="true"
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
-        app:ruler_scale_number_size="16sp" />
+        app:ruler_scale_number_size="16sp"
+        app:ruler_scale_space="5"/>
 
 
     <com.zero.customview.view.ruler.VerticalRuler
@@ -90,5 +91,5 @@
         app:ruler_current_line_color="@color/colorDeepOrange"
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
-        app:ruler_scale_number_size="16sp" />
+        app:ruler_scale_number_size="16sp"/>
 </android.support.constraint.ConstraintLayout>

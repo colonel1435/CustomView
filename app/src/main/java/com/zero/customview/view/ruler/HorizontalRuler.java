@@ -50,6 +50,7 @@ public class HorizontalRuler extends BaseRuler {
                 DisplayUtils.dip2px(mContext, DEFAULT_SCALE_NUMBER_PADDING));
         mNumberMin = ta.getInt(R.styleable.RulerView_ruler_number_min, DEFAULT_NUMBER_MIN);
         mNumberMax = ta.getInt(R.styleable.RulerView_ruler_number_max, DEFAULT_NUMBER_MAX);
+        mScaleSpace = ta.getInt(R.styleable.RulerView_ruler_scale_space, DEFAULT_SCALE_LINE_INT);
         ta.recycle();
         defaultWidth = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_WIDTH);
         defaultHeight = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_HEIGHT);

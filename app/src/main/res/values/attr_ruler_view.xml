@@ -14,5 +14,6 @@
         <attr name="ruler_scale_number_padding" format="dimension|reference"/>
         <attr name="ruler_number_min" format="integer|reference"/>
         <attr name="ruler_number_max" format="integer|reference"/>
+        <attr name="ruler_scale_space" format="integer|reference"/>
     </declare-styleable>
 </resources>

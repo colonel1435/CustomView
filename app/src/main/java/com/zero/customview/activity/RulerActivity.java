@@ -56,6 +56,7 @@ public class RulerActivity extends AppCompatActivity {
                 tvHorizontalArrow.setText(String.valueOf(current));
             }
         });
+        arrowRuler.setScaleRatio(10);
 
         verticalRuler.setCurrentNumber(99);
     }

@@ -72,6 +72,7 @@ public abstract class BaseRuler extends View implements IRuler{
     protected float mRulerLength;
     protected float mCurrentNumber;
     protected int mScaleRatio;
+    protected int mScaleSpace;
     protected float minFingDistance;
     protected float minFingVelocity;
     protected float minPostion;
@@ -145,7 +146,7 @@ public abstract class BaseRuler extends View implements IRuler{
 
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
         mScaleRatio = DEFAULT_SCALE_RATIO;
-        mScaleStepNumber = (float) mScaleRatio / DEFAULT_SCALE_LINE_INT;
+        mScaleStepNumber = (float) mScaleRatio / mScaleSpace;
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new OverScroller(mContext);

@@ -68,7 +68,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.CouponActivity" />
         <activity android:name=".activity.LikeViewActivity" />
-        <activity android:name=".activity.RulerActivity"></activity>
+        <activity android:name=".activity.RulerActivity" />
+        <activity android:name=".activity.FlipActivity"></activity>
     </application>
 
 </manifest>

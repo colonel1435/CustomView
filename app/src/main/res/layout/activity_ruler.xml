@@ -26,11 +26,11 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:ruler_background="@color/colorLightBoohee"
-        app:ruler_border_line_color="@color/colorLightBoohee"
+        app:ruler_border_line_color="@color/colorLightGray"
         app:ruler_scale_line_color="@color/colorLightGray"
         app:ruler_current_line_color="@color/colorDarkCyan"
         app:ruler_scale_number_color="@color/colorBlack"
-        app:ruler_scale_number_size="16sp" />
+        app:ruler_scale_number_size="16sp"/>
 
     <TextView
         android:id="@+id/tv_horizontal_arrow"
@@ -59,7 +59,8 @@
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
         app:ruler_scale_number_size="16sp"
-        app:ruler_scale_space="5"/>
+        app:ruler_scale_space="5"
+        app:ruler_scale_ratio="10"/>
 
 
     <com.zero.customview.view.ruler.VerticalRuler
@@ -71,11 +72,13 @@
         app:layout_constraintRight_toLeftOf="@+id/vt_arrow_ruler"
         app:layout_constraintTop_toBottomOf="@+id/ht_ruler"
         app:ruler_background="@color/colorSlightRed"
-        app:ruler_border_line_color="@color/colorSlightRed"
+        app:ruler_border_line_color="@color/colorWhite"
         app:ruler_current_line_color="@color/colorDarkCyan"
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
-        app:ruler_scale_number_size="16sp" />
+        app:ruler_scale_number_size="16sp"
+        app:ruler_scale_space="4"
+        app:ruler_scale_ratio="2"/>
 
     <com.zero.customview.view.ruler.VerticalArrowRuler
         android:id="@+id/vt_arrow_ruler"
@@ -85,11 +88,13 @@
         app:layout_constraintLeft_toRightOf="@+id/vertical_ruler"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ht_ruler"
-        app:layout_constraintVertical_bias="0.676"
+        app:layout_constraintVertical_bias="0.59"
         app:ruler_background="@color/colorMediumAquamaine"
         app:ruler_border_line_color="@color/colorMediumAquamaine"
         app:ruler_current_line_color="@color/colorDeepOrange"
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
-        app:ruler_scale_number_size="16sp"/>
+        app:ruler_scale_number_size="16sp"
+        app:ruler_scale_space="4"
+        app:ruler_scale_ratio="1"/>
 </android.support.constraint.ConstraintLayout>

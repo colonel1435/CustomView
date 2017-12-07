@@ -12,6 +12,8 @@ import android.util.Log;
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 
+import java.math.BigDecimal;
+
 /**
  * Description
  * @author : Mr.wuming
@@ -51,6 +53,8 @@ public class HorizontalRuler extends BaseRuler {
         mNumberMin = ta.getInt(R.styleable.RulerView_ruler_number_min, DEFAULT_NUMBER_MIN);
         mNumberMax = ta.getInt(R.styleable.RulerView_ruler_number_max, DEFAULT_NUMBER_MAX);
         mScaleSpace = ta.getInt(R.styleable.RulerView_ruler_scale_space, DEFAULT_SCALE_LINE_INT);
+        mScaleRatio = ta.getFloat(R.styleable.RulerView_ruler_scale_ratio, DEFAULT_SCALE_RATIO);
+        enableNearest = ta.getBoolean(R.styleable.RulerView_ruler_enable_nearest, true);
         ta.recycle();
         defaultWidth = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_WIDTH);
         defaultHeight = DisplayUtils.dip2px(mContext, HORIZONTAL_DEFAULT_HEIGHT);
@@ -87,6 +91,7 @@ public class HorizontalRuler extends BaseRuler {
         /***    Init left scale number  ***/
         float scrollX = getScrollX();
         Log.d(TAG, "drawScale: getScroll -> " + getScrollX());
+        float scale = (float) Math.pow(10, mScaleDecimalPlace);
         float scaleNumber;
         float coordX;
         float leftHalf = mNumberMin - mCurrentNumber;
@@ -112,7 +117,7 @@ public class HorizontalRuler extends BaseRuler {
         Log.d(TAG, "drawScale: stepmin -> " + stepMin + " stepMax -> " + stepMax +
                 " scaleNumber -> " + scaleNumber + (leftToRight?"Left -> Right":"RIght -> Left"));
         while (stepMin < stepMax) {
-            if (0 == (scaleNumber % DEFAULT_SCALE_RATIO)) {
+            if (0 == (scaleNumber % mScaleRatio)) {
                 mScalePaint.setStrokeWidth(mScaleLineWidth);
                 mScalePaint.setColor(mScaleLineColor);
                 canvas.drawLine(coordX, mTop + mBoarderLineWidth, coordX,
@@ -131,12 +136,12 @@ public class HorizontalRuler extends BaseRuler {
             if (leftToRight) {
                 stepMin += mScaleStepDist;
                 /***    Keep a decimal place    ***/
-                scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * 10)) / 10;
+                scaleNumber = (float) (Math.round((scaleNumber + mScaleStepNumber) * scale)) / scale;
                 coordX = stepMin;
             } else {
                 stepMax -= mScaleStepDist;
                 /***    Keep a decimal place    ***/
-                scaleNumber = (float) (Math.round((scaleNumber - mScaleStepNumber) * 10)) / 10;
+                scaleNumber = (float) (Math.round((scaleNumber - mScaleStepNumber) * scale)) / scale;
                 coordX = stepMax;
             }
         }
@@ -190,8 +195,19 @@ public class HorizontalRuler extends BaseRuler {
     public void scrollToNearest() {
         Log.d(TAG, "scrollToNearest: currentNUmber -> " + mCurrentNumber
                 + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrX());
+        float target;
+        if (mCurrentNumber - mScaleStepNumber * 0.5f < mCurrentNumber) {
+            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber) * mScaleStepNumber ;
+        } else {
+            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber + 1) * mScaleStepNumber;
+        }
+        float scale = BigDecimal.valueOf(target)
+                .setScale(mScaleDecimalPlace, BigDecimal.ROUND_HALF_UP)
+                .floatValue();
+
+        Log.d(TAG, "scrollToNearest: current -> " + mCurrentNumber + " target -> "  + target + " scale -> " + scale);
         mScroller.startScroll(mScroller.getCurrX(), 0,
-                scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) - mScroller.getCurrX(), 0,
+                scaleToPosition(scale) - mScroller.getCurrX(), 0,
                 SCROLL_ANIMATION_DURATION);
         invalidate();
     }
@@ -219,7 +235,9 @@ public class HorizontalRuler extends BaseRuler {
         float deltaX = currX - lastX;
         float step = deltaX / mScaleStepDist;
         mCurrentNumber += step * mScaleStepNumber;
-        float formatNumber = Math.round(mCurrentNumber * 10)/10.0f;
+        float formatNumber = BigDecimal.valueOf(mCurrentNumber)
+                .setScale(mScaleDecimalPlace, BigDecimal.ROUND_HALF_UP)
+                .floatValue();
         if (mListener != null) {
             mListener.onChange(formatNumber);
         }

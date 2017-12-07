@@ -17,6 +17,9 @@ import android.widget.OverScroller;
 
 import com.zero.customview.utils.DisplayUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Description
  * @author : Mr.wuming
@@ -30,13 +33,12 @@ public abstract class BaseRuler extends View implements IRuler{
     protected static final float DEFAULT_SCALE_WIDTH = 2;
     protected static final float DEFAULT_BORDER_LINE_WIDTH = 1;
     protected static final float DEFAULT_CURRENT_LINE_WIDTH = 4;
-    protected static final float DEFAULT_PADDING = 2;
     protected static final float DEFAULT_CURRENT_LINE_EHIGHT = 28;
     protected static final float DEFAULT_SCALE_BOLD_LINE_HEIGHT = 24;
     protected static final float DEFAULT_SCALE_LINE_HEIGHT = 12;
     protected static final int DEFAULT_SCALE_LINE_MAX = 30;
     protected static final int DEFAULT_SCALE_LINE_INT = 10;
-    protected static final int DEFAULT_SCALE_RATIO = 1;
+    protected static final float DEFAULT_SCALE_RATIO = 1.0f;
     protected static final int DEFAULT_CURRENT_NUMBER = 0;
     protected static final int DEFAULT_SCALE_NUMBER_PADDING = 16;
     protected static final int DEFAULT_NUMBER_MIN = 0;
@@ -71,8 +73,9 @@ public abstract class BaseRuler extends View implements IRuler{
     protected int mNumberMax;
     protected float mRulerLength;
     protected float mCurrentNumber;
-    protected int mScaleRatio;
+    protected float mScaleRatio;
     protected int mScaleSpace;
+    protected int mScaleDecimalPlace;
     protected float minFingDistance;
     protected float minFingVelocity;
     protected float minPostion;
@@ -80,6 +83,7 @@ public abstract class BaseRuler extends View implements IRuler{
     protected float stepMin;
     protected float stepMax;
     protected boolean leftToRight;
+    protected boolean enableNearest;
     protected int mEdgeWidth;
 
     protected int defaultWidth;
@@ -144,9 +148,9 @@ public abstract class BaseRuler extends View implements IRuler{
         }
         mEdgeWidth = DisplayUtils.dip2px(mContext, DEFAULT_EDGE_WIDTH);
 
+        mScaleStepNumber = mScaleRatio / mScaleSpace;
+        mScaleDecimalPlace = getDecimalPlace(mScaleStepNumber);
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
-        mScaleRatio = DEFAULT_SCALE_RATIO;
-        mScaleStepNumber = (float) mScaleRatio / mScaleSpace;
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new OverScroller(mContext);
@@ -246,10 +250,15 @@ public abstract class BaseRuler extends View implements IRuler{
         if (mScroller.computeScrollOffset()) {
             scrollNumber();
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
-            float formatNumber = Math.round(mCurrentNumber * 10)/10.0f;
-            if(!mScroller.computeScrollOffset() &&
-                    Math.abs(Math.round(mCurrentNumber * 100)/100.0f - formatNumber) > 1e-4) {
-                scrollToNearest();
+            if (enableNearest) {
+                BigDecimal decimal = BigDecimal.valueOf(mCurrentNumber);
+                float current = decimal.setScale(mScaleDecimalPlace + 1, BigDecimal.ROUND_HALF_UP).floatValue();
+                boolean hasOffset = (0 != decimal.remainder(BigDecimal.valueOf(mScaleStepNumber)).floatValue());
+                Log.d("current", "computeScroll: current -> " + current + " scale -> " + mScaleStepNumber
+                        + " offet -> " + decimal.remainder(BigDecimal.valueOf(mScaleStepNumber)).floatValue());
+                if (!mScroller.computeScrollOffset() && hasOffset) {
+                    scrollToNearest();
+                }
             }
             invalidate();
         }
@@ -267,7 +276,7 @@ public abstract class BaseRuler extends View implements IRuler{
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            startScroll(distanceX, 0);
+            startScroll(distanceX, distanceY);
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
 
@@ -325,6 +334,12 @@ public abstract class BaseRuler extends View implements IRuler{
             mMinEdge.onRelease();
             mMaxEdge.onRelease();
         }
+    }
+
+    private int getDecimalPlace(float decimal) {
+        BigDecimal bigDecimal =
+                new BigDecimal(String.valueOf(decimal)).setScale(4, RoundingMode.HALF_UP);
+        return bigDecimal.stripTrailingZeros().scale();
     }
 
     public void setScaleRatio(int ratio) {

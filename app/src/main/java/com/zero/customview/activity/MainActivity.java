@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ITEM_LIKE_VIEW = 15;
     private static final int ITEM_RULER_VIEW = 16;
     private static final int ITEM_FLIP_VIEW = 17;
+    private static final int ITEM_WAVE_VIEW = 18;
     private Context mContext = null;
     private Toolbar toolbar;
     private ImageView mTest;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         mDatas.add(getString(R.string.like_view));
         mDatas.add(getString(R.string.ruler_view));
         mDatas.add(getString(R.string.flip_view));
+        mDatas.add(getString(R.string.wave_view));
 
     }
     private void initView() {
@@ -206,6 +208,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case ITEM_FLIP_VIEW:
                 startActivity(new Intent(mContext, FlipActivity.class));
+                break;
+            case ITEM_WAVE_VIEW:
+                startActivity(new Intent(mContext, WaveActivity.class));
                 break;
             default:
                 break;

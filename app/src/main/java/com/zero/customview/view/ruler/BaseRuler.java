@@ -3,6 +3,7 @@ package com.zero.customview.view.ruler;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.media.MediaActionSound;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.EdgeEffectCompat;
@@ -45,6 +46,9 @@ public abstract class BaseRuler extends View implements IRuler{
     protected static final int DEFAULT_NUMBER_MAX = 200;
     protected static final int SCROLL_ANIMATION_DURATION = 300;
     protected static final int DEFAULT_EDGE_WIDTH = 64;
+    protected static final float DEFAULT_HALF_INDEX = 0.5f;
+    protected static final float DEFAULT_FLOAT_DELTA = 1e-4f;
+    protected static final int DEFAULT_DECIMAL_MAX = 3;
     protected Context mContext;
     protected boolean enableTopBorder;
     protected boolean enableBottomBorder;
@@ -151,6 +155,9 @@ public abstract class BaseRuler extends View implements IRuler{
         mScaleStepNumber = mScaleRatio / mScaleSpace;
         mScaleDecimalPlace = getDecimalPlace(mScaleStepNumber);
         mCurrentNumber = DEFAULT_CURRENT_NUMBER;
+        if (mScaleDecimalPlace > DEFAULT_DECIMAL_MAX) {
+            throw new NumberFormatException("Don't allow decimal overs 3");
+        }
 
         mGestureDetector = new GestureDetector(mContext, new DefaultGestureDector());
         mScroller = new OverScroller(mContext);
@@ -251,13 +258,24 @@ public abstract class BaseRuler extends View implements IRuler{
             scrollNumber();
             scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
             if (enableNearest) {
-                BigDecimal decimal = BigDecimal.valueOf(mCurrentNumber);
-                float current = decimal.setScale(mScaleDecimalPlace + 1, BigDecimal.ROUND_HALF_UP).floatValue();
-                boolean hasOffset = (0 != decimal.remainder(BigDecimal.valueOf(mScaleStepNumber)).floatValue());
-                Log.d("current", "computeScroll: current -> " + current + " scale -> " + mScaleStepNumber
-                        + " offet -> " + decimal.remainder(BigDecimal.valueOf(mScaleStepNumber)).floatValue());
+                float tail = (float) Math.floor(mCurrentNumber / mScaleStepNumber);
+                int newScale = (mScaleDecimalPlace + 1) * 2;
+                float delta = Math.abs(tail * mScaleStepNumber - mCurrentNumber);
+                BigDecimal decimal = BigDecimal.valueOf(delta)
+                        .setScale(newScale, BigDecimal.ROUND_HALF_UP);
+                boolean hasOffset = decimal.floatValue() > DEFAULT_FLOAT_DELTA;
                 if (!mScroller.computeScrollOffset() && hasOffset) {
-                    scrollToNearest();
+                    Log.d(TAG, "computeScroll: srollToNearest");
+                    float target;
+                    if (mCurrentNumber - mScaleStepNumber * DEFAULT_HALF_INDEX < tail * mScaleStepNumber) {
+                        target = tail * mScaleStepNumber ;
+                    } else {
+                        target = (tail + 1) * mScaleStepNumber;
+                    }
+                    float scale = BigDecimal.valueOf(target)
+                            .setScale(mScaleDecimalPlace, BigDecimal.ROUND_HALF_UP)
+                            .floatValue();
+                    scrollToNearest(scale);
                 }
             }
             invalidate();

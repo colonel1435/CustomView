@@ -78,7 +78,7 @@
         app:ruler_scale_number_color="@color/colorWhite"
         app:ruler_scale_number_size="16sp"
         app:ruler_scale_space="4"
-        app:ruler_scale_ratio="2"/>
+        app:ruler_scale_ratio="1"/>
 
     <com.zero.customview.view.ruler.VerticalArrowRuler
         android:id="@+id/vt_arrow_ruler"
@@ -95,6 +95,6 @@
         app:ruler_scale_line_color="@color/colorWhite"
         app:ruler_scale_number_color="@color/colorWhite"
         app:ruler_scale_number_size="16sp"
-        app:ruler_scale_space="4"
+        app:ruler_scale_space="10"
         app:ruler_scale_ratio="1"/>
 </android.support.constraint.ConstraintLayout>

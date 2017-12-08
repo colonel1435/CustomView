@@ -64,8 +64,8 @@ public class HorizontalRuler extends BaseRuler {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterX = w * 0.5f;
-        mCenterY = h * 0.5f;
+        mCenterX = w * DEFAULT_HALF_INDEX;
+        mCenterY = h * DEFAULT_HALF_INDEX;
         mScaleStepDist = (mWidth) / (DEFAULT_SCALE_LINE_MAX);
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
         minPostion = ((mNumberMin - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
@@ -102,11 +102,11 @@ public class HorizontalRuler extends BaseRuler {
             if (stepMin < minPostion) {
                 minPostion = stepMin;
             }
-            stepMax = mWidth*0.5f + scrollX;
+            stepMax = mWidth*DEFAULT_HALF_INDEX + scrollX;
             scaleNumber = mNumberMin;
             coordX = stepMin;
         } else {
-            stepMin = getLeft() + scrollX - mWidth*0.5f;
+            stepMin = getLeft() + scrollX - mWidth*DEFAULT_HALF_INDEX;
             stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollX;
             if (stepMax > maxPosition) {
                 maxPosition = stepMax;
@@ -150,10 +150,10 @@ public class HorizontalRuler extends BaseRuler {
 
     @Override
     public void drawCurrentLine(Canvas canvas) {
-        float center = (mLeft + getScrollX() + mRight + getScrollX()) / 2;
-        float bridge = mTop + mCurrentLineHeight * 0.5f;
+        float center = (mLeft + getScrollX() + mRight + getScrollX()) * DEFAULT_HALF_INDEX;
+        float bridge = mTop + mCurrentLineHeight * DEFAULT_HALF_INDEX;
         mCurrentPaint.setStrokeCap(Paint.Cap.BUTT);
-        canvas.drawLine(center, mTop + mBoarderLineWidth*0.5f,
+        canvas.drawLine(center, mTop + mBoarderLineWidth*DEFAULT_HALF_INDEX,
                 center, bridge, mCurrentPaint);
         mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
         canvas.drawLine(center, bridge,
@@ -186,26 +186,13 @@ public class HorizontalRuler extends BaseRuler {
 
     @Override
     public void startFling(float velocityX, float velocityY) {
-        mScroller.fling(getScrollX(), 0, (int)(-0.5f * velocityX), 0,
+        mScroller.fling(getScrollX(), 0, (int)(-DEFAULT_HALF_INDEX * velocityX), 0,
                 (int)minPostion, (int)maxPosition, 0, 0);
         invalidate();
     }
 
     @Override
-    public void scrollToNearest() {
-        Log.d(TAG, "scrollToNearest: currentNUmber -> " + mCurrentNumber
-                + " offset ->" + scaleToPosition(Math.round(mCurrentNumber * 10)/10.0f) + " - " + mScroller.getCurrX());
-        float target;
-        if (mCurrentNumber - mScaleStepNumber * 0.5f < mCurrentNumber) {
-            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber) * mScaleStepNumber ;
-        } else {
-            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber + 1) * mScaleStepNumber;
-        }
-        float scale = BigDecimal.valueOf(target)
-                .setScale(mScaleDecimalPlace, BigDecimal.ROUND_HALF_UP)
-                .floatValue();
-
-        Log.d(TAG, "scrollToNearest: current -> " + mCurrentNumber + " target -> "  + target + " scale -> " + scale);
+    public void scrollToNearest(float scale) {
         mScroller.startScroll(mScroller.getCurrX(), 0,
                 scaleToPosition(scale) - mScroller.getCurrX(), 0,
                 SCROLL_ANIMATION_DURATION);
@@ -228,8 +215,6 @@ public class HorizontalRuler extends BaseRuler {
         boolean lower = currX < minPostion && leftToRight;
         boolean upper = currX > maxPosition && !leftToRight;
         if (lower || upper) {
-            Log.d(TAG, "computeScroll: currx -> " + currX + "position -> "
-                    + (leftToRight? minPostion + "left2right":maxPosition + "right2left"));
             return;
         }
         float deltaX = currX - lastX;

@@ -50,10 +50,10 @@ public interface IRuler {
     void startFling(float velocityX, float velocityY);
     /**
      *  Scroll to the nearest scale line
-     *  @param
+     *  @param scale
      *  @return void
      */
-    void scrollToNearest();
+    void scrollToNearest(float scale);
     /**
      *  Change scale number to scale position
      *  @param scale

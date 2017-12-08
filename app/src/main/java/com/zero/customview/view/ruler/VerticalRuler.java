@@ -64,8 +64,8 @@ public class VerticalRuler extends BaseRuler {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterX = w * 0.5f;
-        mCenterY = h * 0.5f;
+        mCenterX = w * DEFAULT_HALF_INDEX;
+        mCenterY = h * DEFAULT_HALF_INDEX;
         mScaleStepDist = (mHeight) / (DEFAULT_SCALE_LINE_MAX);
         mRulerLength = (mNumberMax - mNumberMin) * mScaleStepDist;
         minPostion = ((mNumberMin - mCurrentNumber) / mScaleStepNumber) * mScaleStepDist;
@@ -102,11 +102,11 @@ public class VerticalRuler extends BaseRuler {
             if (stepMin < minPostion) {
                 minPostion = stepMin;
             }
-            stepMax = mHeight*0.5f + scrollY;
+            stepMax = mHeight*DEFAULT_HALF_INDEX + scrollY;
             scaleNumber = mNumberMin;
             coordY = stepMin;
         } else {
-            stepMin = getLeft() + scrollY - mHeight*0.5f;
+            stepMin = getLeft() + scrollY - mHeight*DEFAULT_HALF_INDEX;
             stepMax = (rightHalf / mScaleStepNumber) * mScaleStepDist + scrollY;
             if (stepMax > maxPosition) {
                 maxPosition = stepMax;
@@ -150,10 +150,10 @@ public class VerticalRuler extends BaseRuler {
 
     @Override
     public void drawCurrentLine(Canvas canvas) {
-        float center = (mTop + getScrollY() + mBottom + getScrollY()) / 2;
-        float bridge = mLeft + mCurrentLineHeight * 0.5f;
+        float center = (mTop + getScrollY() + mBottom + getScrollY()) * DEFAULT_HALF_INDEX;
+        float bridge = mLeft + mCurrentLineHeight * DEFAULT_HALF_INDEX;
         mCurrentPaint.setStrokeCap(Paint.Cap.BUTT);
-        canvas.drawLine(mLeft + mBoarderLineWidth * 0.5f, center,
+        canvas.drawLine(mLeft + mBoarderLineWidth * DEFAULT_HALF_INDEX, center,
                 bridge, center, mCurrentPaint);
         mCurrentPaint.setStrokeCap(Paint.Cap.ROUND);
         canvas.drawLine(bridge, center,
@@ -186,24 +186,13 @@ public class VerticalRuler extends BaseRuler {
 
     @Override
     public void startFling(float velocityX, float velocityY) {
-        mScroller.fling(0, getScrollY(), 0, (int)(-0.5f * velocityY),
+        mScroller.fling(0, getScrollY(), 0, (int)(-DEFAULT_HALF_INDEX * velocityY),
                 0, 0, (int)minPostion, (int)maxPosition);
         invalidate();
     }
 
     @Override
-    public void scrollToNearest() {
-        float target;
-        if (mCurrentNumber - mScaleStepNumber * 0.5f < mCurrentNumber) {
-            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber) * mScaleStepNumber ;
-        } else {
-            target = (float) Math.floor(mCurrentNumber / mScaleStepNumber + 1) * mScaleStepNumber;
-        }
-        float scale = BigDecimal.valueOf(target)
-                .setScale(mScaleDecimalPlace, BigDecimal.ROUND_HALF_UP)
-                .floatValue();
-
-        Log.d(TAG, "scrollToNearest: current -> " + mCurrentNumber + " target -> "  + target + " scale -> " + scale);
+    public void scrollToNearest(float scale) {
         mScroller.startScroll(0, mScroller.getCurrY(),
                 0, scaleToPosition(scale) - mScroller.getCurrY(),
                 SCROLL_ANIMATION_DURATION);
@@ -226,8 +215,6 @@ public class VerticalRuler extends BaseRuler {
         boolean lower = currY < minPostion && leftToRight;
         boolean upper = currY > maxPosition && !leftToRight;
         if (lower || upper) {
-            Log.d(TAG, "computeScroll: currx -> " + currY + "position -> "
-                    + (leftToRight? minPostion + "left2right":maxPosition + "right2left"));
             return;
         }
         float deltaY = currY - lastY;

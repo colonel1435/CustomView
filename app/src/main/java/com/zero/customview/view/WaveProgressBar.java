@@ -1,30 +1,29 @@
 package com.zero.customview.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Xfermode;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.text.method.SingleLineTransformationMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 
 import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
+
+import static android.animation.ValueAnimator.INFINITE;
 
 /**
  * Description
@@ -41,6 +40,8 @@ public class WaveProgressBar extends View {
     private final static int DEFAULT_HEIGHT = 256;
     private final static int DEFAULT_PADDING = 2;
     private final static int DEFAULT_PROGRESS_MAX = 100;
+    private final static float DEFAULT_WAVE_VELOCITY = 30f;
+    private final static long DEFAULT_ANIMATION_DURATION = 1000000;
     private Context mContext;
 
     private float mTextSize;
@@ -61,17 +62,17 @@ public class WaveProgressBar extends View {
     private int mCenterY;
     private float mRadius;
     private int mDefaultPadding;
-    private float lastY;
     private float currentY;
-    private float mFillHeight;
-    private float mFillWidth;
+    private float mWaveAmplitude = 15;
     private float mHalfWaveWidth;
-    private int mWaveSpeed = 30;
-    private float mDistance;
 
     private int mMaxProgress;
     private int progressValue;
     private String progressText;
+
+    private ValueAnimator mWaveAnimator;
+    private float mWaveVelocity;
+    private float mWaveOffsetX;
 
     public WaveProgressBar(Context context) {
         this(context, null);
@@ -95,6 +96,8 @@ public class WaveProgressBar extends View {
                 Color.GRAY);
         mFillColor = ta.getColor(R.styleable.WaveProgressBar_wave_progress_fill_color,
                 Color.BLUE);
+        mWaveVelocity = ta.getFloat(R.styleable.WaveProgressBar_wave_progress_wave_velocity,
+                DEFAULT_WAVE_VELOCITY);
         ta.recycle();
         initView();
     }
@@ -122,8 +125,25 @@ public class WaveProgressBar extends View {
 
         mDefaultPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
         mMaxProgress = DEFAULT_PROGRESS_MAX;
-        progressValue = 50;
+        progressValue = 60;
         progressText = String.valueOf(progressValue) + "%";
+
+        mWaveAnimator = ValueAnimator.ofFloat(0.0f);
+        mWaveAnimator.setInterpolator(new LinearInterpolator());
+        mWaveAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float fraction = (float)animation.getAnimatedValue();
+                if (fraction > 0) {
+                    mWaveOffsetX += mHalfWaveWidth / mWaveVelocity;
+                    mWaveOffsetX = mWaveOffsetX % (mHalfWaveWidth * 4);
+                    invalidate();
+                    Log.d(TAG, "onAnimationUpdate: value -> " + fraction + " offset -> " + mWaveOffsetX);
+                }
+            }
+        });
+        mWaveAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
+        mWaveAnimator.setRepeatCount(INFINITE);
     }
 
     private int measureDimension(int measureSpec, int defaultSize) {
@@ -155,7 +175,8 @@ public class WaveProgressBar extends View {
         mCenterY = (int)((h + getPaddingTop() - getPaddingBottom()) * 0.5f);
         mRadius = Math.min(w - getPaddingLeft() - getPaddingRight() - 2 * mDefaultPadding,
                 h - getPaddingTop() - getPaddingBottom() - 2 * mDefaultPadding) * 0.5f;
-        mHalfWaveWidth = mRadius;
+        mHalfWaveWidth = mRadius / 2;
+        mWaveAnimator.setFloatValues(mHalfWaveWidth*4);
     }
 
     @Override
@@ -164,6 +185,10 @@ public class WaveProgressBar extends View {
         drawWave(canvas);
         drawText(canvas);
         drawDrop(canvas);
+        if (!mWaveAnimator.isRunning()) {
+            Log.d(TAG, "onDraw: start animation!");
+            mWaveAnimator.start();
+        }
     }
 
     private void drawWave(Canvas canvas) {
@@ -174,26 +199,25 @@ public class WaveProgressBar extends View {
         mDrawable.draw(canvas);
         canvas.restore();
         /***    Draw progress   ***/
-        mFillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         currentY = mHeight * (mMaxProgress - progressValue) / mMaxProgress;
+        canvas.save();
+        canvas.translate(0, currentY);
+        mFillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         mFillPath.reset();
-        mFillPath.moveTo(-mDistance, currentY);
+        mFillPath.moveTo(-mWaveOffsetX, 0);
         int waveNum = mWidth / ((int) mHalfWaveWidth * 4) + 1;
-        int mult = 0;
         for (int i = 0; i < waveNum; i++) {
-            mFillPath.quadTo(mHalfWaveWidth * (mult + 1) - mDistance, currentY - mFillHeight,
-                                mHalfWaveWidth * (mult + 2)-mDistance, currentY);
-            mFillPath.quadTo(mHalfWaveWidth * (mult + 3) - mDistance, currentY + mFillHeight,
-                    mHalfWaveWidth * (mult + 4) - mDistance, currentY);
-            mult += 4;
+            mFillPath.rQuadTo(mHalfWaveWidth,  - mWaveAmplitude,
+                    2 * mHalfWaveWidth, 0);
+            mFillPath.rQuadTo(mHalfWaveWidth, mWaveAmplitude,
+                    2 * mHalfWaveWidth, 0);
         }
-        mDistance += mHalfWaveWidth / mWaveSpeed;
-        mDistance = mDistance % (mHalfWaveWidth * 4);
 
         mFillPath.lineTo(mWidth, mHeight);
         mFillPath.lineTo(0, mHeight);
         mFillPath.close();
         canvas.drawPath(mFillPath, mFillPaint);
+        canvas.restore();
     }
 
     private void drawText(Canvas canvas) {
@@ -202,8 +226,6 @@ public class WaveProgressBar extends View {
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         canvas.drawText(progressText, 0, -(fontMetrics.descent + fontMetrics.ascent)*0.5f ,
                 mTextPaint);
-        canvas.drawLine(-mCenterX, 0, mCenterX, 0, mTextPaint);
-        canvas.drawLine(0, -mCenterY, 0, mCenterY, mTextPaint);
         canvas.restore();
     }
 

@@ -6,6 +6,7 @@
         <attr name="wave_progress_drop_color" format="integer|reference"/>
         <attr name="wave_progress_fill_color" format="integer|reference"/>
         <attr name="wave_progress_background" format="integer|reference"/>
+        <attr name="wave_progress_src" format="reference"/>
         <attr name="wave_progress_wave_velocity" format="float|reference"/>
     </declare-styleable>
 </resources>

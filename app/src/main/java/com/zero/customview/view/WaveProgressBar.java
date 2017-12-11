@@ -3,17 +3,18 @@ package com.zero.customview.view;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -40,8 +41,10 @@ public class WaveProgressBar extends View {
     private final static int DEFAULT_HEIGHT = 256;
     private final static int DEFAULT_PADDING = 2;
     private final static int DEFAULT_PROGRESS_MAX = 100;
+    private final static int DEFAULT_PROGRESS_VALUE = 0;
     private final static float DEFAULT_WAVE_VELOCITY = 30f;
     private final static long DEFAULT_ANIMATION_DURATION = 1000000;
+    private final static String DEFAULT_PROGRESS_POSTFIX = "%";
     private Context mContext;
 
     private float mTextSize;
@@ -50,11 +53,14 @@ public class WaveProgressBar extends View {
     private int mBackgroundColor;
     private int mFillColor;
     private Paint mTextPaint;
-    private Paint mBackgroundPaint;
     private Paint mFillPaint;
     private Paint mDropPaint;
     private Drawable mDrawable;
+    private Bitmap mBitmapSrc;
     private Path mFillPath;
+    private PorterDuffXfermode xfermode;
+    private ColorFilter colorFilter;
+    private RectF srcRect;
 
     private int mWidth;
     private int mHeight;
@@ -67,8 +73,8 @@ public class WaveProgressBar extends View {
     private float mHalfWaveWidth;
 
     private int mMaxProgress;
-    private int progressValue;
-    private String progressText;
+    private int mProgressValue;
+    private String mProgressText;
 
     private ValueAnimator mWaveAnimator;
     private float mWaveVelocity;
@@ -98,6 +104,7 @@ public class WaveProgressBar extends View {
                 Color.BLUE);
         mWaveVelocity = ta.getFloat(R.styleable.WaveProgressBar_wave_progress_wave_velocity,
                 DEFAULT_WAVE_VELOCITY);
+        mDrawable = ta.getDrawable(R.styleable.WaveProgressBar_wave_progress_src);
         ta.recycle();
         initView();
     }
@@ -109,24 +116,25 @@ public class WaveProgressBar extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
 
         mFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mFillPaint.setColor(mFillColor);
-        mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBackgroundPaint.setColor(mBackgroundColor);
+        mFillPaint.setStyle(Paint.Style.FILL);
         mFillPath = new Path();
 
         mDropPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mDropPaint.setColor(mDropColor);
 
-        mDrawable = getBackground();
-        if (null == mDrawable) {
-            mDrawable = new ShapeDrawable(new OvalShape());
+        srcRect = new RectF();
+
+        if (null != mDrawable) {
+            mDrawable.setColorFilter(mBackgroundColor, PorterDuff.Mode.SRC_IN);
+            mBitmapSrc = ((BitmapDrawable)mDrawable).getBitmap();
         }
-        mDrawable.setColorFilter(mBackgroundColor, PorterDuff.Mode.SRC_IN);
+        xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP);
+        colorFilter = new PorterDuffColorFilter(mBackgroundColor, PorterDuff.Mode.SRC_ATOP);
 
         mDefaultPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
         mMaxProgress = DEFAULT_PROGRESS_MAX;
-        progressValue = 60;
-        progressText = String.valueOf(progressValue) + "%";
+        mProgressValue = DEFAULT_PROGRESS_VALUE;
+        mProgressText = String.valueOf(mProgressValue) + DEFAULT_PROGRESS_POSTFIX;
 
         mWaveAnimator = ValueAnimator.ofFloat(0.0f);
         mWaveAnimator.setInterpolator(new LinearInterpolator());
@@ -184,7 +192,6 @@ public class WaveProgressBar extends View {
         super.onDraw(canvas);
         drawWave(canvas);
         drawText(canvas);
-        drawDrop(canvas);
         if (!mWaveAnimator.isRunning()) {
             Log.d(TAG, "onDraw: start animation!");
             mWaveAnimator.start();
@@ -192,17 +199,22 @@ public class WaveProgressBar extends View {
     }
 
     private void drawWave(Canvas canvas) {
-        canvas.save();
-        canvas.translate(mCenterX, mCenterY);
-        /***    Draw backgound    ***/
-        mDrawable.setBounds(-mCenterX, -mCenterY, mCenterX, mCenterY);
-        mDrawable.draw(canvas);
-        canvas.restore();
-        /***    Draw progress   ***/
-        currentY = mHeight * (mMaxProgress - progressValue) / mMaxProgress;
-        canvas.save();
+        int count = canvas.saveLayer(null, mFillPaint, Canvas.ALL_SAVE_FLAG);
+        currentY = mHeight * (mMaxProgress - mProgressValue) / mMaxProgress;
         canvas.translate(0, currentY);
-        mFillPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        /***    Draw backgound    ***/
+        mFillPaint.setColorFilter(colorFilter);
+        if (null != mDrawable) {
+            srcRect.set(getPaddingLeft(), mCenterY - currentY - mRadius,
+                    getPaddingLeft() + 2 * mRadius, mCenterY - currentY + mRadius);
+            canvas.drawBitmap(mBitmapSrc, null, srcRect, mFillPaint);
+        } else {
+            canvas.drawCircle(mCenterX, mCenterY - currentY, mRadius, mFillPaint);
+        }
+        /***    Draw progress   ***/
+        mFillPaint.setColorFilter(null);
+        mFillPaint.setColor(mFillColor);
+        mFillPaint.setXfermode(xfermode);
         mFillPath.reset();
         mFillPath.moveTo(-mWaveOffsetX, 0);
         int waveNum = mWidth / ((int) mHalfWaveWidth * 4) + 1;
@@ -217,19 +229,40 @@ public class WaveProgressBar extends View {
         mFillPath.lineTo(0, mHeight);
         mFillPath.close();
         canvas.drawPath(mFillPath, mFillPaint);
-        canvas.restore();
+        mFillPaint.setXfermode(null);
+        canvas.restoreToCount(count);
     }
 
     private void drawText(Canvas canvas) {
         canvas.save();
         canvas.translate(mCenterX, mCenterY);
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        canvas.drawText(progressText, 0, -(fontMetrics.descent + fontMetrics.ascent)*0.5f ,
+        canvas.drawText(mProgressText, 0, -(fontMetrics.descent + fontMetrics.ascent)*0.5f ,
                 mTextPaint);
         canvas.restore();
     }
 
-    private void drawDrop(Canvas canvas) {
+    public int getMaxProgress() {
+        return mMaxProgress;
+    }
 
+    public void setMaxProgress(int mMaxProgress) {
+        this.mMaxProgress = mMaxProgress;
+    }
+
+    public int getProgressValue() {
+        return mProgressValue;
+    }
+
+    public void setProgressValue(int mProgressValue) {
+        this.mProgressValue = mProgressValue;
+        this.mProgressText = String.valueOf(mProgressValue) + DEFAULT_PROGRESS_POSTFIX;
+        invalidate();
+    }
+
+    public void setProgressValue(int mProgressValue, String text) {
+        this.mProgressValue = mProgressValue;
+        this.mProgressText = text;
+        invalidate();
     }
 }

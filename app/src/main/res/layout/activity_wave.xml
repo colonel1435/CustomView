@@ -18,7 +18,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:wave_progress_fill_color="@color/colorLightBlue"
         app:wave_progress_text_color="@color/colorWhite"
-        app:wave_progress_text_size="20sp" />
+        app:wave_progress_text_size="20sp"
+        app:wave_progress="48"/>
 
     <SeekBar
         android:id="@+id/seek_bar"

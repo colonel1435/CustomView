@@ -8,5 +8,7 @@
         <attr name="wave_progress_background" format="integer|reference"/>
         <attr name="wave_progress_src" format="reference"/>
         <attr name="wave_progress_wave_velocity" format="float|reference"/>
+        <attr name="wave_progress" format="integer|reference"/>
+        <attr name="wave_process_max" format="integer|reference"/>
     </declare-styleable>
 </resources>

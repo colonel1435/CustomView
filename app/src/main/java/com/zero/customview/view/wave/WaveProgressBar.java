@@ -106,6 +106,10 @@ public class WaveProgressBar extends View implements IWaveView{
         mWaveVelocity = ta.getFloat(R.styleable.WaveProgressBar_wave_progress_wave_velocity,
                 DEFAULT_WAVE_VELOCITY);
         mDrawable = ta.getDrawable(R.styleable.WaveProgressBar_wave_progress_src);
+        mMaxProgress = ta.getInt(R.styleable.WaveProgressBar_wave_process_max,
+                DEFAULT_PROGRESS_MAX);
+        mProgressValue = ta.getInt(R.styleable.WaveProgressBar_wave_progress,
+                DEFAULT_PROGRESS_VALUE);
         ta.recycle();
         initView();
     }
@@ -133,8 +137,6 @@ public class WaveProgressBar extends View implements IWaveView{
         colorFilter = new PorterDuffColorFilter(mBackgroundColor, PorterDuff.Mode.SRC_ATOP);
 
         mDefaultPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
-        mMaxProgress = DEFAULT_PROGRESS_MAX;
-        mProgressValue = DEFAULT_PROGRESS_VALUE;
         mProgressText = String.valueOf(mProgressValue) + DEFAULT_PROGRESS_POSTFIX;
 
         mWaveAnimator = ValueAnimator.ofFloat(0.0f);

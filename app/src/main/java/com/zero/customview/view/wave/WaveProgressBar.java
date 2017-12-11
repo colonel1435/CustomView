@@ -1,5 +1,6 @@
-package com.zero.customview.view;
+package com.zero.customview.view.wave;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -34,7 +35,7 @@ import static android.animation.ValueAnimator.INFINITE;
  * @date : 2017/12/8 0008 14:58
  */
 
-public class WaveProgressBar extends View {
+public class WaveProgressBar extends View implements IWaveView{
     private final String TAG = this.getClass().getSimpleName()+"@wuming";
     private final static float DEFAULT_TEXT_SIZE = 12;
     private final static int DEFAULT_WIDTH = 256;
@@ -43,7 +44,7 @@ public class WaveProgressBar extends View {
     private final static int DEFAULT_PROGRESS_MAX = 100;
     private final static int DEFAULT_PROGRESS_VALUE = 0;
     private final static float DEFAULT_WAVE_VELOCITY = 30f;
-    private final static long DEFAULT_ANIMATION_DURATION = 1000000;
+    private final static long DEFAULT_ANIMATION_DURATION = 1000;
     private final static String DEFAULT_PROGRESS_POSTFIX = "%";
     private Context mContext;
 
@@ -190,15 +191,16 @@ public class WaveProgressBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawWave(canvas);
+        drawFacade(canvas);
         drawText(canvas);
         if (!mWaveAnimator.isRunning()) {
             Log.d(TAG, "onDraw: start animation!");
-            mWaveAnimator.start();
+            startAnimator(mWaveAnimator);
         }
     }
 
-    private void drawWave(Canvas canvas) {
+    @Override
+    public void drawFacade(Canvas canvas) {
         int count = canvas.saveLayer(null, mFillPaint, Canvas.ALL_SAVE_FLAG);
         currentY = mHeight * (mMaxProgress - mProgressValue) / mMaxProgress;
         canvas.translate(0, currentY);
@@ -233,13 +235,19 @@ public class WaveProgressBar extends View {
         canvas.restoreToCount(count);
     }
 
-    private void drawText(Canvas canvas) {
+    @Override
+    public void drawText(Canvas canvas) {
         canvas.save();
         canvas.translate(mCenterX, mCenterY);
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         canvas.drawText(mProgressText, 0, -(fontMetrics.descent + fontMetrics.ascent)*0.5f ,
                 mTextPaint);
         canvas.restore();
+    }
+
+    @Override
+    public void startAnimator(Animator animator) {
+        animator.start();
     }
 
     public int getMaxProgress() {

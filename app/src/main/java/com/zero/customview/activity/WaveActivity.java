@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.SeekBar;
 
 import com.zero.customview.R;
-import com.zero.customview.view.WaveProgressBar;
+import com.zero.customview.view.wave.WaveProgressBar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

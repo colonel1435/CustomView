@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
 
     <application
         android:name=".activity.GlobalContext"
@@ -78,6 +80,10 @@
         <activity android:name=".activity.FlipActivity" />
         <activity android:name=".activity.WaveActivity" />
         <activity android:name=".activity.HelloMapActivity"></activity>
+        <activity
+            android:name=".offlinemap.OfflineMapActivity"
+            android:label="@string/offlinemap_demo"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -5,6 +5,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".activity.GlobalContext"
@@ -14,6 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="23cfe1389976d1059b70bb468b56533d">
+        </meta-data>
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
@@ -70,7 +76,8 @@
         <activity android:name=".activity.LikeViewActivity" />
         <activity android:name=".activity.RulerActivity" />
         <activity android:name=".activity.FlipActivity" />
-        <activity android:name=".activity.WaveActivity"></activity>
+        <activity android:name=".activity.WaveActivity" />
+        <activity android:name=".activity.HelloMapActivity"></activity>
     </application>
 
 </manifest>

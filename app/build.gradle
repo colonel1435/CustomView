@@ -2,20 +2,42 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    signingConfigs {
+        ZeroDebug {
+            keyAlias 'ZeroDebug'
+            keyPassword 'zerodebug'
+            storeFile file('E:/workspace/code/project/sunland/keys/ZeroDebug.jks')
+            storePassword 'zerodebug'
+        }
+        ZeroRelease {
+            keyAlias 'ZeroRelease'
+            keyPassword 'zerorelease'
+            storeFile file('E:/workspace/code/project/sunland/keys/ZeroRelease.jks')
+            storePassword 'zerorelease'
+        }
+    }
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.zero.customview"
         minSdkVersion 17
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a"
+        }
+        multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.ZeroRelease
+        }
+        debug {
+            signingConfig signingConfigs.ZeroDebug
         }
     }
 }
@@ -25,27 +47,29 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.orhanobut:logger:1.15'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'cn.pedant.sweetalert:library:1.3'
     compile 'com.github.chrisbanes.photoview:library:1.2.4'
     compile 'com.github.ctiao:DanmakuFlameMaster:0.9.12'
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.1.3'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     compile 'io.github.rockerhieu:emojicon:1.4.2'
-    compile 'com.android.support:support-v4:24.2.1'
-    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-v4:25.3.1'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.airbnb.android:lottie:1.0.1'
     compile 'com.facebook.stetho:stetho:1.4.1'
     compile 'com.facebook.stetho:stetho-okhttp3:1.4.1'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
+    compile 'com.amap.api:navi-3dmap:5.0.0'
+    compile 'com.amap.api:search:5.5.0'
+    compile 'com.amap.api:location:3.6.1'
 }

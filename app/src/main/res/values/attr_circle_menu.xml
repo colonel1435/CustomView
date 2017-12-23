@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleMenuView">
+        <attr name="circle_menu_backgoundColor" format="color|reference"/>
+        <attr name="circle_menu_touchColor" format="color|reference"/>
+        <attr name="circle_menu_textColor" format="color|reference"/>
+        <attr name="circle_menu_textSize" format="dimension|reference"/>
+        <attr name="circle_menu_textTop" format="string|reference"/>
+        <attr name="circle_menu_textBottom" format="string|reference"/>
+        <attr name="circle_menu_textLeft" format="string|reference"/>
+        <attr name="circle_menu_textRight" format="string|reference"/>
+        <attr name="circle_menu_textCenter" format="string|reference"/>
+        <attr name="circle_menu_enableRotate" format="boolean"/>
+    </declare-styleable>
+</resources>

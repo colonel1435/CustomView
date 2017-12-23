@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+    <com.zero.customview.view.CircleMenuView
+        android:id="@+id/circle_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:circle_menu_backgoundColor="@color/colorLightBlue"
+        app:circle_menu_touchColor="@color/colorOrange"
+        app:circle_menu_textSize="8sp"
+        app:circle_menu_textCenter="@string/circle_menu_center"
+        app:circle_menu_textTop="@string/circle_menu_top"
+        app:circle_menu_textBottom="@string/circle_menu_bottom"
+        app:circle_menu_textLeft="@string/circle_menu_left"
+        app:circle_menu_textRight="@string/circle_menu_right"/>
+</android.support.constraint.ConstraintLayout>

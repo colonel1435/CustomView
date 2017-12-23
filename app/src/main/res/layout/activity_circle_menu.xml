@@ -15,6 +15,9 @@
         android:id="@+id/circle_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        app:circle_menu_backgoundColor="@color/colorLightBlue"
+        app:circle_menu_touchColor="@color/colorOrange"
+        app:circle_menu_textSize="12sp"/>
 
 </LinearLayout>

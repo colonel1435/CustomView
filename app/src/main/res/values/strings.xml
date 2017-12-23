@@ -59,4 +59,9 @@
     <string name="open_gl_none">不支持OPENGL</string>
     <string name="title_activity_circle_menu">CircleMenuActivity</string>
     <string name="title_activity_bottom_bar">BottomBarActivity</string>
+    <string name="circle_menu_center">取消</string>
+    <string name="circle_menu_top">设备</string>
+    <string name="circle_menu_bottom">删除</string>
+    <string name="circle_menu_left">详情</string>
+    <string name="circle_menu_right">平面图</string>
 </resources>

@@ -1,19 +1,21 @@
 package com.zero.customview.view;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.ProviderInfo;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.zero.customview.R;
 import com.zero.customview.utils.DisplayUtils;
 
 /**
@@ -24,13 +26,27 @@ import com.zero.customview.utils.DisplayUtils;
  */
 
 public class CircleMenuView extends View {
-    enum  POSITION {NONE, TOP, BOTTOM, LEFT, RIGHT, CENTER};
 
+    private static final String TAG = CircleMenuView.class.getSimpleName()+"@wumin";
+    public static final int DEFAULT_WIDTH = 480;
+
+    enum TYPE {NONE, RIGHT, BOTTOM, LEFT, TOP, CENTER}
+
+    private static final float DEFAULT_TEXT_SIZE = 12;
+    private static final String DEFAULT_TEXT_CENTER = "OK";
+    private static final String DEFAULT_TEXT_TOP = "Top";
+    private static final String DEFAULT_TEXT_BOTTOM = "Bottom";
+    private static final String DEFAULT_TEXT_LEFT = "Left";
+    private static final String DEFAULT_TEXT_RIGHT = "Right";
+    private static final int DEFAULT_ANIMATION_DURATION = 100;
+    private static final int DEFAULT_SCALE_INDEX = 10;
+    private static final int DEFAULT_OUTTER_ANGLE = 84;
+    private static final int DEFAULT_INNER_ANGLE = 80;
+    private static final int DEFAULT_SPACE_ANGLE = 10;
     private Context mContext;
     private Paint mPaint;
     private Paint mTextPaint;
     private Paint.FontMetricsInt fontMetrics;
-    private Matrix mMatrix;
 
     private Path centerPath;
     private Path topPath;
@@ -43,30 +59,38 @@ public class CircleMenuView extends View {
     private Region bottomRegion;
     private Region leftRegion;
     private Region rightRegion;
+    private Region globalRegion;
 
-    private String centerText = "OK";
-    private String topText = "Top";
-    private String bottomText = "Bottom";
-    private String leftText = "Left";
-    private String rightText = "Right";
-    private int touchPosition = -1;
-    private int currentPosition = -1;
+    private RectF outCircle;
+    private RectF innerCircle;
+    private String centerText;
+    private String topText;
+    private String bottomText;
+    private String leftText;
+    private String rightText;
+    private int touchType = -1;
+    private int currentType = -1;
 
-    private int regionColor = 0xFF4699A3;
-    private int touchColor = 0XFFE67B63;
-    private int textColor = 0XFFFFFFFF;
-
-    private int textSize = 12;
+    private int regionColor;
+    private int touchColor;
+    private int textColor;
+    private int touchDrawColor;
+    private float textSize;
 
     private int mWidth;
     private int mHeight;
+    private int mCenterX;
+    private int mCenterY;
 
     private int outRadius;
     private int innerRadius;
     private float centerRadius;
+    private float mOutAngle;
+    private float mInnerAngle;
 
-    private int down_x;
-    private int down_y;
+    private boolean enableRotate;
+
+    private float scaleIndex;
     private onMenuClickListener mClickListener;
     public CircleMenuView(Context context) {
         this(context, null);
@@ -79,6 +103,22 @@ public class CircleMenuView extends View {
     public CircleMenuView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CircleMenuView);
+        touchColor = ta.getColor(R.styleable.CircleMenuView_circle_menu_touchColor,
+                Color.YELLOW);
+        regionColor = ta.getColor(R.styleable.CircleMenuView_circle_menu_backgoundColor,
+                Color.BLUE);
+        textColor = ta.getColor(R.styleable.CircleMenuView_circle_menu_textColor,
+                Color.WHITE);
+        textSize = ta.getDimension(R.styleable.CircleMenuView_circle_menu_textSize,
+                DEFAULT_TEXT_SIZE);
+        centerText = ta.getString(R.styleable.CircleMenuView_circle_menu_textCenter);
+        topText = ta.getString(R.styleable.CircleMenuView_circle_menu_textTop);
+        bottomText = ta.getString(R.styleable.CircleMenuView_circle_menu_textBottom);
+        leftText = ta.getString(R.styleable.CircleMenuView_circle_menu_textLeft);
+        rightText = ta.getString(R.styleable.CircleMenuView_circle_menu_textRight);
+        enableRotate = ta.getBoolean(R.styleable.CircleMenuView_circle_menu_enableRotate, true);
+        ta.recycle();
         initView();
     }
 
@@ -93,8 +133,6 @@ public class CircleMenuView extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         fontMetrics = mTextPaint.getFontMetricsInt();
 
-        mMatrix = new Matrix();
-
         topPath = new Path();
         bottomPath = new Path();
         leftPath = new Path();
@@ -106,6 +144,30 @@ public class CircleMenuView extends View {
         leftRegion = new Region();
         rightRegion = new Region();
         centerRegion = new Region();
+        scaleIndex = DisplayUtils.dip2px(mContext, DEFAULT_SCALE_INDEX);
+        mOutAngle = DEFAULT_OUTTER_ANGLE;
+        mInnerAngle = -DEFAULT_INNER_ANGLE;
+
+        touchDrawColor = touchColor;
+        checkMenuText();
+    }
+
+    private void checkMenuText() {
+        if (TextUtils.isEmpty(centerText)) {
+            centerText = DEFAULT_TEXT_CENTER;
+        }
+        if (TextUtils.isEmpty(topText)) {
+            topText = DEFAULT_TEXT_TOP;
+        }
+        if (TextUtils.isEmpty(bottomText)) {
+            bottomText = DEFAULT_TEXT_BOTTOM;
+        }
+        if (TextUtils.isEmpty(leftText)) {
+            leftText = DEFAULT_TEXT_LEFT;
+        }
+        if (TextUtils.isEmpty(rightText)) {
+            rightText = DEFAULT_TEXT_RIGHT;
+        }
     }
 
     public void setMenuClickListener(onMenuClickListener clickListener) {
@@ -113,15 +175,14 @@ public class CircleMenuView extends View {
     }
 
     private int measureSize(int measureSpec) {
-        int defaultSize = 480;
-        int result = 0;
+        int defaultSize = DEFAULT_WIDTH;
+        int result;
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
 
         if (specMode == MeasureSpec.EXACTLY) {
             result = specSize;
         } else {
-            // Measure the text
             result = defaultSize + getPaddingLeft() + getPaddingRight();
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
@@ -141,138 +202,138 @@ public class CircleMenuView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         mWidth = w;
         mHeight = h;
-
-        mMatrix.reset();
-        Region globalRegion = new Region(-w, -h, w, h);
-        int minWidth = Math.min(w, h);
+        mCenterX = w / 2 + getPaddingLeft() - getPaddingRight();
+        mCenterY = h / 2 + getPaddingTop() - getPaddingBottom();
+        globalRegion = new Region(0, 0, mWidth, mHeight);
+        int minWidth = Math.min(mWidth, mHeight);
         minWidth *= 0.8;
         centerRadius = minWidth / 5;
         outRadius = minWidth / 2;
-        RectF outCircle = new RectF(-outRadius, -outRadius, outRadius, outRadius);
+        outCircle = new RectF(mCenterX - outRadius, mCenterY - outRadius,
+                                mCenterX + outRadius, mCenterY + outRadius);
         innerRadius = minWidth / 4;
-        RectF innerCircle = new RectF(-innerRadius, -innerRadius, innerRadius, innerRadius);
-
-        float outAngle = 84;
-        float innerAngle = -80;
-
-        centerPath.addCircle(0, 0, centerRadius, Path.Direction.CW);
-        centerRegion.setPath(centerPath, globalRegion);
-
-        rightPath.addArc(outCircle, -40, outAngle);
-        rightPath.arcTo(innerCircle, 40, innerAngle);
-        rightPath.close();
-        rightRegion.setPath(rightPath, globalRegion);
-
-        bottomPath.addArc(outCircle, 50, outAngle);
-        bottomPath.arcTo(innerCircle, 130, innerAngle);
-        bottomPath.close();
-        bottomRegion.setPath(bottomPath, globalRegion);
-
-        leftPath.addArc(outCircle, 140, outAngle);
-        leftPath.arcTo(innerCircle, 220, innerAngle);
-        leftPath.close();
-        leftRegion.setPath(leftPath, globalRegion);
-
-        topPath.addArc(outCircle, 230, outAngle);
-        topPath.arcTo(innerCircle, 310, innerAngle);
-        topPath.close();
-        topRegion.setPath(topPath, globalRegion);
-
+        innerCircle = new RectF(mCenterX - innerRadius, mCenterY - innerRadius,
+                                    mCenterX + innerRadius, mCenterY + innerRadius);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.translate(mWidth / 2, mHeight / 2);
+        drawSector(canvas);
+        drawText(canvas);
+    }
 
-        if (mMatrix.isIdentity()) {
-            canvas.getMatrix().invert(mMatrix);
-        }
-
+    private void drawSector(Canvas canvas) {
+        setupSector();
+        mPaint.setColor(regionColor);
         canvas.drawPath(topPath, mPaint);
         canvas.drawPath(bottomPath, mPaint);
         canvas.drawPath(leftPath, mPaint);
         canvas.drawPath(rightPath, mPaint);
         canvas.drawPath(centerPath, mPaint);
 
-        mPaint.setColor(touchColor);
-        if (touchPosition == POSITION.TOP.ordinal()) {
-            canvas.drawPath(topPath, mPaint);
-        }else if(touchPosition == POSITION.BOTTOM.ordinal()) {
-            canvas.drawPath(bottomPath, mPaint);
-        } else if (touchPosition == POSITION.LEFT.ordinal()) {
-            canvas.drawPath(leftPath, mPaint);
-        } else if (touchPosition == POSITION.RIGHT.ordinal()) {
-            canvas.drawPath(rightPath, mPaint);
-        } else if (touchPosition == POSITION.CENTER.ordinal()) {
-            canvas.drawPath(centerPath, mPaint);
+        Path touchPath = getTouchPath();
+        if (null != touchPath) {
+            mPaint.setColor(touchDrawColor);
+            canvas.drawPath(touchPath, mPaint);
         }
-        mPaint.setColor(regionColor);
+    }
 
-        float baselineY = -(fontMetrics.ascent + fontMetrics.descent)/2;
+    private void setupSector() {
+        centerPath.addCircle(mCenterX, mCenterY, centerRadius, Path.Direction.CW);
+        centerRegion.setPath(centerPath, globalRegion);
+        rightPath = getSectorWithType(TYPE.RIGHT.ordinal());
+        rightRegion.setPath(rightPath, globalRegion);
+        bottomPath = getSectorWithType(TYPE.BOTTOM.ordinal());
+        bottomRegion.setPath(bottomPath, globalRegion);
+        leftPath = getSectorWithType(TYPE.LEFT.ordinal());
+        leftRegion.setPath(leftPath, globalRegion);
+        topPath = getSectorWithType(TYPE.TOP.ordinal());
+        topRegion.setPath(topPath, globalRegion);
+    }
+
+    private Path getSectorWithType(int type) {
+        Path path = new Path();
+        RectF outRectf = new RectF(outCircle);
+        RectF inRectf = new RectF(innerCircle);
+        float startAngle = mInnerAngle / 2;
+        if (type == touchType) {
+            outRectf.inset(-scaleIndex, -scaleIndex);
+        }
+        path.addArc(outRectf, startAngle + (type - 1) * DEFAULT_INNER_ANGLE +
+                (type - 1) * DEFAULT_SPACE_ANGLE, mOutAngle);
+        path.arcTo(inRectf, startAngle + type * DEFAULT_INNER_ANGLE +
+                (type - 1) * DEFAULT_SPACE_ANGLE, mInnerAngle);
+        path.close();
+        return path;
+    }
+
+    private Path getTouchPath() {
+        Path touchPath = null;
+        if (touchType == TYPE.TOP.ordinal()) {
+            touchPath = topPath;
+        }else if(touchType == TYPE.BOTTOM.ordinal()) {
+            touchPath = bottomPath;
+        } else if (touchType == TYPE.LEFT.ordinal()) {
+            touchPath = leftPath;
+        } else if (touchType == TYPE.RIGHT.ordinal()) {
+            touchPath = rightPath;
+        } else if (touchType == TYPE.CENTER.ordinal()) {
+            touchPath = centerPath;
+        }
+
+        return touchPath;
+    }
+
+    private void drawText(Canvas canvas) {
+        float baselineY = (fontMetrics.descent + fontMetrics.ascent)/2;
         int offset = outRadius * 3 / 4;
-        canvas.drawText(topText, 0, -offset, mTextPaint);
-        canvas.drawText(bottomText,  0, offset, mTextPaint);
-        canvas.drawText(leftText, -offset, baselineY, mTextPaint);
-        canvas.drawText(rightText, offset, baselineY, mTextPaint);
-        canvas.drawText(centerText, 0, baselineY, mTextPaint);
-
-        canvas.drawLine(-mWidth/2, 0, mWidth/2, 0, mTextPaint);
-        canvas.drawLine(0, -mHeight/2, 0, mHeight/2, mTextPaint);
-//        canvas.drawCircle(down_x, down_y, 20, mPaint);
+        canvas.drawText(topText, mCenterX, mCenterY - offset - baselineY, mTextPaint);
+        canvas.drawText(bottomText,  mCenterX, mCenterY + offset - baselineY, mTextPaint);
+        canvas.drawText(leftText, mCenterX - offset, mCenterY - baselineY, mTextPaint);
+        canvas.drawText(rightText, mCenterX + offset, mCenterY - baselineY, mTextPaint);
+        canvas.drawText(centerText, mCenterX, mCenterY - baselineY, mTextPaint);
     }
 
-    private int getTouchPosition(int x, int y) {
-        int position = POSITION.NONE.ordinal();
+    private int getTouchType(int x, int y) {
+        int type = TYPE.NONE.ordinal();
         if (centerRegion.contains(x, y)) {
-            position = POSITION.CENTER.ordinal();
+            type = TYPE.CENTER.ordinal();
         } else if (topRegion.contains(x, y)) {
-            position = POSITION.TOP.ordinal();
+            type = TYPE.TOP.ordinal();
         } else if (bottomRegion.contains(x, y)) {
-            position = POSITION.BOTTOM.ordinal();
+            type = TYPE.BOTTOM.ordinal();
         } else if (leftRegion.contains(x, y)) {
-            position = POSITION.LEFT.ordinal();
+            type = TYPE.LEFT.ordinal();
         } else if (rightRegion.contains(x, y)) {
-            position = POSITION.RIGHT.ordinal();
+            type = TYPE.RIGHT.ordinal();
         }
 
-        return position;
+        return type;
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float[] pts = new float[2];
-        pts[0] = event.getRawX();
-        pts[1] = event.getRawY();
-        mMatrix.mapPoints(pts);
-
-        int x = (int) pts[0];
-        int y = (int) pts[1];
+        int x = (int) event.getX();
+        int y = (int) event.getY();
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                touchPosition = getTouchPosition(x, y);
-                currentPosition = touchPosition;
+                touchType = getTouchType(x, y);
+                currentType = touchType;
+                invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-                currentPosition = getTouchPosition(x, y);
+                currentType = getTouchType(x, y);
                 break;
             case MotionEvent.ACTION_UP:
-                currentPosition = getTouchPosition(x, y);
-                if (currentPosition == touchPosition
-                        && currentPosition != -1
+                currentType = getTouchType(x, y);
+                if (currentType == touchType
+                        && currentType != -1
                         && mClickListener != null) {
-                    if (currentPosition == POSITION.CENTER.ordinal()) {
-                        mClickListener.onCenterClick();
-                    } else if (currentPosition == POSITION.TOP.ordinal()) {
-                        mClickListener.onTopClick();
-                    } else if (currentPosition == POSITION.BOTTOM.ordinal()) {
-                        mClickListener.onBottomClick();
-                    } else if (currentPosition == POSITION.LEFT.ordinal()) {
-                        mClickListener.onLeftClick();
-                    } else if (currentPosition == POSITION.RIGHT.ordinal()) {
-                        mClickListener.onRightClick();
-                    }
+                    startClickListener(currentType);
                 }
-                currentPosition = touchPosition = -1;
+                currentType = touchType = -1;
+                invalidate();
                 break;
             case MotionEvent.ACTION_CANCEL:
                 break;
@@ -280,17 +341,117 @@ public class CircleMenuView extends View {
                 break;
         }
 
-        down_x = x;
-        down_y = y;
-        invalidate();
         return true;
     }
 
+    private void startClickListener(int currentPosition) {
+        if (currentPosition == TYPE.CENTER.ordinal()) {
+            mClickListener.onCenterClick();
+        } else if (currentPosition == TYPE.TOP.ordinal()) {
+            mClickListener.onTopClick();
+        } else if (currentPosition == TYPE.BOTTOM.ordinal()) {
+            mClickListener.onBottomClick();
+        } else if (currentPosition == TYPE.LEFT.ordinal()) {
+            mClickListener.onLeftClick();
+        } else if (currentPosition == TYPE.RIGHT.ordinal()) {
+            mClickListener.onRightClick();
+        }
+    }
+
+    private void setScaleIndex(float scale) {
+        this.scaleIndex = scale;
+        Log.d(TAG, "setScaleIndex: " + scaleIndex);
+        invalidate();
+    }
+
+    public int getTouchDrawColor() {
+        return touchDrawColor;
+    }
+
+    public void setTouchDrawColor(int touchDrawColor) {
+        this.touchDrawColor = touchDrawColor;
+        invalidate();
+    }
+
+    public CircleMenuView setRegionColor(int regionColor) {
+        this.regionColor = regionColor;
+        return this;
+    }
+
+    public CircleMenuView setTouchColor(int touchColor) {
+        this.touchColor = touchColor;
+        return this;
+    }
+
+    public CircleMenuView setTextColor(int textColor) {
+        this.textColor = textColor;
+        return this;
+    }
+
+    public CircleMenuView setTextSize(float textSize) {
+        this.textSize = textSize;
+        return this;
+    }
+
+    public CircleMenuView setCenterText(String centerText) {
+        this.centerText = centerText;
+        return this;
+    }
+
+    public CircleMenuView setTopText(String topText) {
+        this.topText = topText;
+        return this;
+    }
+
+    public CircleMenuView setBottomText(String bottomText) {
+        this.bottomText = bottomText;
+        return this;
+    }
+
+    public CircleMenuView setLeftText(String leftText) {
+        this.leftText = leftText;
+        return this;
+    }
+
+    public CircleMenuView setRightText(String rightText) {
+        this.rightText = rightText;
+        return this;
+    }
+
+    public void build() {
+        requestLayout();
+    }
+
     public interface onMenuClickListener {
+        /**
+        *   Center click listener
+        * @param
+        * @return
+        */
         void onCenterClick();
+        /**
+        *   Top click listener
+        * @param
+        * @return
+        */
         void onTopClick();
+        /**
+        *   Bottom click listener
+        * @param
+        * @return
+        */
         void onBottomClick();
+        /**
+        *   Left click listener
+        * @param
+        * @return
+        */
         void onLeftClick();
+        /**
+        *   Right click listener
+        * @param
+        * @return
+        */
         void onRightClick();
     }
 }

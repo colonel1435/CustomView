@@ -7,6 +7,8 @@ import android.support.v7.widget.Toolbar;
 
 import com.zero.customview.R;
 import com.zero.customview.utils.TipUtils;
+import com.zero.customview.utils.ToastUtil;
+import com.zero.customview.view.CircleMenuDialog;
 import com.zero.customview.view.CircleMenuView;
 
 import butterknife.BindView;
@@ -40,29 +42,66 @@ public class CircleMenuActivity extends AppCompatActivity {
         circleMenu.setMenuClickListener(new CircleMenuView.onMenuClickListener() {
             @Override
             public void onCenterClick() {
-                TipUtils.showTip(mContext, "Message", "CENTER CLICKED!");
+                ToastUtil.showShortToast(mContext,"CENTER CLICKED!");
+                showTest1();
             }
 
             @Override
             public void onTopClick() {
-                TipUtils.showTip(mContext, "Message", "TOP CLICKED!");
+                ToastUtil.showShortToast(mContext,"TOP CLICKED!");
             }
 
             @Override
             public void onBottomClick() {
-                TipUtils.showTip(mContext, "Message", "BOTTOM CLICKED!");
+                ToastUtil.showShortToast(mContext,"BOTTOM CLICKED!");
             }
 
             @Override
             public void onLeftClick() {
-                TipUtils.showTip(mContext, "Message", "LEFT CLICKED!");
+                ToastUtil.showShortToast(mContext,"LEFT CLICKED!");
             }
 
             @Override
             public void onRightClick() {
-                TipUtils.showTip(mContext, "Message", "RIGHT CLICKED!");
+                ToastUtil.showShortToast(mContext,"RIGHT CLICKED!");
             }
         });
+    }
+
+    private void showTest1() {
+        final CircleMenuDialog dlg = CircleMenuDialog.newInstance();
+        dlg.setOnMenuClickListener(new CircleMenuView.onMenuClickListener() {
+            @Override
+            public void onCenterClick() {
+                dlg.dismiss();
+                ToastUtil.showShortToast(mContext, "Center");
+            }
+
+            @Override
+            public void onTopClick() {
+                dlg.dismiss();
+                ToastUtil.showShortToast(mContext, "Top");
+            }
+
+            @Override
+            public void onBottomClick() {
+                dlg.dismiss();
+                ToastUtil.showShortToast(mContext, "Bottom");
+            }
+
+            @Override
+            public void onLeftClick() {
+                dlg.dismiss();
+                ToastUtil.showShortToast(mContext, "left");
+            }
+
+            @Override
+            public void onRightClick() {
+                dlg.dismiss();
+                ToastUtil.showShortToast(mContext, "right");
+            }
+        });
+        dlg.show(getFragmentManager(), "menu");
     }
 
 }

@@ -11,7 +11,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.zero.customview.R;
+import com.zero.customview.adapter.banner.DepthPageTransformer;
 import com.zero.customview.adapter.banner.ScalePageTransformer;
+import com.zero.customview.adapter.banner.ZoomOutPageTransformer;
 import com.zero.customview.fragment.banner.BannerFragment;
 import com.zero.customview.utils.DisplayUtils;
 
@@ -57,7 +59,10 @@ public class BannerActivity extends AppCompatActivity {
         viewpager.setAdapter(mPagerAdapter);
         viewpager.setOffscreenPageLimit(3);
         viewpager.setPageTransformer(false,
-                new ScalePageTransformer());
+                new ZoomOutPageTransformer());
+//                new DepthPageTransformer());
+//                new ScalePageTransformer());
+
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {

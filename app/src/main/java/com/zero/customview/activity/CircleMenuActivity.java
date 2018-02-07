@@ -1,14 +1,17 @@
 package com.zero.customview.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.PopupWindow;
 
 import com.zero.customview.R;
 import com.zero.customview.utils.TipUtils;
 import com.zero.customview.utils.ToastUtil;
 import com.zero.customview.view.CircleMenuDialog;
+import com.zero.customview.view.CircleMenuPopupWindow;
 import com.zero.customview.view.CircleMenuView;
 
 import butterknife.BindView;
@@ -49,6 +52,7 @@ public class CircleMenuActivity extends AppCompatActivity {
             @Override
             public void onTopClick() {
                 ToastUtil.showShortToast(mContext,"TOP CLICKED!");
+                showTest2();
             }
 
             @Override
@@ -104,4 +108,40 @@ public class CircleMenuActivity extends AppCompatActivity {
         dlg.show(getFragmentManager(), "menu");
     }
 
+    private void showTest2() {
+        final CircleMenuPopupWindow window = new CircleMenuPopupWindow(mContext);
+        window.setDismissListener(this, new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                window.dismiss(CircleMenuActivity.this);
+            }
+        });
+        window.setMenuClickListener(new CircleMenuView.onMenuClickListener() {
+            @Override
+            public void onCenterClick() {
+                window.dismiss();
+            }
+
+            @Override
+            public void onTopClick() {
+                window.dismiss();
+            }
+
+            @Override
+            public void onBottomClick() {
+                window.dismiss();
+            }
+
+            @Override
+            public void onLeftClick() {
+                window.dismiss();
+            }
+
+            @Override
+            public void onRightClick() {
+                window.dismiss();
+            }
+        });
+        window.show(this, getWindow().getDecorView());
+    }
 }

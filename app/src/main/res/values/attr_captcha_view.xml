@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CaptchaView">
+        <attr name="captcha_src" format="reference"/>
+        <attr name="captcha_tips" format="string|reference"/>
+        <attr name="captcha_tip_color" format="integer|reference"/>
+        <attr name="captcha_tip_size" format="float|reference"/>
+    </declare-styleable>
+</resources>

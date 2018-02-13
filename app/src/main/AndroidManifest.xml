@@ -70,7 +70,8 @@
         <activity android:name=".activity.LikeViewActivity" />
         <activity android:name=".activity.RulerActivity" />
         <activity android:name=".activity.FlipActivity" />
-        <activity android:name=".activity.WaveActivity"></activity>
+        <activity android:name=".activity.WaveActivity" />
+        <activity android:name=".activity.CaptchaActivity"></activity>
     </application>
 
 </manifest>

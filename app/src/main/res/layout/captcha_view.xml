@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zero.customview.view.captcha.CaptchaView xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/captcha"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:showIn="@layout/activity_captcha">
+
+    <com.zero.customview.view.captcha.CaptchaImageView
+        android:id="@+id/captcha_image"
+        android:layout_width="match_parent"
+        android:layout_height="256dp"
+        android:scaleType="fitXY"
+        app:srcCompat="@mipmap/ic_love" />
+
+    <com.zero.customview.view.captcha.CaptchaSlideView
+        android:id="@+id/captcha_slide"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_margin="4dp"
+        android:thumbOffset="0dp"
+        android:progress="0"
+        android:max="100"
+        android:progressDrawable="@drawable/shape_round_seekbar"
+        android:thumb="@drawable/shape_seekbar_thumb"
+        app:captcha_tips="@string/captcha_tips" />
+</com.zero.customview.view.captcha.CaptchaView>

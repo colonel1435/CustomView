@@ -2,6 +2,7 @@ package com.zero.customview.activity;
 
 import android.app.Application;
 
+import com.squareup.leakcanary.LeakCanary;
 import com.zero.customview.utils.SharedPreferencesUtils;
 
 /**
@@ -15,6 +16,8 @@ public class GlobalContext extends Application {
         super.onCreate();
         context = this;
         SharedPreferencesUtils.config(this);
+
+        LeakCanary.install(this);
     }
     public static GlobalContext getInstance() {
         return context;

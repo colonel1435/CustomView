@@ -40,6 +40,7 @@
     <string name="ruler_view">Ruler</string>
     <string name="flip_view">Flip View</string>
     <string name="wave_view">Wave View</string>
+    <string name="captcha_view">Captcha View</string>
     <string name="anim_clicked_me">Click me</string>
     <string name="start_anim">Startup...</string>
     <string name="anim_shopping">Shopping</string>
@@ -64,4 +65,5 @@
     <string name="circle_menu_bottom">删除</string>
     <string name="circle_menu_left">详情</string>
     <string name="circle_menu_right">平面图</string>
+    <string name="captcha_tips">向左滑动完成验证</string>
 </resources>

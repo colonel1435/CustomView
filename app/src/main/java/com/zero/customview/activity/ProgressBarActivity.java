@@ -3,10 +3,10 @@ package com.zero.customview.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +23,14 @@ import com.zero.customview.R;
 import com.zero.customview.view.HorizontalProgressBar;
 import com.zero.customview.view.MultilevelProgressBar;
 import com.zero.customview.view.RoundProgressBar;
+import com.zero.customview.view.pregressbar.LineProgressBar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ProgressBarActivity extends AppCompatActivity {
+    @BindView(R.id.line_progress_bar)
+    LineProgressBar lineProgressBar;
     private Context mContext = null;
     private ProgressBar mProgressBar;
     private PopupWindow mPopupWindows;
@@ -43,6 +49,7 @@ public class ProgressBarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_bar);
+        ButterKnife.bind(this);
 
         initView();
     }
@@ -71,11 +78,11 @@ public class ProgressBarActivity extends AppCompatActivity {
 
     public void showSpeakDialog(View view) {
         View popupView = LayoutInflater.from(mContext).inflate(R.layout.popupwindow_voice, null);
-        mProgressLayout = (FrameLayout)popupView.findViewById(R.id.fl_progressbar);
-        mSpeakLayout = (LinearLayout)popupView.findViewById(R.id.ll_speak_image);
-        mSpeakErrLayout = (LinearLayout)popupView.findViewById(R.id.ll_speak_err);
-        mMsgText = (TextView)popupView.findViewById(R.id.tv_msg_text);
-        mMsgImage = (ImageView)popupView.findViewById(R.id.iv_msg_image);
+        mProgressLayout = (FrameLayout) popupView.findViewById(R.id.fl_progressbar);
+        mSpeakLayout = (LinearLayout) popupView.findViewById(R.id.ll_speak_image);
+        mSpeakErrLayout = (LinearLayout) popupView.findViewById(R.id.ll_speak_err);
+        mMsgText = (TextView) popupView.findViewById(R.id.tv_msg_text);
+        mMsgImage = (ImageView) popupView.findViewById(R.id.iv_msg_image);
         mPopupWindows = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mPopupWindows.setTouchable(true);
         mPopupWindows.setFocusable(true);
@@ -84,7 +91,7 @@ public class ProgressBarActivity extends AppCompatActivity {
         mPopupWindows.setAnimationStyle(R.style.popwindow_voice_anim);
         mPopupWindows.getBackground().setAlpha(50);
         dardBackground(this, 0.4f);
-        mPopupWindows.showAtLocation(view, Gravity.CENTER, 0 ,0);
+        mPopupWindows.showAtLocation(view, Gravity.CENTER, 0, 0);
         mPopupWindows.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
@@ -92,6 +99,7 @@ public class ProgressBarActivity extends AppCompatActivity {
             }
         });
     }
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -102,10 +110,13 @@ public class ProgressBarActivity extends AppCompatActivity {
                     int rProgress = mRoundProgress.getProgress();
                     mRoundProgress.setProgress(++rProgress);
                     mHorizontalProgress.setProgress(++progress);
+                    lineProgressBar.setProgress(progress);
                     if (progress >= 100) {
                         mHandler.removeMessages(HORIZONTAL_PROGRESSBAR_UPDATE);
                     }
                     mHandler.sendEmptyMessageDelayed(HORIZONTAL_PROGRESSBAR_UPDATE, 100);
+                    break;
+                default:
                     break;
             }
         }

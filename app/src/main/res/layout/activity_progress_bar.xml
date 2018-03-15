@@ -19,6 +19,16 @@
         wumin:progress_unreached_height="5dp"
         wumin:progress_reached_height="5dp"/>
 
+    <com.zero.customview.view.pregressbar.LineProgressBar
+        android:id="@+id/line_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        wumin:line_progress_reached_color="@color/colorGrassGreen"
+        wumin:line_progress_unreached_color="@color/colorAccent"
+        wumin:line_progress_reached_tag="已入库"/>
+
     <com.zero.customview.view.RoundProgressBar
         android:id="@+id/round_progress_bar"
         android:layout_width="wrap_content"

@@ -24,10 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:padding="8dp"
         wumin:line_progress_reached_color="@color/colorGrassGreen"
         wumin:line_progress_unreached_color="@color/colorAccent"
-        wumin:line_progress_reached_tag="已入库"/>
+        wumin:line_progress_tag_background="@color/colorLightBlue"/>
 
     <com.zero.customview.view.RoundProgressBar
         android:id="@+id/round_progress_bar"

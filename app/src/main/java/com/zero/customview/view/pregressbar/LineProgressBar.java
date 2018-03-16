@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -26,6 +27,7 @@ public class LineProgressBar extends View{
     private static final int DEFAULT_MIN = 0;
     private static final int DEFAULT_MAX = 100;
     private static final int DEFAULT_SIZE = 12;
+    private static final int DEFAULT_TAG_SIZE = 8;
     private static final float DEFAULT_BAR_HEIGHT = 8;
     private static final int DEFAULT_HEIGHT = 48;
     private static final int DEFAULT_WIDTH = 144;
@@ -41,6 +43,9 @@ public class LineProgressBar extends View{
     private String mUnReachedTag;
     private float mValueSize;
     private float mTagSize;
+    private int mTagColor;
+    private int mTagBackground;
+    private int mTagPadding;
     private float mBarHeight;
     private float mBarWidth;
 
@@ -81,7 +86,11 @@ public class LineProgressBar extends View{
             mValueSize = ta.getDimension(R.styleable.LineProgressBar_line_progress_text_size,
                     DisplayUtils.sp2px(context, DEFAULT_SIZE));
             mTagSize = ta.getDimension(R.styleable.LineProgressBar_line_progress_tag_size,
-                    DisplayUtils.sp2px(context, DEFAULT_SIZE));
+                    DisplayUtils.sp2px(context, DEFAULT_TAG_SIZE));
+            mTagColor = ta.getColor(R.styleable.LineProgressBar_line_progress_tag_color,
+                    Color.BLACK);
+            mTagBackground = ta.getColor(R.styleable.LineProgressBar_line_progress_tag_background,
+                    Color.WHITE);
             mProgressMax = ta.getInt(R.styleable.LineProgressBar_line_progress_max, DEFAULT_MAX);
             mProgressMin = ta.getInt(R.styleable.LineProgressBar_line_progress_min, DEFAULT_MIN);
             initViews();
@@ -101,11 +110,11 @@ public class LineProgressBar extends View{
         mBarPaint.setDither(true);
 
         mProgressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mProgressPaint.setTextSize(mTagSize);
+        mProgressPaint.setTextSize(mValueSize);
         mProgressPaint.setTextAlign(Paint.Align.CENTER);
 
         mTagPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTagPaint.setTextSize(mValueSize);
+        mTagPaint.setTextSize(mTagSize);
         mTagPaint.setTextAlign(Paint.Align.CENTER);
 
         mProgressMetrics = mProgressPaint.getFontMetrics();
@@ -113,7 +122,8 @@ public class LineProgressBar extends View{
 
         mProgress = 0;
         mDefaultPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
-        setPadding(mDefaultPadding, mDefaultPadding, mDefaultPadding, mDefaultPadding);
+        mTagPadding = mDefaultPadding / 2;
+        setPadding(mDefaultPadding*2, mDefaultPadding, mDefaultPadding*2, mDefaultPadding);
     }
 
     private int measureSize(int measureSpec, int defaultVal) {
@@ -155,14 +165,13 @@ public class LineProgressBar extends View{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mReachedPosition = mSpace * mProgress;
         drawBar(canvas);
         drawValue(canvas);
         drawTag(canvas);
     }
 
     private void drawBar(Canvas canvas) {
-        mReachedPosition = mSpace * mProgress;
-        Log.d(TAG, "drawBar: process -> " + mProgress +" DIST -> " + mReachedPosition);
         /**
          * Draw whole progress bar
          */
@@ -183,31 +192,34 @@ public class LineProgressBar extends View{
         /**
          * Draw min progress
          */
-        canvas.drawText(String.valueOf(mProgressMin), getPaddingLeft()
-                - mProgressPaint.measureText(String.valueOf(mProgressMin))/2, baseY, mProgressPaint);
-        /**
-         * Draw current progress
-         */
-        canvas.drawText(String.valueOf(mProgress), getPaddingLeft() + mReachedPosition
-                - mProgressPaint.measureText(String.valueOf(mProgress))/2, baseY, mProgressPaint);
+        canvas.drawText(String.valueOf(mProgressMin), getPaddingLeft(), baseY, mProgressPaint);
         /**
          * Draw max progress
          */
         canvas.drawText(String.valueOf(mProgressMax), getPaddingLeft()
-                + mSpace*(mProgressMax - mProgressMin)
-                - mProgressPaint.measureText(String.valueOf(mProgressMax))/2, baseY, mProgressPaint);
+                + mSpace*(mProgressMax - mProgressMin), baseY, mProgressPaint);
     }
 
     private void drawTag(Canvas canvas) {
-        if (null != mReachedTag || null != mUnReachedTag) {
-            if (DEFAULT_MIN != mProgress) {
-                float baselineY = mCenterY - mBarHeight - (mTagMetrics.descent + mTagMetrics.ascent)/2
-                        - mDefaultPadding;
-                mProgressPaint.setColor(mReachedColor);
-                canvas.drawText(mReachedTag, getPaddingLeft() + mReachedPosition / 2,
-                        baselineY, mProgressPaint);
-            }
-        }
+        float baselineX = getPaddingLeft() + mReachedPosition;
+        float baselineY = mCenterY - mBarHeight - mTagPadding
+                - (mTagMetrics.descent + mTagMetrics.ascent)/2;
+        float tagWidth = mTagPaint.measureText(String.valueOf(mProgress));
+        /**
+         * Draw tag background
+         */
+        RectF bgRectf = new RectF(baselineX - tagWidth/2 - mTagPadding,
+                                    baselineY + mTagMetrics.top,
+                                    baselineX + tagWidth/2 + mTagPadding,
+                                    baselineY + mTagMetrics.bottom);
+        mTagPaint.setColor(mTagBackground);
+        canvas.drawRoundRect(bgRectf, tagWidth/2, tagWidth/2, mTagPaint);
+        /**
+         * Draw current progress
+         */
+        mTagPaint.setColor(mTagColor);
+        canvas.drawText(String.valueOf(mProgress), baselineX,
+                baselineY, mTagPaint);
     }
 
     public void setProgress(int progress) {
@@ -216,4 +228,15 @@ public class LineProgressBar extends View{
             invalidate();
         }
     }
+
+    public void setProgressMax(int max) {
+        this.mProgressMax = max;
+        invalidate();
+    }
+
+    public void setProgressMin(int min) {
+        this.mProgressMin = min;
+        invalidate();
+    }
+
 }

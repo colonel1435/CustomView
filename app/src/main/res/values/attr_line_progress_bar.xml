@@ -9,6 +9,8 @@
         <attr name="line_progress_reached_color" format="color"/>
         <attr name="line_progress_height" format="dimension"/>
         <attr name="line_progress_tag_size" format="dimension"/>
+        <attr name="line_progress_tag_background" format="integer|reference"/>
+        <attr name="line_progress_tag_color" format="integer|reference"/>
         <attr name="line_progress_text_size" format="dimension"/>
         <attr name="line_progress_text_color" format="color"/>
         <attr name="line_progress_text_offset" format="dimension"/>

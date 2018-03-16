@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.zero.customview.R;
@@ -22,7 +21,7 @@ import com.zero.customview.utils.DisplayUtils;
  * @date : 2018/3/15 13:47
  */
 
-public class LineProgressBar extends View{
+public class LineProgressBar extends View {
     private static final String TAG = LineProgressBar.class.getSimpleName()+"@wumin";
     private static final int DEFAULT_MIN = 0;
     private static final int DEFAULT_MAX = 100;
@@ -123,7 +122,7 @@ public class LineProgressBar extends View{
         mProgress = 0;
         mDefaultPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
         mTagPadding = mDefaultPadding / 2;
-        setPadding(mDefaultPadding*2, mDefaultPadding, mDefaultPadding*2, mDefaultPadding);
+        setPadding(mDefaultPadding*2, 0, mDefaultPadding*2, 0);
     }
 
     private int measureSize(int measureSpec, int defaultVal) {
@@ -135,7 +134,7 @@ public class LineProgressBar extends View{
         if (specMode == MeasureSpec.EXACTLY) {
             result = specSize;
         } else {
-            result = defaultSize + getPaddingLeft() + getPaddingRight();
+            result = defaultSize;
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
             }
@@ -155,7 +154,7 @@ public class LineProgressBar extends View{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int defaultWidth = DEFAULT_WIDTH;
-        int defaultHeight = (int)(DEFAULT_HEIGHT
+        int defaultHeight = (int)(mBarHeight
                 + (mProgressMetrics.bottom - mProgressMetrics.top)
                 + (mTagMetrics.bottom - mTagMetrics.top));
         setMeasuredDimension(measureSize(widthMeasureSpec, defaultWidth),

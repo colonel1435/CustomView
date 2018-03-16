@@ -154,7 +154,7 @@ public class LineProgressBar extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int defaultWidth = DEFAULT_WIDTH;
-        int defaultHeight = (int)(mBarHeight
+        int defaultHeight = (int)(mBarHeight + mTagPadding
                 + (mProgressMetrics.bottom - mProgressMetrics.top)
                 + (mTagMetrics.bottom - mTagMetrics.top));
         setMeasuredDimension(measureSize(widthMeasureSpec, defaultWidth),

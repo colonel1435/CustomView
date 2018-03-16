@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RadarScanView">
+        <attr name="radar_line_color" format="integer|reference"/>
+        <attr name="radar_line_size" format="float|reference"/>
+        <attr name="radar_dot_color" format="integer|reference"/>
+        <attr name="radar_dot_size" format="float|reference"/>
+        <attr name="radar_color" format="integer|reference"/>
+    </declare-styleable>
+</resources>

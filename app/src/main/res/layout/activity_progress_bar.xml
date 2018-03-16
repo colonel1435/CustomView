@@ -28,26 +28,43 @@
         wumin:line_progress_unreached_color="@color/colorAccent"
         wumin:line_progress_tag_background="@color/colorLightBlue"/>
 
-    <com.zero.customview.view.RoundProgressBar
-        android:id="@+id/round_progress_bar"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:padding="10dp"
-        wumin:radius="200dp"
-        wumin:progress_text_color="@color/colorCadeBlue"
-        wumin:progress_reached_color="@color/colorCadeBlue"
-        wumin:progress_reached_height="5dp"
-        wumin:progress_unreached_height="5dp"/>
-    <com.zero.customview.view.MultilevelProgressBar
-        android:id="@+id/multilevel_progress_bar"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="20dp"
-        wumin:circleWidth="15dp"
-        wumin:firstColor="@color/colorCadeBlue"
-        wumin:secondColor="@color/colorLightRed"
-        wumin:speed="30" />
+        android:background="@color/colorGrey"
+        android:gravity="center">
+        <com.zero.customview.view.RadarScanView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            wumin:radar_color="@color/colorPrimary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.zero.customview.view.RoundProgressBar
+            android:id="@+id/round_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            wumin:radius="200dp"
+            wumin:progress_text_color="@color/colorCadeBlue"
+            wumin:progress_reached_color="@color/colorCadeBlue"
+            wumin:progress_reached_height="5dp"
+            wumin:progress_unreached_height="5dp"/>
+        <com.zero.customview.view.MultilevelProgressBar
+            android:id="@+id/multilevel_progress_bar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="20dp"
+            wumin:circleWidth="15dp"
+            wumin:firstColor="@color/colorCadeBlue"
+            wumin:secondColor="@color/colorLightRed"
+            wumin:speed="30" />
+
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/fl_progressbar"

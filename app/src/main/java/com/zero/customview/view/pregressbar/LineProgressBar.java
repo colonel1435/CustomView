@@ -139,7 +139,7 @@ public class LineProgressBar extends View{
         super.onSizeChanged(w, h, oldw, oldh);
         mCenterX = w / 2 + getPaddingLeft() - getPaddingRight();
         mCenterY = h / 2 + getPaddingTop() - getPaddingBottom();
-        mSpace = (w - getPaddingLeft() - getPaddingRight()) / (mProgressMax - mProgressMin);
+        mSpace = (float) (w - getPaddingLeft() - getPaddingRight()) / (mProgressMax - mProgressMin);
     }
 
     @Override
@@ -193,7 +193,8 @@ public class LineProgressBar extends View{
         /**
          * Draw max progress
          */
-        canvas.drawText(String.valueOf(mProgressMax), getWidth()-getPaddingRight()
+        canvas.drawText(String.valueOf(mProgressMax), getPaddingLeft()
+                + mSpace*(mProgressMax - mProgressMin)
                 - mProgressPaint.measureText(String.valueOf(mProgressMax))/2, baseY, mProgressPaint);
     }
 

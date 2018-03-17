@@ -6,5 +6,7 @@
         <attr name="radar_dot_color" format="integer|reference"/>
         <attr name="radar_dot_size" format="float|reference"/>
         <attr name="radar_color" format="integer|reference"/>
+        <attr name="radar_auto_point" format="boolean"/>
+        <attr name="radar_scan_speed" format="integer"/>
     </declare-styleable>
 </resources>

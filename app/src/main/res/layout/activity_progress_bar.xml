@@ -36,7 +36,8 @@
         <com.zero.customview.view.RadarScanView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            wumin:radar_color="@color/colorPrimary"/>
+            wumin:radar_color="@color/colorPrimary"
+            wumin:radar_auto_point="true"/>
     </LinearLayout>
 
     <LinearLayout

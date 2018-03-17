@@ -35,9 +35,11 @@ public class RadarScanView extends View {
     private static final int DEFAULT_LINE_SIZE = 1;
     private static final int DEFAULT_CIRCLE_MAX = 4;
     private static final int DEFAULT_DOT_SIZE = 4;
-    private static final int CROSSLINE_ANGLE = 45;
+    private static final int DEFAULT_CROSSLINE_ANGLE = 45;
+    private static final int DEFAULT_CIRCLE_ANGLE = 360;
     private static final int DEFAULT_PADDING = 8;
     public static final int REFRESH_DELAY_MILLIS = 100;
+    public static final int DEFAULT_SCAN_SPEED = 8;
 
     private Context mContext;
     private int mLineColor;
@@ -58,10 +60,11 @@ public class RadarScanView extends View {
     private Paint mRadarPaint;
     private Paint mPointPaint;
     private Shader scanShader;
-    private Matrix matrix = new Matrix();
-    private int scanSpeed = 8;
+    private Matrix matrix;
+    private int mScanSpeed;
     private int scanAngle = 0;
     private List<Point> mPoints;
+    private boolean mAutoPoint;
 
     public RadarScanView(Context context) {
         this(context, null);
@@ -82,6 +85,8 @@ public class RadarScanView extends View {
                     Color.WHITE);
             mRadarColor = ta.getColor(R.styleable.RadarScanView_radar_color,
                     Color.BLUE);
+            mAutoPoint = ta.getBoolean(R.styleable.RadarScanView_radar_auto_point, false);
+            mScanSpeed = ta.getInt(R.styleable.RadarScanView_radar_scan_speed, DEFAULT_SCAN_SPEED);
             initViews();
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,6 +115,7 @@ public class RadarScanView extends View {
 
         isScanning = true;
         mPadding = DisplayUtils.dip2px(mContext, DEFAULT_PADDING);
+        matrix = new Matrix();
 
         mDotSize = DisplayUtils.dip2px(mContext, DEFAULT_DOT_SIZE);
         mPoints = new ArrayList<>();
@@ -179,7 +185,7 @@ public class RadarScanView extends View {
          */
         double angle;
         for (int i = 0; i < DEFAULT_CIRCLE_MAX; i++) {
-            angle = (2 * Math.PI)/360 * (i * CROSSLINE_ANGLE);
+            angle = (2 * Math.PI)/DEFAULT_CIRCLE_ANGLE * (i * DEFAULT_CROSSLINE_ANGLE);
             canvas.drawLine((float) (- mRadius * Math.cos(angle)),
                             (float) (mRadius * Math.sin(angle)),
                             (float) (mRadius * Math.cos(angle)),
@@ -202,7 +208,6 @@ public class RadarScanView extends View {
     private void drawPoint(Canvas canvas) {
         if (mPoints.size() > 0) {
             for (Point point : mPoints) {
-                Log.d("wumin", "drawPoint: x -> " + point.x + " y-> " + point.y);
                 mPointPaint.setColor(Color.RED);
                 canvas.drawCircle(point.x, point.y, mDotSize, mPointPaint);
             }
@@ -212,9 +217,11 @@ public class RadarScanView extends View {
     private Runnable run = new Runnable() {
         @Override
         public void run() {
-            addPoint(true);
-            scanAngle = (scanAngle + scanSpeed) % 360;
-            matrix.postRotate(scanSpeed, centerX, centerY);
+            if (mAutoPoint) {
+                addPoint(true);
+            }
+            scanAngle = (scanAngle + mScanSpeed) % 360;
+            matrix.postRotate(mScanSpeed, centerX, centerY);
             invalidate();
             postDelayed(run, REFRESH_DELAY_MILLIS);
         }
@@ -222,15 +229,14 @@ public class RadarScanView extends View {
 
     public void addPoint(boolean add) {
         if (add) {
+            /**
+             * Create random point in radar circle with random radius & random angle
+             */
             Random random = new Random();
-            float x = random.nextInt((int)(mRadius*Math.sin(Math.PI/4)));
-            float y = random.nextInt((int)(mRadius*Math.sin(Math.PI/4)));
-            Point point;
-            if (random.nextBoolean()) {
-                point = new Point((int)(centerX - x), (int)(centerY - y));
-            } else {
-                point = new Point((int)(centerX + x), (int)(centerY + y));
-            }
+            float radius = random.nextInt((int)(mRadius - mDotSize/2));
+            double angle = (2 * Math.PI / DEFAULT_CIRCLE_ANGLE) * random.nextInt(DEFAULT_CIRCLE_ANGLE);
+            Point point = new Point(centerX + (int)(radius * Math.cos(angle)),
+                                    centerY + (int)(radius * Math.sin(angle)));
             mPoints.add(point);
             invalidate();
         }
